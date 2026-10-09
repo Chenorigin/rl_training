@@ -1,0 +1,45 @@
+{
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-06_22-06-56_stair_resume/model_156300.pt",
+  "model": "/home/ubuntu/\u684c\u9762/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+  "terrain": "custom",
+  "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/all_terrain.xml",
+  "terrain_parameters": {
+    "width": [
+      4.0
+    ],
+    "friction": [
+      1.0,
+      0.01,
+      0.01
+    ],
+    "spawn_xy": [
+      -1.0,
+      0.0
+    ],
+    "spawn_yaw_deg": [
+      0.0
+    ],
+    "goal_x": [
+      38.0
+    ]
+  },
+  "goal_x": 38.0,
+  "course_width": 4.0,
+  "crossed_finish": false,
+  "inside_course": true,
+  "cleared_terrain": false,
+  "cleared_stairs": false,
+  "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked",
+  "steps_executed": 50,
+  "physics_enabled": true,
+  "actor_input_dim": 244,
+  "critic_used": false,
+  "start_x": -1.0,
+  "final_x": -0.6095783940516697,
+  "final_z": 0.5677629925846981,
+  "max_x": -0.6095783940516697,
+  "forward_distance": 0.3904216059483303,
+  "fell": false,
+  "observation_finite": true,
+  "action_finite": true
+}

@@ -1,0 +1,109 @@
+--- /home/ubuntu/cyq_shixi_projects/rl_training/.scratch/gait_refinement_20261002/baseline/stair_ascent.py	2026-10-02 00:07:38.505190368 +0800
++++ /home/ubuntu/cyq_shixi_projects/rl_training/source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_ascent.py	2026-10-02 15:53:48.373758384 +0800
+@@ -8,6 +8,7 @@
+ import torch
+ 
+ from isaaclab.utils.math import quat_apply, yaw_quat
++from .gait_refinement import TUNING
+ 
+ 
+ def _new_state(env):
+@@ -77,6 +78,11 @@
+         "rear_same_tread_paid": torch.full((n,), -1, device=device, dtype=torch.long),
+         "front_same_tread_event": flags(),
+         "rear_same_tread_event": flags(),
++        "same_tread_time": zeros(2),
++        "same_tread_riser": torch.full((n, 2), -1, device=device, dtype=torch.long),
++        "same_tread_dwell": zeros(2),
++        "same_tread_events_total": zeros(2),
++        "same_tread_seconds_total": zeros(2),
+     }
+ 
+ 
+@@ -87,7 +93,7 @@
+         if key in {"radius"}:
+             value[reset] = float("nan")
+         elif key in {"front_expected", "rear_expected", "rear_target_index", "front_lift_lead",
+-                     "front_same_tread_paid", "rear_same_tread_paid"}:
++                     "front_same_tread_paid", "rear_same_tread_paid", "same_tread_riser"}:
+             value[reset] = -1
+         else:
+             value[reset] = 0
+@@ -103,6 +109,28 @@
+     )
+ 
+ 
++def _visible_higher_riser(context, scanner_xy, heading, last_xy, last_heading, last_z):
++    """Check all visible risers on the recorded flight, not only the nearest."""
++    if "ascending_edges_x" in context:
++        x = context["ascending_edges_x"][None].expand(scanner_xy.shape[0], -1)
++        valid = context["ascending_edges_valid"]
++        upper = context["ascending_edges_upper_z"]
++    else:
++        # Compatibility with minimal scan-context fixtures/older callers.
++        x = context["edge_x"][:, None]
++        valid = (context["up_gate"] > 0)[:, None]
++        upper = context["upper_z"][:, None]
++    edges = scanner_xy[:, None] + heading[:, None] * x[..., None]
++    delta = edges - last_xy[:, None]
++    along = (delta * last_heading[:, None]).sum(dim=-1)
++    lateral = (delta[..., 0] * last_heading[:, None, 1]
++               - delta[..., 1] * last_heading[:, None, 0]).abs()
++    rise = upper - last_z[:, None]
++    aligned = (heading * last_heading).sum(dim=1) > 0.8
++    return (valid & (along >= 0.15) & (along <= 0.50) & (lateral <= 0.20)
++            & (rise >= 0.06) & (rise <= 0.30) & aligned[:, None]).any(dim=1)
++
++
+ def ascent_state(env, asset_cfg, sensor_cfg, contact_sensor_cfg, command_name="base_velocity"):
+     """Advance independent front and rear one-wheel-per-riser sequences once per step."""
+     step = int(env.common_step_counter)
+@@ -417,6 +445,12 @@
+         & (front_last_x > 0.06).all(dim=1)
+         & ((wheel[:, :2, 2] - front_last_z[:, None] - state["radius"][:, :2]).abs() <= 0.05).all(dim=1)
+     )
++    # A platform is allowed to carry both legs. Require evidence of another
++    # higher riser on this flight before labelling the pair a style violation.
++    front_intermediate = _visible_higher_riser(
++        context, scanner.data.pos_w[:, :2], heading, front_last_xy, front_last_heading, front_last_z)
++    commanded_forward = context["command_x"] > 0.1
++    front_pair &= front_intermediate & commanded_forward
+     state["front_same_tread_event"] = front_pair & (state["front_same_tread_paid"] != front_last)
+     state["front_same_tread_paid"] = torch.where(
+         state["front_same_tread_event"], front_last, state["front_same_tread_paid"],
+@@ -431,10 +465,35 @@
+         & (rear_last_x > 0.06).all(dim=1)
+         & ((wheel[:, 2:, 2] - rear_last_z[:, None] - state["radius"][:, 2:]).abs() <= 0.05).all(dim=1)
+     )
++    # Front scan may already be flat on the top landing while rear wheels
++    # still have recorded intermediate risers to cross.
++    next_rear = state["rear_count"].clamp_max(63)
++    queued_higher = ((state["rear_count"] < state["front_count"])
++                     & (state["front_history_target_z"][row, next_rear] > rear_last_z + 0.06))
++    visible_higher = _visible_higher_riser(
++        context, scanner.data.pos_w[:, :2], heading, rear_last_xy, rear_last_heading, rear_last_z)
++    rear_intermediate = queued_higher | visible_higher
++    rear_pair &= rear_intermediate & commanded_forward
+     state["rear_same_tread_event"] = rear_pair & (state["rear_same_tread_paid"] != rear_last)
+     state["rear_same_tread_paid"] = torch.where(
+         state["rear_same_tread_event"], rear_last, state["rear_same_tread_paid"],
+     )
++    pairs = torch.stack((front_pair, rear_pair), dim=1)
++    risers = torch.stack((front_last, rear_last), dim=1)
++    new_riser = risers != state["same_tread_riser"]
++    state["same_tread_time"][new_riser] = 0.0
++    state["same_tread_riser"] = risers
++    # A command pause, turn, or temporary scan loss only closes the gate;
++    # it cannot renew the already consumed grace on this physical riser.
++    # The grace budget belongs to the tread, not every contact episode: briefly
++    # lifting/replacing a wheel on that same tread cannot renew the free time.
++    state["same_tread_time"] += pairs.float() * env.step_dt
++    # Permit a brief transfer of support, then charge time rather than only
++    # a one-shot event. The rate is bounded per axle and stops when a leg leaves.
++    state["same_tread_dwell"] = (pairs & (state["same_tread_time"] > TUNING["same_tread_grace"])).float()
++    state["same_tread_events_total"] += torch.stack(
++        (state["front_same_tread_event"], state["rear_same_tread_event"]), dim=1).float()
++    state["same_tread_seconds_total"] += state["same_tread_dwell"] * env.step_dt
+ 
+     env._m20_ascent_cache = {"step": step, "state": state}
+     return state

@@ -1,0 +1,4 @@
+Scope: add native all_terrain.xml and usage docs only. Preserve loader, deployment control, training and all previous XMLs.
+Acceptance: real loader compiles with pinned M20 model; robot masses and joint/actuator order unchanged; one static floor; every terrain collision group 0; independent representative ray heights and yaw-aligned 187-point scan agree; finite actor 244->16; bounded physical entry smoke executes; render actual geoms and inspect images.
+No claim of full-course learned-policy success. Render is geometry preview, not a physical policy result. Negative control: standalone floor sampled at section sites must fail raised-surface checks.
+Budget: serial CPU one thread, torch imports + model <2GiB conservative; no GPU; prior docs/mujoco_terrains/checks.json same CPU/OSMesa path. Small XML/log/PNG/NPZ <10MiB; memory available101080MiB, free disk69GiB, load2.46. Bounded smoke50 policy steps; subprocess timeout90s.

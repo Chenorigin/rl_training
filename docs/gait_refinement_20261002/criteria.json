@@ -1,0 +1,35 @@
+{
+  "scope": "Reward wiring and numerical checks; gait improvement requires a NEW trained checkpoint",
+  "baseline_checkpoint": ".scratch/gait_refinement_20261002/baseline/model_31800.pt",
+  "cases": [
+    "ascent",
+    "descent",
+    "turn_left",
+    "turn_right",
+    "flat"
+  ],
+  "steps": 750,
+  "stair_height_m": 0.15,
+  "tread_depth_m": 0.3,
+  "step_count": 5,
+  "min_extension_m": 0.35,
+  "command_translation": 0.5,
+  "command_yaw": 0.6,
+  "comparison": "fixed checkpoint/scene/PD/actor ABI. Baseline collection is exploratory; compare future trained policies using this frozen criteria.",
+  "physical_acceptance": "no falls, retain stair crossing and flat tracking; alternation improves with nonzero sample count, turn reach/clearance reduces without losing yaw tracking; unsupported folding reported separately",
+  "numerical_acceptance": [
+    "terminal platform cost zero",
+    "same tread persists after grace",
+    "rear gating survives front platform",
+    "normal/swing/up/invalid compression zero",
+    "deep supported descent folding positive finite",
+    "long flight reward bounded",
+    "turn rewards exclude traversal",
+    "pre_teacher byte unchanged"
+  ],
+  "limitations": [
+    "single scene does not establish all terrain robustness",
+    "Isaac smoke establishes runtime wiring only",
+    "no training or physical robot run"
+  ]
+}

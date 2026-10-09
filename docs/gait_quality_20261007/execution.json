@@ -1,0 +1,47 @@
+[
+  {
+    "label": "latest",
+    "case": "up30",
+    "rc": 0
+  },
+  {
+    "label": "latest",
+    "case": "up20",
+    "rc": 0
+  },
+  {
+    "label": "latest",
+    "case": "down30",
+    "rc": 0
+  },
+  {
+    "label": "initial",
+    "case": "up30",
+    "rc": 0
+  },
+  {
+    "label": "initial",
+    "case": "up20",
+    "rc": 0
+  },
+  {
+    "label": "initial",
+    "case": "down30",
+    "rc": 0
+  },
+  {
+    "label": "intermediate",
+    "case": "up30",
+    "rc": 0
+  },
+  {
+    "label": "intermediate",
+    "case": "up20",
+    "rc": 0
+  },
+  {
+    "label": "intermediate",
+    "case": "down30",
+    "rc": 0
+  }
+]

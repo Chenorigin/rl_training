@@ -1,0 +1,132 @@
+def descent_rear_forward_cost(env, asset_cfg, hip_cfg, knee_cfg, sensor_cfg, contact_sensor_cfg):
+    """Penalize excess rear forward reach while actually bearing vertical load."""
+    return _context(env,asset_cfg,hip_cfg,knee_cfg,sensor_cfg,contact_sensor_cfg)["rear_forward"].mean(-1)
+
+
+def ascent_front_body_clearance_cost(env, asset_cfg, hip_cfg, knee_cfg, sensor_cfg, contact_sensor_cfg):
+    """Map-based front belly clearance; invalid cells cannot fabricate a cost."""
+    return _context(env,asset_cfg,hip_cfg,knee_cfg,sensor_cfg,contact_sensor_cfg)["body_gap"]
+
+
+def _update_pose_stats(env,up,down,front_a,front_load,front_air,loaded_cost,air_cost,
+                       rear_b,rear_g,rear_load,rear_cost,gap,gap_valid,load,ground_valid):
+    names = ("front_loaded_samples","front_loaded_a_sum","front_loaded_bad",
+             "front_swing_samples","front_swing_a_sum","front_swing_bad",
+             "rear_loaded_samples","rear_b_sum","rear_g_sum","rear_bad",
+             "rear_entry_samples","rear_entry_b_sum","rear_entry_g_sum")
+    state = getattr(env,"_m20_pose_stats",None)
+    if state is None:
+        state = {name:torch.zeros(env.num_envs,2,device=env.device) for name in names}
+        state.update({name:torch.zeros(env.num_envs,device=env.device) for name in
+                      ("gap_samples","gap_sum","gap_bad","up_steps","down_steps","loaded_without_local_map")})
+        state["front_loaded_a_min"] = torch.full((env.num_envs,2),torch.pi,device=env.device)
+        state["front_swing_a_min"] = torch.full((env.num_envs,2),torch.pi,device=env.device)
+        state["rear_b_max"] = torch.full((env.num_envs,2),-torch.pi,device=env.device)
+        state["rear_g_max"] = torch.full((env.num_envs,2),-torch.pi,device=env.device)
+        env._m20_pose_stats = state
+    reset = env.episode_length_buf <= 1
+    for key,value in state.items():
+        value[reset] = torch.pi if key.endswith("_min") else (-torch.pi if key.endswith("_max") else 0)
+    state["up_steps"] += up; state["down_steps"] += down
+    for phase,mask,cost in (("loaded",front_load,loaded_cost),("swing",front_air,air_cost)):
+        state[f"front_{phase}_samples"] += mask
+        state[f"front_{phase}_a_sum"] += front_a*mask
+        state[f"front_{phase}_bad"] += (cost>0)&mask
+        state[f"front_{phase}_a_min"] = torch.minimum(state[f"front_{phase}_a_min"],torch.where(mask,front_a,torch.pi))
+    state["rear_loaded_samples"] += rear_load
+    state["rear_b_sum"] += rear_b*rear_load; state["rear_g_sum"] += rear_g*rear_load
+    state["rear_bad"] += (rear_cost>0)&rear_load
+    state["rear_b_max"] = torch.maximum(state["rear_b_max"],torch.where(rear_load,rear_b,-torch.pi))
+    state["rear_g_max"] = torch.maximum(state["rear_g_max"],torch.where(rear_load,rear_g,-torch.pi))
+    descent = getattr(env,"_m20_stair_step_state",None)
+    entry = torch.zeros(env.num_envs,dtype=torch.bool,device=env.device)
+    if descent is not None:
+        # Mixed support: at least one front wheel has transferred down but rear
+        # support has not completed, rather than time since first seeing stairs.
+        entry = descent["active"] & ~descent["up"] & descent["front_reached"].any(-1) & ~descent["rear_support_paid"].all(-1)
+    mask = rear_load & entry[:,None]
+    state["rear_entry_samples"] += mask
+    state["rear_entry_b_sum"] += rear_b*mask; state["rear_entry_g_sum"] += rear_g*mask
+    state["gap_samples"] += gap_valid
+    state["gap_sum"] += torch.where(gap_valid,gap,0)
+    state["gap_bad"] += gap_valid&(gap<TUNING["body_gap_target"])
+    state["loaded_without_local_map"] += (load&~ground_valid&(up|down)[:,None]).sum(-1)
+
+
+def gait_quality_metrics(env,env_ids):
+    result = _legacy_gait_quality_metrics(env,env_ids)
+    state = getattr(env,"_m20_pose_stats",None)
+    if state is None:
+        return result
+    sums = {key:value[env_ids].sum(0) for key,value in state.items()}
+    def average(total,count):
+        return torch.rad2deg(total.sum()/count.sum().clamp_min(1))
+    for phase in ("loaded","swing"):
+        count = sums[f"front_{phase}_samples"]
+        result[f"front_{phase}_a_mean_deg"] = average(sums[f"front_{phase}_a_sum"],count)
+        result[f"front_{phase}_a_low_fraction"] = sums[f"front_{phase}_bad"].sum()/count.sum().clamp_min(1)
+        observed = state[f"front_{phase}_a_min"][env_ids]
+        result[f"front_{phase}_a_min_deg"] = torch.rad2deg(observed.amin()) if observed.numel() and count.sum()>0 else count.new_zeros(())
+        for leg,i in (("fl",0),("fr",1)):
+            result[f"{leg}_{phase}_samples"] = count[i]
+            result[f"{leg}_{phase}_a_mean_deg"] = torch.rad2deg(sums[f"front_{phase}_a_sum"][i]/count[i].clamp_min(1))
+            result[f"{leg}_{phase}_a_low_fraction"] = sums[f"front_{phase}_bad"][i]/count[i].clamp_min(1)
+    rear = sums["rear_loaded_samples"]
+    result["rear_forward_samples"] = rear.sum()
+    result["rear_forward_excess_fraction"] = sums["rear_bad"].sum()/rear.sum().clamp_min(1)
+    result["rear_body_b_mean_deg"] = average(sums["rear_b_sum"],rear)
+    result["rear_gravity_g_mean_deg"] = average(sums["rear_g_sum"],rear)
+    for coord in ("b","g"):
+        peak = state[f"rear_{coord}_max"][env_ids]
+        result[f"rear_{coord}_max_deg"] = torch.rad2deg(peak.amax()) if peak.numel() and rear.sum()>0 else rear.new_zeros(())
+    for leg,i in (("hl",0),("hr",1)):
+        result[f"{leg}_loaded_samples"] = rear[i]
+        result[f"{leg}_body_b_mean_deg"] = torch.rad2deg(sums["rear_b_sum"][i]/rear[i].clamp_min(1))
+        result[f"{leg}_gravity_g_mean_deg"] = torch.rad2deg(sums["rear_g_sum"][i]/rear[i].clamp_min(1))
+        result[f"{leg}_forward_excess_fraction"] = sums["rear_bad"][i]/rear[i].clamp_min(1)
+    entry = sums["rear_entry_samples"]
+    result["rear_entry_samples"] = entry.sum()
+    result["rear_entry_b_mean_deg"] = average(sums["rear_entry_b_sum"],entry)
+    result["rear_entry_g_mean_deg"] = average(sums["rear_entry_g_sum"],entry)
+    result["front_body_gap_samples"] = sums["gap_samples"]
+    result["front_body_gap_mean_m"] = sums["gap_sum"]/sums["gap_samples"].clamp_min(1)
+    result["front_body_gap_low_fraction"] = sums["gap_bad"]/sums["gap_samples"].clamp_min(1)
+    result["loaded_without_local_map_samples"] = sums["loaded_without_local_map"]
+    return result
+
+
+def stair_step_completion_metrics(env,env_ids):
+    result = _legacy_step_completion_metrics(env,env_ids)
+    state = getattr(env,"_m20_ascent_state",None)
+    if state is None:
+        return result
+    ids = torch.arange(env.num_envs,device=env.device)[env_ids]
+    known = torch.arange(64,device=env.device)[None] < state["map_count"][ids,None]
+    intermediate = state["map_intermediate"][ids]&known
+    result["registered_risers"] = state["map_count"][ids].float().mean()
+    for axle,name in enumerate(("front","rear")):
+        paid = state["map_paid"][ids,:,axle]&known
+        strict = state["map_correct"][ids,:,axle]&~state["map_duplicate_paid"][ids,:,axle]&intermediate
+        result[f"up_{name}_registered_intermediate_risers"] = intermediate.sum().float()
+        result[f"up_{name}_landing_coverage"] = paid.sum().float()/known.sum().clamp_min(1)
+        result[f"up_{name}_strict_coverage"] = strict.sum().float()/intermediate.sum().clamp_min(1)
+        result[f"up_{name}_physical_landings"] = state["physical_total"][ids,axle].float().mean()
+        result[f"up_{name}_skipped_riser_events"] = state["skip_total"][ids,axle].float().mean()
+        result[f"up_{name}_unsafe_events"] = state["unsafe_total"][ids,axle].float().mean()
+        # Longest surviving strict run. A later duplicate invalidates an earlier
+        # tread; future detected-but-unlanded treads contribute no success.
+        order = (state["map_flight"][ids].float()*1e6+state["map_z"][ids]).argsort(-1,stable=True)
+        good = strict.gather(1,order)
+        flight = state["map_flight"][ids].gather(1,order)
+        group_start = torch.ones_like(good); group_start[:,1:] = flight[:,1:]!=flight[:,:-1]
+        total = good.long().cumsum(-1)
+        restart = torch.where(~good,total,torch.where(group_start,total-good.long(),0)).cummax(-1).values
+        runs = (total-restart).amax(-1)
+        result[f"up_{name}_longest_strict_run"] = runs.float().mean()
+        result[f"up_{name}_six_step_strict_fraction"] = (runs>=6).float().mean()
+        for side,leg in enumerate((("fl","fr"),("hl","hr"))[axle]):
+            result[f"{leg}_stable_treads"] = (state["map_landed"][ids,:,axle*2+side]&known).sum(-1).float().mean()
+    result["up_rear_lift_credit"] = state["rear_lift_credit"][ids].mean()
+    return result
+
+

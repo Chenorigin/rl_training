@@ -1,0 +1,6 @@
+# Independent review receipt
+
+Self review: CPU attribution/counterexample tests, existing regressions, recorded-pose posture attribution, runtime name bindings, final exact-source Isaac100step inference smoke16env. No training or weight saving.
+Independent reviewer: /root/reward_review (same GPT/Codex family; other-family unavailable). Actual three CPU suites and .scratch/gait_safety_20261007/reviewer_extra.py executed, pyflakes passed. Reviewed reward bindings, rate/event units, short stable delayed same-tread, mirror, top platform and rotated new flight, strict metric and progress function. Caught introduced undefined new_flight reference in progress; fixed and directly covered by CPU calls. Rechecked final removal of body-heading exemption; forward command plus turn45 cannot avoid stored tread cost, pure yaw/reverse still close style gate without clearing history.
+
+Outcome: implementation/wiring checks pass. New-policy gait performance not measured. Independent reviewer confirms no new observed startup blocker, not a proof of optimal style or hardware safety. Bounds:64recorded risers, map clearance proxy, no explicit skip-riser cost, strictmetric local not whole-flight, training30cm vs test20cm tread.

@@ -1,0 +1,6 @@
+{
+  "stair_result_fields": 26,
+  "gait_result_fields": 52,
+  "all_result_values_identical": true,
+  "environment_config_changes_only_import_bindings": true
+}

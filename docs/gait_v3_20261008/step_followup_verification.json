@@ -1,0 +1,35 @@
+{
+  "previous_source_sha256": "5b089ff048e9847b9141423430ce43a9430d5ff2ae287eba6f4309f3c8d8d7b1",
+  "canonical_source_sha256": "cb4465a2f342c3154725a20a838de35eb12fd5c20f577bf344b40916e2256785",
+  "changed_production_functions": [
+    "_new_state",
+    "ascent_state",
+    "stair_step_completion_metrics"
+  ],
+  "other_production_AST_unchanged": true,
+  "frozen_files_unchanged": {
+    "deploy/deploy_mujoco/deploy_mujoco.py": true,
+    "deploy/deploy_mujoco/terrain_loader.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/pre_teacher_env_cfg.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/commands.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/stair_teacher_ppo_cfg.py": true
+  },
+  "env_cfg_sha256": "a16d22f2bc2ad466aa51f555d5381ec40bcdd1a27268d640162c29ff1e71fd33",
+  "cpu_checks": "passed",
+  "pyflakes": "passed",
+  "independent_review_family": "Codex/GPT same family, heterogeneous family unavailable",
+  "independent_review_source_sha256": "cb4465a2f342c3154725a20a838de35eb12fd5c20f577bf344b40916e2256785",
+  "isaac_smoke_source_sha256": "cb4465a2f342c3154725a20a838de35eb12fd5c20f577bf344b40916e2256785",
+  "isaac_smoke_steps": 200,
+  "isaac_smoke_envs": 16,
+  "isaac_smoke_finite": true,
+  "isaac_smoke_observed_risers": 7,
+  "isaac_gpu_headroom_MB": 42029,
+  "isaac_host_available_MB": 102668,
+  "smoke_budget": "16env200steps,180s timeout; no optimizer",
+  "training_started": false,
+  "trained_behavior_verified": false,
+  "independent_report": "step_followup_review.md",
+  "front_skip_then_same_tread_chain": "FL1 FR3 FL3 passed, CPU only; production source unchanged",
+  "cpu_check_script_sha256": "bc22c3af57224bd7387218691d66d87f13fc541c2b8560c2e7f79f9c70a9b1d1"
+}

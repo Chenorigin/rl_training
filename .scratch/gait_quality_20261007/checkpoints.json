@@ -1,0 +1,17 @@
+{
+  "initial": {
+    "source": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-02_00-12-17/model_80000.pt",
+    "copy": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/gait_quality_20261007/initial.pt",
+    "sha256": "e8848b00613283789e09fa78d0e39a83b49bd26b799e28b3dd3e86372f384674"
+  },
+  "intermediate": {
+    "source": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-03_15-12-45_gait_resume/model_149999.pt",
+    "copy": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/gait_quality_20261007/intermediate.pt",
+    "sha256": "002ebb3c003a3924fe20d4bf0d18781a0fce60c050947c54c6cedb2e35828319"
+  },
+  "latest": {
+    "source": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-06_22-06-56_stair_resume/model_196600.pt",
+    "copy": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/gait_quality_20261007/latest.pt",
+    "sha256": "765228e6499dd8af9fd3eb7d41d8289072b4478ad20e19ce95b23ab8f7862fe8"
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/latest_gait_20261008/latest.pt",
+  "model": "/home/ubuntu/\u684c\u9762/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+  "terrain": "descent",
+  "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_descent.xml",
+  "terrain_parameters": {
+    "width": [
+      4.0
+    ],
+    "friction": [
+      1.0,
+      0.01,
+      0.01
+    ],
+    "spawn_xy": [
+      -1.0,
+      0.0
+    ],
+    "spawn_yaw_deg": [
+      0.0
+    ],
+    "start_x": [
+      0.5
+    ],
+    "step_height": [
+      0.15
+    ],
+    "tread_depth": [
+      0.3
+    ],
+    "step_count": [
+      8.0
+    ],
+    "platform_length": [
+      10.0
+    ]
+  },
+  "goal_x": 2.9,
+  "course_width": 4.0,
+  "crossed_finish": true,
+  "inside_course": true,
+  "cleared_terrain": true,
+  "cleared_stairs": true,
+  "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked",
+  "steps_executed": 774,
+  "final_mode": "policy",
+  "transitions": [
+    {
+      "time": 0.0,
+      "mode": "prone"
+    },
+    {
+      "time": 0.26,
+      "mode": "standing"
+    },
+    {
+      "time": 5.28,
+      "mode": "ready"
+    },
+    {
+      "time": 5.82,
+      "mode": "policy"
+    }
+  ],
+  "max_x": 3.3380153828274794,
+  "final_x": 3.3380153828274794,
+  "final_z": 0.5727207742543676,
+  "fell_in_policy": false,
+  "critic_used": false,
+  "checkpoint_original": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-07_23-47-00_gait_safety_v2/model_22000.pt",
+  "checkpoint_sha256": "8f4c98797361f37c1d596209d6033c3aabacf5c8d5f82b45ea1ab1cc85b6bc81",
+  "control": "original prone/Z/C/FSM, CPU display headless",
+  "command": [
+    0.5,
+    0,
+    0
+  ],
+  "stop_reasons": [
+    "all_wheels_crossed"
+  ],
+  "physics_sampling_hz": 200,
+  "static_wheel_force_mean_n": 338.75857672970614,
+  "robot_weight_n": 338.69864736000005,
+  "nonwheel_collisions": {},
+  "phase_duration_s": 6.515000000000001,
+  "phase_forward_distance_m": 3.307963370623153,
+  "force": {
+    "contact_samples": 3819,
+    "mean_n": 122.28870620164705,
+    "p95_n": 246.02699653358363,
+    "p99_n": 530.8673513817076,
+    "max_n": 1479.8911241907851
+  },
+  "mechanical_power_mean_w": 141.14288729474575,
+  "absolute_mechanical_energy_j": 919.5459107252685,
+  "positive_mechanical_energy_j": 343.0789900677123,
+  "mechanical_energy_j_per_m": 277.9794718682283,
+  "front_loaded": {
+    "samples": 243,
+    "extension_min_m": 0.4087124148681188,
+    "extension_p05_m": 0.44410829506007127,
+    "knee_abs_max_deg": 82.1568005627176,
+    "knee_abs_p95_deg": 67.78729203777472
+  },
+  "body_gap_min_m": 0.3322520530621502,
+  "body_gap_low_fraction": 0.0,
+  "front_support": {
+    "samples": 110,
+    "extension_min_m": 0.4087124148681188,
+    "extension_p05_m": 0.4299181016832659,
+    "knee_abs_max_deg": 82.1568005627176,
+    "knee_abs_p95_deg": 73.81487107074396
+  },
+  "front_swing": {
+    "samples": 153,
+    "extension_min_m": 0.4226725697718737,
+    "extension_p05_m": 0.44817702728394043,
+    "knee_abs_max_deg": 76.7433928744935,
+    "knee_abs_p95_deg": 65.98334855736033
+  },
+  "front_support_envelope_excess_fraction": 0.0,
+  "front_swing_envelope_excess_fraction": 0.0,
+  "front_sequence": {
+    "events": [],
+    "checks": 0,
+    "correct": 0,
+    "rate": null,
+    "sequential_same_tread": 0,
+    "transitions": []
+  },
+  "rear_sequence": {
+    "events": [],
+    "checks": 0,
+    "correct": 0,
+    "rate": null,
+    "sequential_same_tread": 0,
+    "transitions": []
+  },
+  "descent_entry": {
+    "first_front_down_s": 9.040000000000013,
+    "first_rear_down_s": 9.72000000000012,
+    "stable_rear_samples": 90,
+    "rear_tilt_body_p95_deg": 43.183092883752565,
+    "rear_tilt_yaw_p95_deg": 34.30146867500443,
+    "rear_forward_body_max_m": 0.3741782900600508,
+    "pitch_min_deg": 2.89789284249741,
+    "rear_fold": {
+      "samples": 90,
+      "extension_min_m": 0.29668643234967046,
+      "extension_p05_m": 0.34619311326665925,
+      "knee_abs_max_deg": 119.71733555509113,
+      "knee_abs_p95_deg": 103.93646905968451
+    }
+  }
+}

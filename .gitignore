@@ -30,6 +30,14 @@ exported/
 docker/artifacts/
 *.tmp
 
+# Training checkpoints (keep local, never commit)
+**/checkpoint/
+**/checkpoints/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+
 # Isaac-Sim packman
 _isaac_sim*
 _repo

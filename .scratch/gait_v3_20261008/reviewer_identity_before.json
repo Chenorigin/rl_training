@@ -1,0 +1,20 @@
+{
+  "first_physical_tread_successes": 1.0,
+  "after_same_tread_lateral_scan_shift_successes": 2.0,
+  "map_count": 2,
+  "map_z": [
+    0.10000000149011612,
+    0.10000000149011612
+  ],
+  "map_xy": [
+    [
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.6000000238418579
+    ]
+  ],
+  "flights": 2
+}

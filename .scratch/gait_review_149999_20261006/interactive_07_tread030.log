@@ -1,0 +1,88 @@
+[TERRAIN] {"terrain": "ascent", "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml", "terrain_parameters": {"width": [4.0], "friction": [1.0, 0.01, 0.01], "spawn_xy": [-1.0, 0.0], "spawn_yaw_deg": [0.0], "start_x": [0.25], "step_height": [0.15], "tread_depth": [0.3], "step_count": [20.0], "platform_length": [10.0]}, "goal_x": 6.25, "course_width": 4.0}
+[KEYS] Z stand | C teacher policy | X lie down | R damping | H height scan | Esc quit
+[HEIGHTMAP] 187 points: green=local ground, red=higher, blue=lower
+[KEYS] W/S forward/back | A/D left/right | Q/E turn left/right
+[KEYS] Input: MuJoCo window
+[KEYS] Window motion: hold/release state (X11)
+[MODE] prone
+step=0000 mode=prone t=0.02s x=-1.000 z=0.199 cmd=[0.0, 0.0, 0.0]
+[MODE] standing t=0.26s
+step=0250 mode=standing t=5.02s x=-1.001 z=0.532 cmd=[0.0, 0.0, 0.0]
+[MODE] ready t=5.28s
+[MODE] policy t=5.82s
+step=0500 mode=policy t=10.02s x=1.650 z=1.287 cmd=[0.699999988079071, 0.0, 0.0]
+step=0750 mode=policy t=15.02s x=5.271 z=3.104 cmd=[0.699999988079071, 0.0, 0.0]
+step=1000 mode=policy t=20.02s x=7.294 z=3.544 cmd=[0.699999988079071, 0.0, 0.0]
+step=1250 mode=policy t=25.02s x=9.027 z=3.560 cmd=[0.699999988079071, 0.0, 0.0]
+{
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-03_15-12-45_gait_resume/model_149999.pt",
+  "model": "/home/ubuntu/\u684c\u9762/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+  "terrain": "ascent",
+  "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml",
+  "terrain_parameters": {
+    "width": [
+      4.0
+    ],
+    "friction": [
+      1.0,
+      0.01,
+      0.01
+    ],
+    "spawn_xy": [
+      -1.0,
+      0.0
+    ],
+    "spawn_yaw_deg": [
+      0.0
+    ],
+    "start_x": [
+      0.25
+    ],
+    "step_height": [
+      0.15
+    ],
+    "tread_depth": [
+      0.3
+    ],
+    "step_count": [
+      20.0
+    ],
+    "platform_length": [
+      10.0
+    ]
+  },
+  "goal_x": 6.25,
+  "course_width": 4.0,
+  "crossed_finish": true,
+  "inside_course": true,
+  "cleared_terrain": true,
+  "cleared_stairs": true,
+  "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked",
+  "steps_executed": 1476,
+  "final_mode": "policy",
+  "transitions": [
+    {
+      "time": 0.0,
+      "mode": "prone"
+    },
+    {
+      "time": 0.26,
+      "mode": "standing"
+    },
+    {
+      "time": 5.28,
+      "mode": "ready"
+    },
+    {
+      "time": 5.82,
+      "mode": "policy"
+    }
+  ],
+  "max_x": 9.70231100832726,
+  "final_x": 9.65063496866033,
+  "final_z": 3.571027918906334,
+  "fell_in_policy": false,
+  "critic_used": false,
+  "trajectory": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/gait_review_149999_20261006/interactive_07_tread030/basic.npz"
+}
+[GAIT] {"sample_count": 1185, "metrics_valid": true, "scope": "+X ascent alternation uses XML step labels; top platform excluded; no route-bypass proof", "rear_extension_min_m": 0.3170349736737179, "rear_supported_extension_p05_m": 0.45971470335373565, "rear_supported_knee_abs_p95_rad": 1.0586240906100464, "rear_compressed_support_fraction": 0.0, "compression_threshold_m": 0.3, "turn_clearance_p95_m": null, "turn_reach_p95_m": null, "turn_steps": 0, "front_same_tread_events": 0, "turn_yaw_error_mean_rad_s": null, "translation_velocity_error_mean_m_s": 0.37276987736889067, "rear_same_tread_events": 0, "front_alternation_rate": 0.0, "rear_alternation_rate": 0.0, "alternation_checks": [19, 19], "mean_absolute_mechanical_power_w": 212.13908811011493, "absolute_mechanical_energy_j": 5027.696388209723, "vertical_support_impulse_ns": [1457.4935663514345, 1804.5056214140523, 2663.676223478878, 1991.6219958277488]}

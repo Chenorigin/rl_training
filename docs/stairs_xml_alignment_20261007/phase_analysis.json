@@ -1,0 +1,22 @@
+{
+  "stable_support_intermediate": {
+    "samples": 14,
+    "knee_q_max_deg": 99.81204853903411,
+    "knee_q_p95_deg": 99.66468466612854,
+    "hinge_plane_inner_min_deg": 80.18795146096589
+  },
+  "loaded_contact_intermediate": {
+    "samples": 173,
+    "knee_q_max_deg": 125.07623811218387,
+    "knee_q_p95_deg": 121.00857850082282,
+    "hinge_plane_inner_min_deg": 54.92376188781613
+  },
+  "swing_intermediate": {
+    "samples": 541,
+    "knee_q_max_deg": 158.65797069558454,
+    "knee_q_p95_deg": 157.10273248345982,
+    "hinge_plane_inner_min_deg": 21.342029304415462
+  },
+  "phase_definition": "Stable support >=0.2s; loaded contact Fz>50N, Fz>0.5force norm, clearance +/-0.05m; swing norm<5N. Floor/top excluded. Body geometry refreshed only on copied MjData.",
+  "middle_support_capture_is_platform": true
+}

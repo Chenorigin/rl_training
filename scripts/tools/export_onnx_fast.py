@@ -6,13 +6,7 @@
 Reconstructs the actor MLP directly from a checkpoint and exports it to ONNX,
 optionally embedding robot metadata as ONNX model properties.
 
-Examples:
-    # Lite3
-    python scripts/tools/export_onnx_fast.py \\
-        --checkpoint_path logs/rsl_rl/deeprobotics_lite3_rough/2025-01-01_12-00-00/model_5000.pt \\
-        --robot lite3 \\
-        --output_path exported/lite3_policy.onnx
-
+Example:
     # M20
     python scripts/tools/export_onnx_fast.py \\
         --checkpoint_path logs/rsl_rl/deeprobotics_m20_rough/2025-01-01_12-00-00/model_5000.pt \\
@@ -33,39 +27,6 @@ import torch.nn as nn
 # ---------------------------------------------------------------------------
 
 # fmt: off
-_LITE3_JOINT_NAMES = [
-    "FL_HipX_joint", "FL_HipY_joint", "FL_Knee_joint",
-    "FR_HipX_joint", "FR_HipY_joint", "FR_Knee_joint",
-    "HL_HipX_joint", "HL_HipY_joint", "HL_Knee_joint",
-    "HR_HipX_joint", "HR_HipY_joint", "HR_Knee_joint",
-]
-
-_LITE3_LINK_NAMES = [
-    "TORSO",
-    "FL_HIP", "FR_HIP", "HL_HIP", "HR_HIP",
-    "FL_THIGH", "FR_THIGH", "HL_THIGH", "HR_THIGH",
-    "FL_SHANK", "FR_SHANK", "HL_SHANK", "HR_SHANK",
-    "FL_FOOT", "FR_FOOT", "HL_FOOT", "HR_FOOT",
-]
-
-# HipX: stiffness=30, damping=1 | HipY: stiffness=30, damping=1 | Knee: stiffness=30, damping=1
-_LITE3_STIFFNESS  = [30.0, 30.0, 30.0] * 4
-_LITE3_DAMPING    = [1.0,  1.0,  1.0 ] * 4
-# Default init pose from DEEPROBOTICS_LITE3_CFG
-_LITE3_DEFAULT_POS = [0.0, -0.8, 1.6] * 4
-# Action scale: HipX=0.125, HipY=0.25, Knee=0.25
-_LITE3_ACTION_SCALE = [0.125, 0.25, 0.25] * 4
-
-LITE3_CFG = {
-    "joint_names":       _LITE3_JOINT_NAMES,
-    "link_names":        _LITE3_LINK_NAMES,
-    "base_link":         "TORSO",
-    "stiffness":         _LITE3_STIFFNESS,
-    "damping":           _LITE3_DAMPING,
-    "default_joint_pos": _LITE3_DEFAULT_POS,
-    "action_scale":      _LITE3_ACTION_SCALE,
-}
-
 # M20: 12 leg joints + 4 wheel joints = 16 total
 _M20_LEG_JOINT_NAMES = [
     "fl_hipx_joint", "fl_hipy_joint", "fl_knee_joint",
@@ -103,10 +64,7 @@ M20_CFG = {
 }
 # fmt: on
 
-ROBOT_CONFIGS = {
-    "lite3": LITE3_CFG,
-    "m20":   M20_CFG,
-}
+ROBOT_CONFIGS = {"m20": M20_CFG}
 
 
 # ---------------------------------------------------------------------------
@@ -174,7 +132,7 @@ def main() -> None:
         "--robot",
         required=True,
         choices=list(ROBOT_CONFIGS.keys()),
-        help="Robot type: 'lite3' or 'm20'.",
+        help="Robot type: 'm20'.",
     )
     parser.add_argument("--output_path", required=True, help="Output .onnx file path.")
     parser.add_argument(

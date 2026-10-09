@@ -8,7 +8,7 @@ train.py dumps these files to <log_dir>/params/ at the start of each run.
 Usage:
     python scripts/tools/compare_runs.py <path_run1> <path_run2>
 
-Each path should be a run directory (e.g. logs/rsl_rl/deeprobotics_lite3_rough/2025-01-01_12-00-00)
+Each path should be a run directory (e.g. logs/rsl_rl/deeprobotics_m20_rough/2025-01-01_12-00-00)
 containing params/agent.yaml and params/env.yaml, or the yaml files directly.
 """
 

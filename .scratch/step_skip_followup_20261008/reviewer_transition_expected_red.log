@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/step_skip_followup_20261008/reviewer_transition_payment.py", line 93, in <module>
+    assert out[f'rear_lead{first}_first_seed']['main_events'] == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

@@ -1,0 +1,20 @@
+{
+  "checkpoint": "model_80100.pt",
+  "samples": 901,
+  "scope": "front stable support on elevated surfaces in 15cm/30cm MuJoCo scene; not teacher reward gate",
+  "extension_quantiles_m": [
+    0.3813200289657502,
+    0.4087556868301915,
+    0.4698869196427278,
+    0.5027432687360015,
+    0.5091864236592665
+  ],
+  "knee_abs_quantiles_rad": [
+    0.398386875060163,
+    0.6057580792217776,
+    0.9596948923494819,
+    1.5991838465954666
+  ],
+  "short_extension_fraction": 0.0,
+  "large_knee_fraction": 0.0
+}

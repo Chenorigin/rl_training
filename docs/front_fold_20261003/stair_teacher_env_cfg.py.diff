@@ -1,0 +1,13 @@
+--- /home/ubuntu/cyq_shixi_projects/rl_training/.scratch/front_fold_20261003/baseline/stair_teacher_env_cfg.py	2026-10-03 14:28:15.077887979 +0800
++++ /home/ubuntu/cyq_shixi_projects/rl_training/source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_teacher_env_cfg.py	2026-10-03 14:29:30.939292293 +0800
+@@ -238,6 +238,10 @@
+         func=gait_refinement.descent_rear_fold_cost,
+         weight=gait_refinement.TUNING["rear_fold_weight"], params=_gait_entities(),
+     )
++    stair_ascent_front_fold_cost = RewTerm(
++        func=gait_refinement.ascent_front_fold_cost,
++        weight=gait_refinement.TUNING["front_fold_weight"], params=_gait_entities(),
++    )
+     turn_swing_size_cost = RewTerm(
+         func=gait_refinement.turn_swing_size_cost,
+         weight=gait_refinement.TUNING["turn_size_weight"], params=_gait_entities(),

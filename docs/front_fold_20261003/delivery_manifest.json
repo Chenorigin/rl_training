@@ -1,0 +1,23 @@
+{
+  "files": {
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/gait_refinement.py": "f71bfcb772f6c7d5fb32760719fbf70593576794672ee7d0e7bb7810e36999fe",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_teacher_env_cfg.py": "c2d3e2ec76c71c57b7f227e4eca65a3fb497866f3cbda06dc32a005c31ac3abc",
+    "scripts/tools/check_gait_refinement.py": "fa81d288d03dc484c5f871b0e89f683ad04895bc7136309f2f7b5ed1df3e80c0",
+    "scripts/tools/smoke_stair_rewards.py": "e7e7eef83133050e6f44a689c04e39e90aa55f5ca99da807d22570f186c0da4d"
+  },
+  "pre_teacher_unchanged": true,
+  "numerical_passed": true,
+  "isaac_finite": true,
+  "isaac_steps": 60,
+  "isaac_envs": 16,
+  "new_term_weight": -0.5,
+  "isaac_up_samples": 0.0,
+  "limits": [
+    "new term was loaded but no ascent episode in short Isaac probe",
+    "MuJoCo recorded existing actor only; no reward-driven new training",
+    "only same-family independent review available",
+    "initial touchdown buffer can be exploited by frequent brief contacts"
+  ],
+  "training_started": false,
+  "review": "independent Codex read-only numerical re-runs"
+}

@@ -1,0 +1,5 @@
+ascent {"sample_count": 750, "fell": false, "rear_supported_extension_p05_m": 0.49735849716562053, "turn_clearance_p95_m": null, "front_same_tread_events": 0}
+descent {"sample_count": 750, "fell": false, "rear_supported_extension_p05_m": 0.42985740267937816, "turn_clearance_p95_m": null, "front_same_tread_events": 0}
+turn_left {"sample_count": 750, "fell": false, "rear_supported_extension_p05_m": 0.5063213670729302, "turn_clearance_p95_m": 0.010949290123774057, "front_same_tread_events": 0}
+turn_right {"sample_count": 750, "fell": false, "rear_supported_extension_p05_m": 0.5043379723538012, "turn_clearance_p95_m": 0.012239834706649126, "front_same_tread_events": 0}
+flat {"sample_count": 750, "fell": false, "rear_supported_extension_p05_m": 0.5023385254843608, "turn_clearance_p95_m": null, "front_same_tread_events": 0}

@@ -1,0 +1,35 @@
+{
+  "scope": "counterfactual production reward over real MuJoCo dynamics; contact-time adapter differs from Isaac",
+  "policy": "baseline199998",
+  "dt": 0.02,
+  "starts": 1.0,
+  "samples": [
+    [
+      36.0,
+      33.0
+    ]
+  ],
+  "gain_total": 0.0,
+  "weighted_bonus_total": 0.0,
+  "active_time_s": 0.98,
+  "gait_metrics": {
+    "rear_entry_samples": 0.0,
+    "rear_entry_b_mean_deg": 0.0,
+    "rear_entry_g_mean_deg": 0.0,
+    "descent_entry_started": 1.0,
+    "hl_entry_samples": 36.0,
+    "hl_entry_x_mean_m": 0.06997279077768326,
+    "hl_entry_in_band_fraction": 0.7222222089767456,
+    "hl_entry_too_forward_fraction": 0.2777777910232544,
+    "hl_entry_too_rearward_fraction": 0.0,
+    "hl_entry_retract_credit": 0.0,
+    "hl_entry_blocked_fraction": 0.0,
+    "hr_entry_samples": 33.0,
+    "hr_entry_x_mean_m": 0.07438874989748001,
+    "hr_entry_in_band_fraction": 0.6969696879386902,
+    "hr_entry_too_forward_fraction": 0.3030303120613098,
+    "hr_entry_too_rearward_fraction": 0.0,
+    "hr_entry_retract_credit": 0.0,
+    "hr_entry_blocked_fraction": 0.0
+  }
+}

@@ -1,0 +1,93 @@
+[TERRAIN] {"terrain": "ascent", "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml", "terrain_parameters": {"width": [4.0], "friction": [1.0, 0.01, 0.01], "spawn_xy": [-1.0, 0.0], "spawn_yaw_deg": [0.0], "start_x": [0.25], "step_height": [0.15], "tread_depth": [0.2], "step_count": [20.0], "platform_length": [10.0]}, "goal_x": 4.25, "course_width": 4.0}
+[KEYS] Z stand | C teacher policy | X lie down | R damping | H height scan | Esc quit
+[HEIGHTMAP] 187 points: green=local ground, red=higher, blue=lower
+[KEYS] W/S forward/back | A/D left/right | Q/E turn left/right
+[KEYS] Input: MuJoCo window or focused terminal
+[KEYS] Window motion: hold/release state (X11)
+[MODE] prone
+step=0000 mode=prone t=0.02s x=-1.000 z=0.199 cmd=[0.0, 0.0, 0.0]
+[MODE] standing t=0.26s
+step=0250 mode=standing t=5.02s x=-1.001 z=0.532 cmd=[0.0, 0.0, 0.0]
+[MODE] ready t=5.28s
+[MODE] policy t=5.82s
+CAPTURE {"case": "up", "leg": "fl", "time_s": 7.759999999999857, "checkpoint": "model_196600.pt", "physical_closed_loop": true, "phase_tag": "first_support", "terrain": {"terrain": "ascent", "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml", "terrain_parameters": {"width": [4.0], "friction": [1.0, 0.01, 0.01], "spawn_xy": [-1.0, 0.0], "spawn_yaw_deg": [0.0], "start_x": [0.25], "step_height": [0.15], "tread_depth": [0.2], "step_count": [20.0], "platform_length": [10.0]}, "goal_x": 4.25, "course_width": 4.0}, "command_x": 0.7, "H_hip_joint_world": [0.14200616126643864, 0.12386088513369703, 0.6102239449594894], "K_knee_joint_world": [0.10821354720098925, 0.22636892529784075, 0.36418996166382744], "W_wheel_center_world": [0.323656382071951, 0.2920081340917063, 0.24034689908994333], "knee_q_signed_deg": 67.3729921694978, "knee_inner_hinge_plane_deg": 112.62700783050221, "knee_inner_3d_deg": 115.6740685994182, "whole_leg_forward_tilt_body_deg": 22.09908709432477, "whole_leg_forward_tilt_gravity_deg": 26.47409389840262, "thigh_forward_tilt_body_deg": -11.727239047933963, "body_pitch_positive_nose_down_deg": -4.305674907926979}
+CAPTURE {"case": "up", "leg": "fl", "time_s": 8.139999999999873, "checkpoint": "model_196600.pt", "physical_closed_loop": true, "phase_tag": "later_swing", "terrain": {"terrain": "ascent", "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml", "terrain_parameters": {"width": [4.0], "friction": [1.0, 0.01, 0.01], "spawn_xy": [-1.0, 0.0], "spawn_yaw_deg": [0.0], "start_x": [0.25], "step_height": [0.15], "tread_depth": [0.2], "step_count": [20.0], "platform_length": [10.0]}, "goal_x": 4.25, "course_width": 4.0}, "command_x": 0.7, "H_hip_joint_world": [0.431729452137555, 0.13012552179568124, 0.697167312762966], "K_knee_joint_world": [0.4893303544474111, 0.25763521577614856, 0.46780739038310026], "W_wheel_center_world": [0.6554707546541758, 0.294303983443483, 0.660457316084864], "knee_q_signed_deg": 124.96006019217378, "knee_inner_hinge_plane_deg": 55.03993980782623, "knee_inner_3d_deg": 64.30481102428422, "whole_leg_forward_tilt_body_deg": 69.34076177081751, "whole_leg_forward_tilt_gravity_deg": 80.55704527853723, "thigh_forward_tilt_body_deg": 4.270047200735574, "body_pitch_positive_nose_down_deg": -9.165436393403464}
+CAPTURE {"case": "up", "leg": "fl", "time_s": 8.159999999999876, "checkpoint": "model_196600.pt", "physical_closed_loop": true, "phase_tag": "high_swing", "terrain": {"terrain": "ascent", "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml", "terrain_parameters": {"width": [4.0], "friction": [1.0, 0.01, 0.01], "spawn_xy": [-1.0, 0.0], "spawn_yaw_deg": [0.0], "start_x": [0.25], "step_height": [0.15], "tread_depth": [0.2], "step_count": [20.0], "platform_length": [10.0]}, "goal_x": 4.25, "course_width": 4.0}, "command_x": 0.7, "H_hip_joint_world": [0.4448618515223165, 0.1301856183726599, 0.7049362972282857], "K_knee_joint_world": [0.5057356060347102, 0.2586899651927234, 0.4769810848291969], "W_wheel_center_world": [0.6663996185813468, 0.2940527288110106, 0.6744596279615874], "knee_q_signed_deg": 125.80456247503695, "knee_inner_hinge_plane_deg": 54.195437524963054, "knee_inner_3d_deg": 63.6112155508934, "whole_leg_forward_tilt_body_deg": 70.03430722299605, "whole_leg_forward_tilt_gravity_deg": 82.0525924605516, "thigh_forward_tilt_body_deg": 4.380156951263024, "body_pitch_positive_nose_down_deg": -9.858330057958643}
+CAPTURE {"case": "up", "leg": "fl", "time_s": 8.37999999999991, "checkpoint": "model_196600.pt", "physical_closed_loop": true, "phase_tag": "loaded_contact", "terrain": {"terrain": "ascent", "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml", "terrain_parameters": {"width": [4.0], "friction": [1.0, 0.01, 0.01], "spawn_xy": [-1.0, 0.0], "spawn_yaw_deg": [0.0], "start_x": [0.25], "step_height": [0.15], "tread_depth": [0.2], "step_count": [20.0], "platform_length": [10.0]}, "goal_x": 4.25, "course_width": 4.0}, "command_x": 0.7, "H_hip_joint_world": [0.5788840934503179, 0.14303942879268688, 0.7591677928029431], "K_knee_joint_world": [0.5203981799017079, 0.23181512036874619, 0.512427373532859], "W_wheel_center_world": [0.76023716277033, 0.29515254894114906, 0.5797092984041086], "knee_q_signed_deg": 119.60664257097304, "knee_inner_hinge_plane_deg": 60.393357429026956, "knee_inner_3d_deg": 68.76983632849388, "whole_leg_forward_tilt_body_deg": 30.39459359085135, "whole_leg_forward_tilt_gravity_deg": 45.671791588193926, "thigh_forward_tilt_body_deg": -30.305228389063924, "body_pitch_positive_nose_down_deg": -16.507327452903183}
+CAPTURE {"case": "up", "leg": "fr", "time_s": 8.419999999999916, "checkpoint": "model_196600.pt", "physical_closed_loop": true, "phase_tag": "high_swing", "terrain": {"terrain": "ascent", "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml", "terrain_parameters": {"width": [4.0], "friction": [1.0, 0.01, 0.01], "spawn_xy": [-1.0, 0.0], "spawn_yaw_deg": [0.0], "start_x": [0.25], "step_height": [0.15], "tread_depth": [0.2], "step_count": [20.0], "platform_length": [10.0]}, "goal_x": 4.25, "course_width": 4.0}, "command_x": 0.7, "H_hip_joint_world": [0.598785440904142, 0.015478601871323897, 0.7880574784188618], "K_knee_joint_world": [0.504332061295327, -0.1247539745524228, 0.579261061806816], "W_wheel_center_world": [0.7071903181268548, -0.16566696536620695, 0.7316942596147243], "knee_q_signed_deg": 144.88179775655064, "knee_inner_hinge_plane_deg": 35.11820224344935, "knee_inner_3d_deg": 49.05796165014232, "whole_leg_forward_tilt_body_deg": 38.08279902110335, "whole_leg_forward_tilt_gravity_deg": 62.150964594275024, "thigh_forward_tilt_body_deg": -40.87937892331109, "body_pitch_positive_nose_down_deg": -18.50957410687921}
+CAPTURE {"case": "up", "leg": "fr", "time_s": 8.839999999999982, "checkpoint": "model_196600.pt", "physical_closed_loop": true, "phase_tag": "high_swing", "terrain": {"terrain": "ascent", "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml", "terrain_parameters": {"width": [4.0], "friction": [1.0, 0.01, 0.01], "spawn_xy": [-1.0, 0.0], "spawn_yaw_deg": [0.0], "start_x": [0.25], "step_height": [0.15], "tread_depth": [0.2], "step_count": [20.0], "platform_length": [10.0]}, "goal_x": 4.25, "course_width": 4.0}, "command_x": 0.7, "H_hip_joint_world": [0.7958103835878834, 0.026704579900186376, 0.9650946930254601], "K_knee_joint_world": [0.7336332798877194, -0.10589060094330152, 0.7398501907783648], "W_wheel_center_world": [0.8897326239562617, -0.1507625855126976, 0.9390504035246736], "knee_q_signed_deg": 150.68602458622357, "knee_inner_hinge_plane_deg": 29.313975413776408, "knee_inner_3d_deg": 45.23872722357086, "whole_leg_forward_tilt_body_deg": 47.91159577094967, "whole_leg_forward_tilt_gravity_deg": 75.4549112574026, "thigh_forward_tilt_body_deg": -39.11907352650446, "body_pitch_positive_nose_down_deg": -25.45933277628117}
+CAPTURE {"case": "up", "leg": "fr", "time_s": 9.28000000000005, "checkpoint": "model_196600.pt", "physical_closed_loop": true, "phase_tag": "high_swing", "terrain": {"terrain": "ascent", "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml", "terrain_parameters": {"width": [4.0], "friction": [1.0, 0.01, 0.01], "spawn_xy": [-1.0, 0.0], "spawn_yaw_deg": [0.0], "start_x": [0.25], "step_height": [0.15], "tread_depth": [0.2], "step_count": [20.0], "platform_length": [10.0]}, "goal_x": 4.25, "course_width": 4.0}, "command_x": 0.7, "H_hip_joint_world": [1.0165016538834002, 0.05573009566882482, 1.1022713035043004], "K_knee_joint_world": [0.9504921794500001, -0.052900207878784106, 0.8655757893174434], "W_wheel_center_world": [1.1003633713952072, -0.10696687248574727, 1.067260311726083], "knee_q_signed_deg": 157.2310897454597, "knee_inner_hinge_plane_deg": 22.768910254540305, "knee_inner_3d_deg": 41.451139912684276, "whole_leg_forward_tilt_body_deg": 43.64726786285238, "whole_leg_forward_tilt_gravity_deg": 67.6465926700567, "thigh_forward_tilt_body_deg": -39.29416162585926, "body_pitch_positive_nose_down_deg": -23.922021585430002}
+step=0500 mode=policy t=10.02s x=1.017 z=1.191 cmd=[0.699999988079071, 0.0, 0.0]
+step=0750 mode=policy t=15.02s x=3.469 z=2.991 cmd=[0.699999988079071, 0.0, 0.0]
+CAPTURE {"case": "up", "leg": "fl", "time_s": 16.480000000001006, "checkpoint": "model_196600.pt", "physical_closed_loop": true, "phase_tag": "middle_support", "terrain": {"terrain": "ascent", "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml", "terrain_parameters": {"width": [4.0], "friction": [1.0, 0.01, 0.01], "spawn_xy": [-1.0, 0.0], "spawn_yaw_deg": [0.0], "start_x": [0.25], "step_height": [0.15], "tread_depth": [0.2], "step_count": [20.0], "platform_length": [10.0]}, "goal_x": 4.25, "course_width": 4.0}, "command_x": 0.7, "H_hip_joint_world": [4.64017349279417, 0.8851794408833734, 3.5232662153528134], "K_knee_joint_world": [4.552809044562184, 0.9683548806635672, 3.2831998507731583], "W_wheel_center_world": [4.702879773984627, 1.0473061030194475, 3.0900504121637535], "knee_q_signed_deg": 57.09550346693631, "knee_inner_hinge_plane_deg": 122.90449653306362, "knee_inner_3d_deg": 125.21993110025116, "whole_leg_forward_tilt_body_deg": 4.655318073784488, "whole_leg_forward_tilt_gravity_deg": 11.156000534419805, "thigh_forward_tilt_body_deg": -23.89882595183038, "body_pitch_positive_nose_down_deg": -6.526496320622686}
+{
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/gait_quality_20261007/latest.pt",
+  "model": "/home/ubuntu/\u684c\u9762/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+  "terrain": "ascent",
+  "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml",
+  "terrain_parameters": {
+    "width": [
+      4.0
+    ],
+    "friction": [
+      1.0,
+      0.01,
+      0.01
+    ],
+    "spawn_xy": [
+      -1.0,
+      0.0
+    ],
+    "spawn_yaw_deg": [
+      0.0
+    ],
+    "start_x": [
+      0.25
+    ],
+    "step_height": [
+      0.15
+    ],
+    "tread_depth": [
+      0.2
+    ],
+    "step_count": [
+      20.0
+    ],
+    "platform_length": [
+      10.0
+    ]
+  },
+  "goal_x": 4.25,
+  "course_width": 4.0,
+  "crossed_finish": true,
+  "inside_course": true,
+  "cleared_terrain": true,
+  "cleared_stairs": true,
+  "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked",
+  "steps_executed": 849,
+  "final_mode": "policy",
+  "transitions": [
+    {
+      "time": 0.0,
+      "mode": "prone"
+    },
+    {
+      "time": 0.26,
+      "mode": "standing"
+    },
+    {
+      "time": 5.28,
+      "mode": "ready"
+    },
+    {
+      "time": 5.82,
+      "mode": "policy"
+    }
+  ],
+  "max_x": 4.689402464631466,
+  "final_x": 4.689402464631466,
+  "final_z": 3.5667927417490017,
+  "fell_in_policy": false,
+  "critic_used": false
+}
+SUMMARY {"checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/gait_quality_20261007/latest.pt", "model": "/home/ubuntu/\u684c\u9762/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml", "terrain": "ascent", "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml", "terrain_parameters": {"width": [4.0], "friction": [1.0, 0.01, 0.01], "spawn_xy": [-1.0, 0.0], "spawn_yaw_deg": [0.0], "start_x": [0.25], "step_height": [0.15], "tread_depth": [0.2], "step_count": [20.0], "platform_length": [10.0]}, "goal_x": 4.25, "course_width": 4.0, "crossed_finish": true, "inside_course": true, "cleared_terrain": true, "cleared_stairs": true, "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked", "steps_executed": 849, "final_mode": "policy", "transitions": [{"time": 0.0, "mode": "prone"}, {"time": 0.26, "mode": "standing"}, {"time": 5.28, "mode": "ready"}, {"time": 5.82, "mode": "policy"}], "max_x": 4.689402464631466, "final_x": 4.689402464631466, "final_z": 3.5667927417490017, "fell_in_policy": false, "critic_used": false, "stop_reason": "all_wheels_completed", "terrain_source_sha256": "570d86ca57989a56a57ce70975ec65dbf8dfdcbc2e9cc7dba37ad32a0f4fea07", "checkpoint_sha256": "765228e6499dd8af9fd3eb7d41d8289072b4478ad20e19ce95b23ab8f7862fe8", "command_x": 0.7, "terrain_cli_overrides": null, "screenshots": ["first_support", "high_swing", "later_swing", "loaded_contact", "middle_support"], "support_stats": {"count": 38, "knee_q_p95_deg": 99.25218509735689, "knee_q_max_deg": 99.81204853903411, "knee_inner_min_deg": 80.18795146096589}, "swing_stats": {"count": 570, "knee_q_p95_deg": 157.0408718110385, "knee_q_max_deg": 158.65797069558454, "knee_inner_min_deg": 21.342029304415462}}

@@ -1,0 +1,13 @@
+{
+  "gamma": 0.99,
+  "control_dt": 0.02,
+  "first_rear_completion": 3.0,
+  "first_rear_preparation_max": 0.5,
+  "later_same_tread_penalty": -4.5,
+  "discounted_style_return": {
+    "0.2": -0.5697193375396195,
+    "0.4": -0.18058121918753844,
+    "0.6": 0.171348319752739,
+    "1.0": 0.7774726978810866
+  }
+}

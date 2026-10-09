@@ -1,0 +1,18 @@
+{
+  "reason": "25cm recorded model80100 trajectory shows extreme folds outside settled support; widen scope to severe swing only",
+  "front_swing_min_extension_m": 0.22,
+  "front_swing_max_knee_rad": 2.5,
+  "swing_cost_scale": 0.5,
+  "checks": [
+    "normal swing .30m/2.2rad cost0",
+    "extreme up swing .18m/2.7rad positive",
+    "zero or invalid swing0",
+    "initial touchdown free",
+    "settled support cost unchanged",
+    "support and swing masks mutually exclusive"
+  ],
+  "limits": [
+    "values are candidate style envelopes, not hardware limits",
+    "no new training comparison"
+  ]
+}

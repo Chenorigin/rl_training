@@ -1,0 +1,25 @@
+{
+  "new_files_sha256": {
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_student.py": "d04249808dc91c0657f1540f956f523d6f901fc768cc3efaf5d21c48429a8bf6",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_student_env_cfg.py": "933cbd480204cab0094b6df8f47526a9d0d325078badfa165d49a2a39e573d83",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/stair_student_ppo_cfg.py": "e7e5f38b60c34f2a41f8f684cbe152492d7e5304859608b89bd7ad2e6eba1687"
+  },
+  "teacher_source_unchanged": true,
+  "teacher_cfg_unchanged": true,
+  "frozen_files_unchanged": {
+    "deploy/deploy_mujoco/deploy_mujoco.py": true,
+    "deploy/deploy_mujoco/terrain_loader.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/pre_teacher_env_cfg.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/commands.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/stair_teacher_ppo_cfg.py": true
+  },
+  "cpu_checks": "passed",
+  "pyflakes": "passed",
+  "isaac_smoke": "4env8steps passed",
+  "gpu_free_MB_before": 41934,
+  "host_available_MB_before": 102284,
+  "training_started": false,
+  "real_lidar_verified": false,
+  "registration_sha256": "f85f2bc64fdda387e05bb6046a3c5b2c05a1cfbd9df2ed3985b07058a5e0d793",
+  "independent_review": "passed, Codex/GPT same family; heterogeneous family unavailable"
+}

@@ -1,0 +1,32 @@
+{
+  "scope": "new ascent-front supported fold cost; pre_teacher/observations/actions/descent rewards frozen",
+  "reference": "docs/gait_refinement_20261002/baseline_v2/ascent.npz",
+  "checkpoint": "logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-02_00-12-17/model_80100.pt",
+  "front_min_extension_m": 0.35,
+  "front_max_knee_rad": 2.0,
+  "support_grace_s": 0.2,
+  "weight": -0.5,
+  "checks": [
+    "normal ascending support zero",
+    "severe ascending compression positive bounded",
+    "swing and early landing zero",
+    "flat/descent/zero/reverse/yaw-only/invalid zero",
+    "recent active ascent supported fold positive",
+    "episode reset does not inherit gate",
+    "whole robot rotation invariant",
+    "left/right symmetric",
+    "existing tests still pass",
+    "Isaac manager resolves new term and finite step"
+  ],
+  "limits": [
+    "supported folding only; swing folding remains free",
+    "no retraining, no new gait improvement claim"
+  ],
+  "baseline_hashes": {
+    "stair_teacher_env_cfg.py": "b6fcae3f3bfba183bc5674c52ff8c49846b3ef3e0c2fcaa360246aa9e275700b",
+    "gait_refinement.py": "771bedf909c64226b8ea4d8ceba280bab5691003c378ca784e055aaddd239d85",
+    "pre_teacher_env_cfg.py": "6b86f54c7562ba75c51947bb8dc1e5d0bcce5a474a55d174419b7c185f44266a",
+    "smoke_stair_rewards.py": "ae16dc19a66a646be4d039203fa5e6f5117b8b8d48b954601ded6c2675f3f67f",
+    "check_gait_refinement.py": "032d16e6f63a25a072f8873d6f9bdc3e0562bdbb24ffeffdd56e8cb92acc063d"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "lift_before_landing": 0.0,
+  "repeat_lift_credit": 0.0,
+  "retry_after_low_crossing": 0.0,
+  "retry_after_face_contact": 0.0,
+  "third_front_target_active": false,
+  "three_alternating_front_landings": 2.0,
+  "alternating_rear_landings": 3.0,
+  "wrong_front_side_no_credit": 1.0,
+  "same_tread_cost": true,
+  "same_tread_repeat_cost": false,
+  "same_tread_completion_count": 1.0,
+  "real_height_profile_up_gate": 1.0,
+  "flat_orientation_coefficient": 50.00000596046448,
+  "stair_orientation_coefficient": 5.000000447034836,
+  "descent_different_treads_completed": 0.0
+}

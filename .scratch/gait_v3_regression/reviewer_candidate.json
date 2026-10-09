@@ -1,0 +1,31 @@
+{
+  "guard_sha256": "630870284cb7f6a5a5787f14116e39b8666886e9e29bcbf0503ff70f23c63e9e",
+  "legacy_resume_fixed_lr_actual": 1e-05,
+  "legacy_reference_frozen_and_warmup_reset": true,
+  "full_resume_counter_restored": 63,
+  "explicit_reference_replacement_restarts_warmup": true,
+  "partial_actor_load_requires_explicit_train_reference": true,
+  "anchor_actor_gradient_nonzero_reference_gradient_none": true,
+  "flat_vs_uneven_anchor_weight_ratio": 9.999998092651367,
+  "official_configclass_stair_guard_pre_ppo_isolated": true,
+  "pre_algorithm": {
+    "class_name": "PPO",
+    "num_learning_epochs": 5,
+    "num_mini_batches": 4,
+    "learning_rate": 0.001,
+    "schedule": "adaptive",
+    "gamma": 0.99,
+    "lam": 0.95,
+    "entropy_coef": 0.003,
+    "desired_kl": 0.01,
+    "max_grad_norm": 1.0,
+    "optimizer": "adam",
+    "value_loss_coef": 1.0,
+    "use_clipped_value_loss": true,
+    "clip_param": 0.2,
+    "normalize_advantage_per_mini_batch": false,
+    "share_cnn_encoders": false,
+    "rnd_cfg": null,
+    "symmetry_cfg": null
+  }
+}

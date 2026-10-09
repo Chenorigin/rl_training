@@ -1,0 +1,22 @@
+{
+  "terrain_xml": "78e8cbb5a0eaeff9b08566f58fa7589a01a1115777053f76189b18bd7538af5a",
+  "checkpoint": "4842608f320e2eab4b0845f2750da64e3cb8d55ee028178e98f75e04edacc575",
+  "frozen_files_unchanged": [
+    "deploy/deploy_mujoco/deploy_mujoco.py",
+    "deploy/deploy_mujoco/terrain_loader.py",
+    "deploy/deploy_mujoco/terrains/slope_down.xml",
+    "deploy/deploy_mujoco/terrains/stairs_ascent.xml",
+    "deploy/deploy_mujoco/terrains/hurdles.xml",
+    "deploy/deploy_mujoco/terrains/flat.xml",
+    "deploy/deploy_mujoco/terrains/mixed.xml",
+    "deploy/deploy_mujoco/terrains/rough.xml",
+    "deploy/deploy_mujoco/terrains/obstacles.xml",
+    "deploy/deploy_mujoco/terrains/slope_up.xml",
+    "deploy/deploy_mujoco/terrains/custom.xml",
+    "deploy/deploy_mujoco/terrains/stairs_descent.xml",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_teacher_env_cfg.py",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/pre_teacher_env_cfg.py",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/stair_teacher_ppo_cfg.py",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/pre_teacher_ppo_cfg.py"
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "event_weighted_batch": {
+    "up_front_skipped_riser_events": 0.3333333432674408,
+    "up_front_skip_fraction": 0.10000000149011612,
+    "up_front_visited_intermediate_risers": 10.0,
+    "up_front_same_tread_fraction": 0.20000000298023224,
+    "up_rear_skipped_riser_events": 0.3333333432674408,
+    "up_rear_skip_fraction": 0.10000000149011612,
+    "up_rear_visited_intermediate_risers": 10.0,
+    "up_rear_same_tread_fraction": 0.20000000298023224
+  },
+  "indexed_subset_with_empty_env": {
+    "up_front_skipped_riser_events": 0.5,
+    "up_front_skip_fraction": 0.5,
+    "up_front_visited_intermediate_risers": 2.0,
+    "up_front_same_tread_fraction": 1.0,
+    "up_rear_skipped_riser_events": 0.5,
+    "up_rear_skip_fraction": 0.5,
+    "up_rear_visited_intermediate_risers": 2.0,
+    "up_rear_same_tread_fraction": 1.0
+  },
+  "final_platform_denominator": {
+    "up_front_skipped_riser_events": 0.3333333432674408,
+    "up_front_skip_fraction": 0.09090909361839294,
+    "up_front_visited_intermediate_risers": 10.0,
+    "up_front_same_tread_fraction": 0.20000000298023224,
+    "up_rear_skipped_riser_events": 0.3333333432674408,
+    "up_rear_skip_fraction": 0.09090909361839294,
+    "up_rear_visited_intermediate_risers": 10.0,
+    "up_rear_same_tread_fraction": 0.20000000298023224
+  },
+  "allocated_no_samples": {
+    "up_front_skipped_riser_events": 0.0,
+    "up_front_skip_fraction": 0.0,
+    "up_front_visited_intermediate_risers": 0.0,
+    "up_front_same_tread_fraction": 0.0,
+    "up_rear_skipped_riser_events": 0.0,
+    "up_rear_skip_fraction": 0.0,
+    "up_rear_visited_intermediate_risers": 0.0,
+    "up_rear_same_tread_fraction": 0.0
+  },
+  "valid_randomized_batch_cases": 100,
+  "production_functions_changed": [
+    "stair_step_completion_metrics"
+  ],
+  "reward_tuning_unchanged": true,
+  "whole_module_except_metric_ast_unchanged": true,
+  "source_sha256": "e6118080109f365305822c56c0c673cbb449fc5548fb623e75715309d5b7192c",
+  "config_sha256": "a16d22f2bc2ad466aa51f555d5381ec40bcdd1a27268d640162c29ff1e71fd33",
+  "reviewer_family": "Codex / GPT; same family as implementer, independent execution"
+}

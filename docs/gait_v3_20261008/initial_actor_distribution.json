@@ -1,0 +1,53 @@
+{
+  "distribution.log_std_param": {
+    "min_std": 0.23636725544929504,
+    "max_std": 0.5617510676383972,
+    "mean_std": 0.37219715118408203
+  },
+  "baseline_trace_fields": [
+    "body_gap",
+    "command",
+    "yaw_velocity",
+    "wheel_clearance",
+    "time",
+    "qpos",
+    "qvel",
+    "root_pos",
+    "wheel_pos",
+    "hip_pos",
+    "ground",
+    "forces",
+    "knee",
+    "extension",
+    "support",
+    "contact_time",
+    "tilt_body_deg",
+    "tilt_yaw_deg",
+    "leg_forward_body",
+    "pitch_deg",
+    "phase"
+  ],
+  "latest_trace_fields": [
+    "body_gap",
+    "command",
+    "yaw_velocity",
+    "wheel_clearance",
+    "time",
+    "qpos",
+    "qvel",
+    "root_pos",
+    "wheel_pos",
+    "hip_pos",
+    "ground",
+    "forces",
+    "knee",
+    "extension",
+    "support",
+    "contact_time",
+    "tilt_body_deg",
+    "tilt_yaw_deg",
+    "leg_forward_body",
+    "pitch_deg",
+    "phase"
+  ]
+}

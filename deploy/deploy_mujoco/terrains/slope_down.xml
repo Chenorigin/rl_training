@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 下坡：从坡顶出生平台沿 +X 下连续坡面至 z=0。
+     本文件供 deploy_mujoco.py 的 terrain-xml 参数使用。
+     参数化模板由 terrain_loader.py 在加载时生成碰撞体，不含机器人。
+     编辑 data 后重新启动部署；无需再改 Python，命令行覆盖值会打印在运行摘要中。 -->
+<mujoco model="slope_down_terrain">
+  <compiler angle="radian"/>
+  <custom>
+    <text name="terrain_kind" data="slope_down"/>
+    <!-- 公共参数：长度单位 m；世界 +X 为路线前进方向，+Y 为左，+Z 为上。 -->
+    <!-- width：路线宽度；生成障碍之外保留 z=0 无限平面，方便自由操控。 -->
+    <numeric name="width" data="4.0"/>
+    <!-- friction：滑动 / 扭转 / 滚动摩擦；应用于生成的地面和障碍。 -->
+    <numeric name="friction" data="1.0 0.01 0.01"/>
+    <!-- spawn_xy：机器人出生世界坐标 x y；z 自动射线查询 + 站立/趴下偏置。 -->
+    <numeric name="spawn_xy" data="-1.0 0.0"/>
+    <!-- spawn_yaw_deg：出生偏航角，单位度；0 表示朝 +X。 -->
+    <numeric name="spawn_yaw_deg" data="0"/>
+    <!-- start_x：第一段地形起点的世界 X 坐标。 -->
+    <numeric name="start_x" data="0.5"/>
+    <!-- slope_deg：坡面倾角的正数幅值，单位度，须小于 60；方向由 terrain_kind 决定。 -->
+    <numeric name="slope_deg" data="12"/>
+    <!-- ramp_length：坡面在世界 X 的水平长度；总高=length×tan(倾角)。 -->
+    <numeric name="ramp_length" data="3.0"/>
+    <!-- ramp_thickness：坡面碰撞盒厚度，沿法向测量。 -->
+    <numeric name="ramp_thickness" data="0.15"/>
+    <!-- platform_length：坡顶出口 / 出生平台长度，须覆盖出生 XY。 -->
+    <numeric name="platform_length" data="10.0"/>
+  </custom>
+</mujoco>

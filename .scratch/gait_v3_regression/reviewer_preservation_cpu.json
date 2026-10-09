@@ -1,0 +1,17 @@
+{
+  "warmup_actor_exactly_frozen": true,
+  "warmup_critic_changed": true,
+  "anchor_detects_drift": 0.008163264952600002,
+  "actual_ppo_losses": {
+    "value": 6.517167091369629,
+    "surrogate": 3.1478703022003174e-07,
+    "entropy": 5.905862808227539,
+    "anchor": 0.008163264952600002,
+    "critic_warmup": 0.0
+  },
+  "reference_frozen": true,
+  "checkpoint_auxiliary_state_restored": true,
+  "std_growth_capped": true,
+  "crossing_no_repeat_bypass_retreat_front_only_collapse_or_inversion": true,
+  "legacy_resume_restores_guards_and_honors_fixed_lr": true
+}

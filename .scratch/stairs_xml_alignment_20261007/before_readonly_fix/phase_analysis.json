@@ -1,0 +1,22 @@
+{
+  "stable_support_intermediate": {
+    "samples": 14,
+    "knee_q_max_deg": 99.16135645994625,
+    "knee_q_p95_deg": 99.1518601087849,
+    "hinge_plane_inner_min_deg": 80.83864354005375
+  },
+  "loaded_contact_intermediate": {
+    "samples": 180,
+    "knee_q_max_deg": 124.41467369686004,
+    "knee_q_p95_deg": 120.83164461911002,
+    "hinge_plane_inner_min_deg": 55.585326303139965
+  },
+  "swing_intermediate": {
+    "samples": 523,
+    "knee_q_max_deg": 159.39497623945982,
+    "knee_q_p95_deg": 157.90994610002832,
+    "hinge_plane_inner_min_deg": 20.605023760540178
+  },
+  "phase_definition": "Stable support >=0.2s, loaded contact Fz>50N and vertical component >0.5force norm, clearance +/-0.05m. Floor/top platform excluded. q and pivots refreshed at same qpos.",
+  "middle_support_capture_is_platform": true
+}

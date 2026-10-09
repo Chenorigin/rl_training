@@ -1,0 +1,70 @@
+[
+  {
+    "label": "baseline",
+    "case": "xml20",
+    "exit": 0,
+    "elapsed_s": null,
+    "note": "single run completed before remaining batch; elapsed not recorded"
+  },
+  {
+    "label": "latest",
+    "case": "xml20",
+    "exit": 0,
+    "elapsed_s": 2.519684531027451
+  },
+  {
+    "label": "latest",
+    "case": "up30",
+    "exit": 0,
+    "elapsed_s": 2.574594150064513
+  },
+  {
+    "label": "latest",
+    "case": "down30",
+    "exit": 0,
+    "elapsed_s": 2.8709805619437248
+  },
+  {
+    "label": "latest",
+    "case": "turn_q",
+    "exit": 0,
+    "elapsed_s": 2.7247657619882375
+  },
+  {
+    "label": "latest",
+    "case": "turn_e",
+    "exit": 0,
+    "elapsed_s": 2.722655548946932
+  },
+  {
+    "label": "baseline",
+    "case": "up30",
+    "exit": 0,
+    "elapsed_s": 2.7220553539227694
+  },
+  {
+    "label": "baseline",
+    "case": "down30",
+    "exit": 0,
+    "elapsed_s": 2.9707045869436115
+  },
+  {
+    "label": "baseline",
+    "case": "turn_q",
+    "exit": 0,
+    "elapsed_s": 2.676933792885393
+  },
+  {
+    "label": "baseline",
+    "case": "turn_e",
+    "exit": 0,
+    "elapsed_s": 2.721982560120523
+  },
+  {
+    "label": "latest",
+    "case": "xml20_continued",
+    "exit": 0,
+    "elapsed_s": null,
+    "note": "same-case continuation to resolve premature termination risk; measured physical failure"
+  }
+]

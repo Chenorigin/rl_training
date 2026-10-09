@@ -1,0 +1,88 @@
+--- /home/ubuntu/cyq_shixi_projects/rl_training/.scratch/front_fold_20261003/baseline/check_gait_refinement.py	2026-10-03 14:28:15.077887979 +0800
++++ /home/ubuntu/cyq_shixi_projects/rl_training/scripts/tools/check_gait_refinement.py	2026-10-03 14:35:25.262180739 +0800
+@@ -72,6 +72,85 @@
+     env._m20_stair_step_state = {'active':torch.tensor([True]),'up':torch.tensor([False])}
+     result['rear_follow_cost_after_scan_flat'] = float(ns['descent_rear_fold_cost'](env, **params))
+     assert result['rear_follow_cost_after_scan_flat'] > 0
++    def front_cost(env):
++        cost = ns['ascent_front_fold_cost'](env, **params)
++        assert torch.isfinite(cost).all() and 0 <= float(cost) <= 1
++        return float(cost)
++    for name, kwargs, positive in (
++        ('front_normal_up', dict(down=False), False),
++        ('front_folded_up', dict(down=False,folded=True), True),
++        ('front_folded_swing', dict(down=False,folded=True,swing=True), False),
++        ('front_folded_down', dict(down=True,folded=True), False),
++        ('front_invalid_scan', dict(down=False,folded=True,invalid=True), False),
++        ('front_zero_command', dict(down=False,folded=True,command=(0,0,0)), False),
++        ('front_reverse_command', dict(down=False,folded=True,command=(-.5,0,0)), False),
++        ('front_pure_yaw', dict(down=False,folded=True,command=(0,0,.6)), False),
++    ):
++        env = env_for(**kwargs)
++        result[name+'_cost'] = front_cost(env)
++        assert (result[name+'_cost'] > 0) == positive, (name,result[name+'_cost'])
++    env = env_for(down=False,folded=True)
++    env._m20_stair_scan_context['context']['up_gate'].zero_()
++    result['front_flat_cost'] = front_cost(env)
++    assert result['front_flat_cost'] == 0
++    env = env_for(down=False,folded=True)
++    env.scene['contact_forces'].data.current_contact_time.fill_(.15)
++    result['front_landing_buffer_cost'] = front_cost(env)
++    assert result['front_landing_buffer_cost'] == 0
++    for name, command, invalid, positive in (
++        ('extreme_front_up_swing',(.5,0,0),False,True),
++        ('extreme_front_zero_swing',(0,0,0),False,False),
++        ('extreme_front_invalid_swing',(.5,0,0),True,False),
++    ):
++        env = env_for(down=False,swing=True,invalid=invalid,command=command)
++        env.scene['robot'].data.body_pos_w[:,4:6] = env.scene['robot'].data.body_pos_w[:,:2]
++        env.scene['robot'].data.body_pos_w[:,4:6,2] += .18
++        env.scene['robot'].data.joint_pos[:,:2] = 2.7
++        result[name+'_cost'] = front_cost(env)
++        assert (result[name+'_cost']>0) == positive
++    env = env_for(down=False,folded=True)
++    env.scene['contact_forces'].data.net_forces_w[:,:,:] = torch.tensor([100.,0.,1.])
++    result['front_riser_face_only_cost'] = front_cost(env)
++    assert result['front_riser_face_only_cost'] == 0
++    env = env_for(down=False,folded=True)
++    env._m20_stair_scan_context['context']['up_gate'].zero_()
++    env._m20_ascent_state = {'active':torch.tensor([True])}
++    result['front_active_ascent_scan_transition_cost'] = front_cost(env)
++    assert result['front_active_ascent_scan_transition_cost'] > 0
++    env = env_for(down=False,folded=True)
++    env._m20_stair_scan_context['context']['up_gate'].zero_()
++    env._m20_stair_scan_context['context']['ascending_edges_valid'] = torch.tensor([[True]])
++    result['front_recent_riser_cost'] = front_cost(env)
++    assert result['front_recent_riser_cost'] > 0
++    env = env_for(down=False,folded=True)
++    env.episode_length_buf.fill_(0)
++    env._m20_stair_scan_context['context']['up_gate'].zero_()
++    env._m20_ascent_state = {'active':torch.tensor([True])}
++    result['front_reset_stale_target_cost'] = front_cost(env)
++    assert result['front_reset_stale_target_cost'] == 0
++    # One supported front leg folds, then mirror FL/FR: equal total cost.
++    env = env_for(down=False,folded=True)
++    env.scene['contact_forces'].data.current_contact_time[0,1] = 0
++    left_cost = front_cost(env)
++    env = env_for(down=False,folded=True)
++    env.scene['contact_forces'].data.current_contact_time[0,0] = 0
++    right_cost = front_cost(env)
++    result['front_single_leg_cost'] = left_cost
++    assert left_cost == right_cost and left_cost > 0
++    # A whole-body rotation preserves hip-wheel length and cost.
++    env = env_for(down=False,folded=True)
++    points = env.scene['robot'].data.body_pos_w
++    points[:,:,:2] = torch.stack((-points[:,:,1],points[:,:,0]),dim=-1)
++    hits = env.scene['height_scanner'].data.ray_hits_w
++    hits[:,:,:2] = torch.stack((-hits[:,:,1],hits[:,:,0]),dim=-1)
++    result['front_rotated_cost'] = front_cost(env)
++    assert abs(result['front_rotated_cost']-result['front_folded_up_cost']) < 1e-6
++    for length, knee, expected in ((.4,1.5,False),(.3,1.5,True),(.4,2.2,True)):
++        env = env_for(down=False)
++        env.scene['robot'].data.body_pos_w[:,4:6] = env.scene['robot'].data.body_pos_w[:,:2]
++        env.scene['robot'].data.body_pos_w[:,4:6,2] += length
++        env.scene['robot'].data.joint_pos[:,:2] = knee
++        assert (front_cost(env)>0) == expected
+     air = torch.tensor([0., .10, .20, .35, 1., 5.])
+     result['air_scores'] = ns['bounded_air_score'](air, .10, .20, .35).tolist()
+     assert result['air_scores'][2] > 0 and max(result['air_scores'][3:]) == 0

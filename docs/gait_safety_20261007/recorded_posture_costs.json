@@ -1,0 +1,57 @@
+{
+  "stairs_ascent_xml": {
+    "recorded_frames": 524,
+    "selected_frames": 477,
+    "training": false,
+    "definition": "hypothetical changed posture costs on unchanged recorded poses/physical forces; no new policy rollout",
+    "posture_cost_rate_mean": [
+      0.7175665715011569,
+      0.004134560291902118,
+      0.0
+    ],
+    "posture_cost_rate_p95": [
+      1.14979248046875,
+      0.03149299323558804,
+      0.0
+    ],
+    "posture_cost_rate_max": [
+      1.2128525376319885,
+      0.10854309797286987,
+      0.0
+    ],
+    "cost_order": [
+      "front_fold",
+      "front_body_gap",
+      "rear_forward"
+    ],
+    "front_body_gap_min_m": 0.19208478927612305,
+    "front_body_gap_p05_m": 0.20557613372802735,
+    "front_body_gap_below_target_fraction": 0.13417190775681342
+  },
+  "down30": {
+    "recorded_frames": 461,
+    "selected_frames": 331,
+    "training": false,
+    "definition": "hypothetical changed posture costs on unchanged recorded poses/physical forces; no new policy rollout",
+    "posture_cost_rate_mean": [
+      0.0,
+      0.0,
+      0.001818908124812527
+    ],
+    "posture_cost_rate_p95": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "posture_cost_rate_max": [
+      0.0,
+      0.0,
+      0.23500384390354156
+    ],
+    "cost_order": [
+      "front_fold",
+      "front_body_gap",
+      "rear_forward"
+    ]
+  }
+}

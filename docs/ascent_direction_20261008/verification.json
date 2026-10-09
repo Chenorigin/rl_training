@@ -1,0 +1,25 @@
+{
+  "frozen_files_unchanged": {
+    "deploy/deploy_mujoco/deploy_mujoco.py": true,
+    "deploy/deploy_mujoco/terrain_loader.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/pre_teacher_env_cfg.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/commands.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/stair_teacher_ppo_cfg.py": true
+  },
+  "source_matches_executed_isaac_smoke": true,
+  "isaac_new_reward_exercised": true,
+  "checkpoint": "logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-06_22-06-56_stair_resume/model_199998.pt",
+  "checkpoint_sha256": "b500859bedc871db1a860298944e699d1aed7481142b35400267c12ce1f53f76",
+  "changed_source_sha256": {
+    "README_CN.md": "7ea26008f18884e4aef2bd9c20f04ff423e97b89840968a065904094559686c1",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_teacher.py": "41891e2606993a573da0da9f32c0cad4edf75f2741722b8b6e38df9e2b3d1004",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_teacher_env_cfg.py": "e9ca67f3a9bb74331940c53a75f22e455e407e99a242d2636d1ef0e2d52e9810",
+    "scripts/tools/check_ascent_direction.py": "62ae0c4e40e0f325ee9cc38b6b451222d38912ff0fd221e40b7c407812d6831f",
+    "scripts/tools/check_gait_refinement.py": "f7cc558fafd52edd215b15ea4b1d435bc2a1a032724464bdd810d63af9f9fa4a",
+    "scripts/tools/smoke_stair_rewards.py": "306e9430e1e60890468fbde9785caf79422381ba3bc14c1ed8d9fef0021089b9"
+  },
+  "old_functions_unchanged_count": 55,
+  "old_baseline_checks_equal_count": 26,
+  "new_trained_policy_effect": "not measured",
+  "full_historical_assert_fixed": "FAILED: restored known same-tread event limitation"
+}

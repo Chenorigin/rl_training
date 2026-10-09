@@ -1,0 +1,1243 @@
+--- .scratch/gait_v3_20261008/before/stair_teacher.py
++++ source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_teacher.py
+@@ -18,7 +18,7 @@
+ import torch
+ 
+ from isaaclab.managers import SceneEntityCfg
+-from isaaclab.utils.math import quat_apply, yaw_quat
++from isaaclab.utils.math import quat_apply, quat_apply_inverse, yaw_quat
+ 
+ from .commands import UniformThresholdVelocityCommand
+ from .rewards import joint_pos_penalty
+@@ -38,13 +38,13 @@
+     "rear_min_extension": 0.35, "extension_scale": 0.10,
+     "rear_max_knee": 1.90, "knee_scale": 0.50,
+     "front_min_extension": 0.35, "front_max_knee": 2.0,
+-    "front_support_grace": 0.20, "front_fold_weight": -0.5,
++    "front_support_grace": 0.0, "front_fold_weight": -3.0,
+     "front_swing_min_extension": 0.22, "front_swing_max_knee": 2.50,
+     "front_swing_scale": 0.50,
+     "support_grace": 0.12, "same_tread_grace": 0.12,
+     "wheel_radius": 0.09, "nearest_valid_distance": 0.12,
+     "turn_size_weight": -1.0, "rear_fold_weight": -1.0,
+-    "same_tread_event_weight": -1.0, "same_tread_dwell_weight": -1.0,
++    "same_tread_event_weight": -4.5, "same_tread_dwell_weight": -1.0,
+     "turn_status_weight": 1.0, "turn_symmetry_weight": 2.0,
+     "ascent_direction_weight": -2.0,
+     "direction_lateral_tolerance": 0.10, "direction_lateral_scale": 0.25,
+@@ -55,6 +55,31 @@
+     "direction_command_change": np.deg2rad(15.0),
+     "direction_exit_inset": 0.06, "direction_exit_height_tolerance": 0.05,
+     "direction_exit_contact_time": 0.06,
++    # Persistent physical tread ledger; these are perception/style tolerances.
++    "riser_identity_distance": 0.12, "riser_height_tolerance": 0.04,
++    "riser_lateral_corridor": 0.45, "riser_min_spacing": 0.15,
++    "riser_observation_half_width": 0.35,
++    "tread_observation_corridor": 0.80,
++    "riser_max_spacing": 0.50, "riser_cross_clearance": 0.01,
++    "riser_default_half_width": 0.05,
++    "tread_inset": 0.025, "tread_height_tolerance": 0.04,
++    "landing_time": 0.04, "prep_distance": 0.60,
++    "prep_weight": 0.5, "rear_completion_weight": 3.0,
++    "front_touchdown_weight": 0.25,
++    "front_a_support_low_deg": 90.0, "front_a_support_high_deg": 80.0,
++    "front_a_swing_low_deg": 75.0, "front_a_swing_high_deg": 55.0,
++    "pose_low_rise": 0.15, "pose_high_rise": 0.25,
++    "pose_angle_scale": np.deg2rad(20.0), "pose_length_scale": 0.10,
++    "pose_load_force_scale": 60.0,
++    "rear_b_limit": np.deg2rad(35.0), "rear_g_limit": np.deg2rad(25.0),
++    "rear_forward_relax": np.deg2rad(5.0), "rear_forward_weight": -2.0,
++    "front_swing_min_extension_v3": 0.30,
++    "front_swing_length_high": 0.26, "front_support_length_high": 0.33,
++    "body_gap_target": 0.22, "body_gap_scale": 0.10,
++    "body_bottom_z": -0.07, "body_gap_weight": -1.0,
++    "pose_tracking_discount": 0.25,
++    "pose_phase_radius": 1.50,
++
+ }
+ 
+ 
+@@ -227,6 +252,8 @@
+         "ascending_edges_x": edge_x,
+         "ascending_edges_valid": nearby & (delta > 0.0),
+         "ascending_edges_upper_z": profile[:, 1:],
++        "ascending_edges_lower_z": profile[:, :-1],
++        "ascending_edges_half_width": 0.5 * (x_levels[1:] - x_levels[:-1]),
+         "edge_x": torch.where(has_edge, selected_x, torch.zeros_like(selected_x)),
+         "edge_delta": torch.where(has_edge, selected_delta, torch.zeros_like(selected_delta)),
+         "lower_z": torch.where(has_edge, lower_z, torch.zeros_like(lower_z)),
+@@ -257,7 +284,7 @@
+     n, device = env.num_envs, env.device
+     zeros = lambda *shape: torch.zeros((n, *shape), device=device)
+     flags = lambda *shape: torch.zeros((n, *shape), device=device, dtype=torch.bool)
+-    return {
++    state = {
+         "active": flags(),
+         "edge_xy": zeros(2),
+         "heading": zeros(2),
+@@ -327,16 +354,48 @@
+         "same_tread_seconds_total": zeros(2),
+     }
+ 
++    state.update({
++        "map_count": torch.zeros(n,device=device,dtype=torch.long),
++        "map_xy": zeros(64,2), "map_heading": zeros(64,2),
++        "map_z": zeros(64), "map_lower_z": zeros(64),
++        "map_next_x": torch.full((n,64),torch.inf,device=device),
++        "map_intermediate": flags(64), "map_landed": flags(64,4),
++        "map_safe": flags(64,4), "map_failed": flags(64,4),
++        "map_clear": flags(64,4), "map_crossed": flags(64,4),
++        "map_face_struck": flags(64,4), "map_half_width": zeros(64),
++        "map_band_min": zeros(64), "map_band_max": zeros(64),
++        "map_stable_time": zeros(64,4), "map_paid": flags(64,2),
++        "map_correct": flags(64,2), "map_side": torch.full((n,64,2),-1,device=device,dtype=torch.long),
++        "map_duplicate_paid": flags(64,2), "map_prep_max": zeros(64,2),
++        "map_lead": torch.full((n,64,2),-1,device=device,dtype=torch.long),
++        "map_dwell": zeros(64,2), "map_face_paid": flags(64,2),
++        "map_flight": torch.full((n,64),-1,device=device,dtype=torch.long),
++        "flight_count": torch.zeros(n,device=device,dtype=torch.long),
++        "axis_last_slot": torch.full((n,2),-1,device=device,dtype=torch.long),
++        "axis_target_slot": torch.full((n,2),-1,device=device,dtype=torch.long),
++        "previous_wheel": zeros(4,3), "wheel_history_valid": flags(),
++        "radius_calibrated": flags(4), "rear_lift_gain": zeros(),
++        "rear_lift_credit": zeros(), "skip_total": zeros(2),
++        "physical_total": zeros(2), "unsafe_total": zeros(2),
++        "axis_run": zeros(2), "axis_max_run": zeros(2),
++        "duplicate_event_count": zeros(2),
++    })
++    state["radius"].fill_(TUNING["wheel_radius"])
++    return state
++
+ 
+ def _reset(state, reset):
+     if not reset.any():
+         return
+     for key, value in state.items():
+         if key in {"radius"}:
+-            value[reset] = float("nan")
++            value[reset] = TUNING["wheel_radius"]
+         elif key in {"front_expected", "rear_expected", "rear_target_index", "front_lift_lead",
+-                     "front_same_tread_paid", "rear_same_tread_paid", "same_tread_riser"}:
++                     "front_same_tread_paid", "rear_same_tread_paid", "same_tread_riser",
++                     "map_side", "map_lead", "axis_last_slot", "axis_target_slot", "map_flight"}:
+             value[reset] = -1
++        elif key == "map_next_x":
++            value[reset] = torch.inf
+         else:
+             value[reset] = 0
+ 
+@@ -373,370 +432,334 @@
+             & (rise >= 0.06) & (rise <= 0.30) & aligned[:, None]).any(dim=1)
+ 
+ 
++def _register_ascent_risers(state, scan, scanner, heading, command):
++    """Observe every ascending riser; registration never depends on actor success."""
++    n, device = heading.shape[0], heading.device
++    row = torch.arange(n, device=device)
++    xs = scan.get("ascending_edges_x", scan["edge_x"])
++    if "ascending_edges_x" in scan:
++        valid = scan["ascending_edges_valid"]
++        upper = scan["ascending_edges_upper_z"]
++        lower = scan["ascending_edges_lower_z"]
++        xy = scanner.data.pos_w[:, None, :2] + heading[:, None] * xs[None, :, None]
++    else:
++        valid = (scan["up_gate"] > 0)[:, None]
++        upper, lower = scan["upper_z"][:, None], scan["lower_z"][:, None]
++        xy = scanner.data.pos_w[:, None, :2] + heading[:, None] * xs[:, None, None]
++    for j in range(valid.shape[1]):
++        enabled = valid[:, j] & (command[:, 0] > TUNING["translation_threshold"])
++        delta = xy[:, j, None] - state["map_xy"]
++        along = (delta * state["map_heading"]).sum(-1)
++        lateral_signed = (-delta[...,0]*state["map_heading"][...,1]
++                          +delta[...,1]*state["map_heading"][...,0])
++        known = torch.arange(64, device=device)[None] < state["map_count"][:, None]
++        aligned = (state["map_heading"] * heading[:, None]).sum(-1) > 0.8
++        half_band = TUNING["riser_observation_half_width"]
++        overlap_band = (lateral_signed-half_band <= state["map_band_max"]) & (
++            lateral_signed+half_band >= state["map_band_min"])
++        match = known & aligned & (along.abs() < TUNING["riser_identity_distance"]) & overlap_band & (
++            (state["map_z"] - upper[:, j, None]).abs() < TUNING["riser_height_tolerance"]) & (
++            (state["map_lower_z"]-lower[:,j,None]).abs() < TUNING["riser_height_tolerance"])
++        add = enabled & ~match.any(-1) & (state["map_count"] < 64)
++        slot = torch.where(match.any(-1), match.long().argmax(-1), state["map_count"]).clamp_max(63)
++        ids = torch.nonzero(add, as_tuple=False).squeeze(-1)
++        state["map_xy"][ids, slot[ids]] = xy[ids, j]
++        state["map_heading"][ids, slot[ids]] = heading[ids]
++        state["map_z"][ids, slot[ids]] = upper[ids, j]
++        state["map_lower_z"][ids, slot[ids]] = lower[ids, j]
++        state["map_band_min"][ids,slot[ids]] = -half_band
++        state["map_band_max"][ids,slot[ids]] = half_band
++        matched = enabled & match.any(-1)
++        mid = torch.nonzero(matched,as_tuple=False).squeeze(-1)
++        band_center = lateral_signed[mid,slot[mid]]
++        state["map_band_min"][mid,slot[mid]] = torch.minimum(state["map_band_min"][mid,slot[mid]],band_center-half_band)
++        state["map_band_max"][mid,slot[mid]] = torch.maximum(state["map_band_max"][mid,slot[mid]],band_center+half_band)
++        half_width = scan.get("ascending_edges_half_width")
++        state["map_half_width"][ids,slot[ids]] = (
++            half_width[j] if half_width is not None else TUNING["riser_default_half_width"])
++        state["map_count"][ids] += 1
++        # A successor confirms an intermediate tread and bounds its upper end.
++        # Update both directions so rear observations/registration order cannot
++        # change tread identity. No N*64*64 pairwise allocation is needed.
++        own_xy = state["map_xy"][row, slot]
++        own_h = state["map_heading"][row, slot]
++        own_z = state["map_z"][row, slot]
++        delta = own_xy[:, None] - state["map_xy"]
++        dist = (delta * state["map_heading"]).sum(-1)
++        cross = (delta[..., 0] * state["map_heading"][..., 1]
++                 - delta[..., 1] * state["map_heading"][..., 0]).abs()
++        known = torch.arange(64, device=device)[None] < state["map_count"][:, None]
++        parallel = (state["map_heading"] * own_h[:, None]).sum(-1) > 0.8
++        pred = known & parallel & (dist >= TUNING["riser_min_spacing"]) & (
++            dist <= TUNING["riser_max_spacing"]) & (cross < TUNING["riser_lateral_corridor"]) & (
++            (state["map_z"] - lower[:, j, None]).abs() < TUNING["riser_height_tolerance"]) & enabled[:, None]
++        state["map_next_x"] = torch.minimum(state["map_next_x"], torch.where(pred, dist, torch.inf))
++        dz = state["map_lower_z"] - own_z[:, None]
++        successor = known & parallel & (-dist >= TUNING["riser_min_spacing"]) & (
++            -dist <= TUNING["riser_max_spacing"]) & (cross < TUNING["riser_lateral_corridor"]) & (
++            dz.abs() < TUNING["riser_height_tolerance"]) & enabled[:, None]
++        next_dist = torch.where(successor, -dist, torch.inf).amin(-1)
++        state["map_next_x"][row, slot] = torch.minimum(state["map_next_x"][row, slot], next_dist)
++        neighbors = pred | successor
++        connected = neighbors.any(-1)
++        neighbor_slot = neighbors.long().argmax(-1)
++        new_flight = add & ~connected
++        state["map_flight"][ids, slot[ids]] = torch.where(connected[ids],
++            state["map_flight"][ids, neighbor_slot[ids]], state["flight_count"][ids])
++        state["flight_count"] += new_flight.long()
++    state["map_intermediate"] = torch.isfinite(state["map_next_x"])
++
++
+ def ascent_state(env, asset_cfg, sensor_cfg, contact_sensor_cfg, command_name="base_velocity"):
+-    """Advance independent front and rear one-wheel-per-riser sequences once per step."""
++    """Physical tread ledger shared by two independently learning alternating axles.
++
++    Every observed riser is registered before either axle's reward is considered.
++    Stable landings, clearance, style, duplicate history and preparation budgets
++    are separate records. Missing a tread advances physical progress without
++    rewarding the skipped/wrong step or permanently trapping the next target.
++    """
+     step = int(env.common_step_counter)
+     cache = getattr(env, "_m20_ascent_cache", None)
+     if cache is not None and cache["step"] == step:
+         return cache["state"]
+-
+-    context = _stair_scan_context(env, sensor_cfg, command_name)
+-    asset = env.scene[asset_cfg.name]
+-    scanner = env.scene[sensor_cfg.name]
+-    contact_sensor = env.scene.sensors[contact_sensor_cfg.name]
++    scan = _stair_scan_context(env, sensor_cfg, command_name)
++    robot, scanner = env.scene[asset_cfg.name], env.scene[sensor_cfg.name]
++    sensor = env.scene.sensors[contact_sensor_cfg.name]
+     state = getattr(env, "_m20_ascent_state", None)
+     if state is None or state["active"].shape[0] != env.num_envs:
+         state = _new_state(env)
+         env._m20_ascent_state = state
+-    if hasattr(env, "episode_length_buf"):
+-        _reset(state, env.episode_length_buf <= 1)
++    reset = env.episode_length_buf <= 1
++    _reset(state, reset)
++    wheels = robot.data.body_pos_w[:, asset_cfg.body_ids]
++    force = sensor.data.net_forces_w[:, contact_sensor_cfg.body_ids]
++    norm = torch.linalg.vector_norm(force, dim=-1)
++    loaded = (force[..., 2] > 5) & (force[..., 2] > 0.5 * norm)
++    loaded &= sensor.data.current_contact_time[:, contact_sensor_cfg.body_ids] > 0
++    command = env.command_manager.get_command(command_name)
++    enabled = command[:, 0] > TUNING["translation_threshold"]
++    row = torch.arange(env.num_envs, device=env.device)
++    forward = torch.zeros(env.num_envs, 3, device=env.device); forward[:, 0] = 1
++    heading = quat_apply(yaw_quat(scanner.data.quat_w), forward)[:, :2]
++    _register_ascent_risers(state, scan, scanner, heading, command)
++    known = torch.arange(64, device=env.device)[None] < state["map_count"][:, None]
++    # Known model wheel radius is available immediately. Sensor-based estimates
++    # only calibrate it on flat loaded support, never disable landing attribution.
++    hits = scanner.data.ray_hits_w
++    valid_hits = torch.isfinite(hits).all(-1)
++    distance = torch.linalg.vector_norm(wheels[:, :, None, :2] - hits[:, None, :, :2], dim=-1)
++    distance = torch.where(valid_hits[:, None], distance, torch.inf)
++    near, nearest = distance.min(-1)
++    surface = hits[..., 2].gather(1, nearest)
++    measured = wheels[..., 2] - surface
++    local = distance < 0.16
++    lo = torch.where(local, hits[:, None, :, 2], torch.inf).amin(-1)
++    hi = torch.where(local, hits[:, None, :, 2], -torch.inf).amax(-1)
++    flat = (local.sum(-1) >= 2) & ((hi-lo) < 0.025)
++    calibrate = ~state["radius_calibrated"] & loaded & flat & (near < 0.08) & (
++        (measured - TUNING["wheel_radius"]).abs() < 0.025)
++    state["radius"][calibrate] = measured[calibrate]
++    state["radius_calibrated"] |= calibrate
++    relative = wheels[:, None, :, :2] - state["map_xy"][:, :, None]
++    x = (relative * state["map_heading"][:, :, None]).sum(-1)
++    cross = (relative[..., 0] * state["map_heading"][:, :, None, 1]
++             - relative[..., 1] * state["map_heading"][:, :, None, 0]).abs()
++    prev = state["previous_wheel"][:, None, :, :2] - state["map_xy"][:, :, None]
++    prev_x = (prev * state["map_heading"][:, :, None]).sum(-1)
++    width = state["map_half_width"][:,:,None]
++    history = state["wheel_history_valid"][:,None,None] & known[:,:,None]
++    advance = x > prev_x
++    overlap = history & advance & (prev_x <= width) & (x >= -width)
++    # The two rays bracket the real riser. Preserve clearance observed anywhere
++    # in that interval; a midpoint can be 5cm too early to see the final lift.
++    def interval_height(at_x):
++        fraction = ((at_x-prev_x)/(x-prev_x).clamp_min(1e-6)).clamp(0,1)
++        return state["previous_wheel"][:,None,:,2]+fraction*(
++            wheels[:,None,:,2]-state["previous_wheel"][:,None,:,2])
++    high = torch.maximum(interval_height(torch.maximum(prev_x,-width)),
++                         interval_height(torch.minimum(x,width)))
++    clearance = high-state["map_z"][:,:,None]-state["radius"][:,None]
++    state["map_clear"] |= overlap & (clearance >= TUNING["riser_cross_clearance"])
++    crossing = history & (prev_x < width) & (x >= width)
++    state["map_crossed"] |= crossing
++    face_horizontal = torch.linalg.vector_norm(force[...,:2],dim=-1)
++    face_all = history & (x >= -0.12) & (x <= width+0.03) & (
++        wheels[:,None,:,2] < state["map_z"][:,:,None]+state["radius"][:,None]+0.05) & (
++        face_horizontal[:,None]>50) & (face_horizontal[:,None]>1.5*force[:,None,:,2].clamp_min(0))
++    state["map_face_struck"] |= face_all
++    state["map_face_struck"] &= ~(x < -width-0.06)
++    state["map_clear"] &= ~face_all
++    safe_cross = state["map_clear"] & state["map_crossed"] & ~state["map_face_struck"]
++    state["retry_count"] += (safe_cross & state["map_failed"]).sum((1,2))
++    state["map_failed"] |= crossing & ~safe_cross & known[:, :, None]
++    state["map_failed"] &= ~safe_cross
++    state["map_safe"] |= safe_cross
++    state["map_safe"] &= ~face_all
++    # A ray pair bounds the real riser. Settle a landing only beyond that
++    # interval, so an early upper-tread contact cannot consume its credit
++    # before the completed crossing is observable.
++    landing_boundary = torch.maximum(width, torch.full_like(width, TUNING["tread_inset"]))
++    occupancy = known[:, :, None] & loaded[:, None] & (x > landing_boundary) & (
++        x < state["map_next_x"][:, :, None] - TUNING["tread_inset"]) & (
++        cross < TUNING["tread_observation_corridor"]) & (
++        (wheels[:, None, :, 2] - state["map_z"][:, :, None] - state["radius"][:, None]).abs()
++        <= TUNING["tread_height_tolerance"])
++    state["map_stable_time"] = torch.where(occupancy, state["map_stable_time"] + env.step_dt, 0)
++    stable = state["map_stable_time"] >= TUNING["landing_time"]
++    state["map_landed"] |= stable
+     for key in ("front_event", "rear_event", "front_face_event", "front_violation_event",
+                 "rear_violation_event", "front_same_tread_event", "rear_same_tread_event"):
+         state[key].zero_()
++    state["front_lift_gain"].zero_(); state["rear_lift_gain"].zero_()
+     state["front_lift_settlement"].zero_()
+-    state["front_lift_gain"].zero_()
+-
+-    wheel = asset.data.body_pos_w[:, asset_cfg.body_ids]
+-    velocity = asset.data.body_lin_vel_w[:, asset_cfg.body_ids]
+-    force = contact_sensor.data.net_forces_w[:, contact_sensor_cfg.body_ids]
+-    force_z = force[..., 2]
+-    force_norm = torch.linalg.vector_norm(force, dim=-1)
+-    contact = (contact_sensor.data.current_contact_time[:, contact_sensor_cfg.body_ids] > 0) & (
+-        force_z > 0.5 * force_norm
+-    )
+-    # Calibrate on the actual surface under each wheel, including before a
+-    # stair target starts. The target's source tread need not be the tread
+-    # under a trailing wheel in a one-leg-per-riser gait.
+-    hits = scanner.data.ray_hits_w
+-    valid_hits = torch.isfinite(hits).all(dim=-1)
+-    distance = torch.linalg.vector_norm(wheel[:, :, None, :2] - hits[:, None, :, :2], dim=-1)
+-    distance = torch.where(valid_hits[:, None], distance, torch.inf)
+-    nearest_distance, nearest = distance.min(dim=-1)
+-    surface_z = hits[..., 2].gather(1, nearest)
+-    measured_radius = wheel[..., 2] - surface_z
+-    local = (distance < 0.16) & valid_hits[:, None]
+-    local_max = torch.where(local, hits[:, None, :, 2], -torch.inf).amax(dim=-1)
+-    local_min = torch.where(local, hits[:, None, :, 2], torch.inf).amin(dim=-1)
+-    flat_support = (local.sum(dim=-1) >= 2) & ((local_max - local_min) <= 0.025)
+-    calibrate = (~torch.isfinite(state["radius"]) & contact & (force_z > 5.0)
+-                 & (contact_sensor.data.current_contact_time[:, contact_sensor_cfg.body_ids] >= 0.06)
+-                 & flat_support & (nearest_distance < 0.08)
+-                 & (measured_radius >= 0.02) & (measured_radius <= 0.25))
+-    state["radius"][calibrate] = measured_radius[calibrate]
+-    forward = torch.zeros((env.num_envs, 3), device=env.device)
+-    forward[:, 0] = 1.0
+-    heading = quat_apply(yaw_quat(scanner.data.quat_w), forward)[:, :2]
+-    candidate_xy = scanner.data.pos_w[:, :2] + heading * context["edge_x"][:, None]
+-
+-    # The first riser permits either lead. Afterwards, only the next physical
+-    # riser on the same flight is eligible; skipped or repeated edges earn zero.
+-    count = state["front_count"]
+-    last_i = (count - 1).clamp_min(0)
+-    row = torch.arange(env.num_envs, device=env.device)
+-    last_xy = state["front_history_xy"][row, last_i]
+-    last_heading = state["front_history_heading"][row, last_i]
+-    delta_xy = candidate_xy - last_xy
+-    along = (delta_xy * last_heading).sum(dim=1)
+-    lateral = torch.abs(delta_xy[:, 0] * last_heading[:, 1] - delta_xy[:, 1] * last_heading[:, 0])
+-    height_step = context["upper_z"] - state["front_history_target_z"][row, last_i]
+-    adjacent = (count == 0) | (
+-        (along >= 0.15) & (along <= 0.50) & (lateral <= 0.20)
+-        & (height_step >= 0.06) & (height_step <= 0.30)
+-    )
+-    retired_distance = torch.linalg.vector_norm(candidate_xy - state["retired_xy"], dim=1)
+-    repeated = state["retired_valid"] & (retired_distance < 0.12) & (
+-        (context["upper_z"] - state["retired_z"]).abs() < 0.05
+-    )
+-    start = (
+-        ~state["active"] & (context["up_gate"] > 0)
+-        & adjacent & ~repeated & (count < 64)
+-    )
+-    # Credit survives visiting another target and returning. Remember the
+-    # physical riser plane, not just the last abandoned edge, so A-B-A cannot
+-    # reset the lift budget. Quantized scans can shift the estimated edge 5 cm.
+-    history_delta = candidate_xy[:, None] - state["lift_history_xy"]
+-    history_along = (history_delta * state["lift_history_heading"]).sum(dim=-1).abs()
+-    history_aligned = (heading[:, None] * state["lift_history_heading"]).sum(dim=-1) > 0.8
+-    history_valid = torch.arange(64, device=env.device)[None] < state["lift_history_count"][:, None]
+-    same_point = torch.linalg.vector_norm(history_delta, dim=-1) < 0.15
+-    matches = (history_valid & (same_point | (history_aligned & (history_along < 0.15)))
+-               & ((context["upper_z"][:, None] - state["lift_history_z"]).abs() < 0.05))
+-    known = matches.any(dim=1)
+-    start &= known | (state["lift_history_count"] < 64)
+-    target_slot = torch.where(known, matches.long().argmax(dim=1), state["lift_history_count"]).clamp_max(63)
+-    new_ids = torch.nonzero(start & ~known, as_tuple=False).squeeze(-1)
+-    new_slots = target_slot[new_ids]
+-    state["lift_history_xy"][new_ids, new_slots] = candidate_xy[new_ids]
+-    state["lift_history_heading"][new_ids, new_slots] = heading[new_ids]
+-    state["lift_history_z"][new_ids, new_slots] = context["upper_z"][new_ids]
+-    state["lift_history_count"][new_ids] += 1
+-    state["lift_history_index"][start] = target_slot[start]
+-    state["active"][start] = True
+-    state["edge_xy"][start] = candidate_xy[start]
+-    state["heading"][start] = heading[start]
+-    state["source_z"][start] = context["lower_z"][start]
+-    state["target_z"][start] = context["upper_z"][start]
+-    state["age"][start] = 0.0
+-    state["targets_started"][start] += 1
+-    state["front_lift_max"][start] = state["lift_history_max"][row[start], target_slot[start]]
+-    state["front_lift_lead"][start] = -1
+-    for key in ("front_prev_valid", "front_safe", "front_failed", "front_face",
+-                "front_lift", "front_physical_time"):
+-        state[key][start] = 0
+-
+-    front_x = ((wheel[:, :2, :2] - state["edge_xy"][:, None]) * state["heading"][:, None]).sum(dim=-1)
+-    front_radius = state["radius"][:, :2]
+-    # A failed crossing can be retried after returning behind the edge. A
+-    # previous face contact remains an event cost, not a permanent veto.
+-    retry = state["active"][:, None] & (front_x < -0.06) & state["front_failed"]
+-    state["retry_count"] += retry.any(dim=1).float()
+-    state["front_failed"][retry] = False
+-    state["front_safe"][front_x < -0.06] = False
+-
+     face_force = torch.linalg.vector_norm(force[:, :2, :2], dim=-1)
+-    face_now = (
+-        state["active"][:, None] & (front_x >= -0.12) & (front_x <= 0.03)
+-        & torch.isfinite(front_radius)
+-        & (wheel[:, :2, 2] < state["target_z"][:, None] + front_radius + 0.05)
+-        & (face_force > 50.0) & (face_force > 1.5 * force_z[:, :2].clamp_min(0))
+-    )
+-    state["front_face_event"] = face_now & ~state["front_face"]
+-    state["front_face"] |= face_now
+-
+-    lift = (
+-        state["active"][:, None] & (front_x < 0) & ~contact[:, :2]
+-        & torch.isfinite(front_radius) & (velocity[:, :2, 2] > 0.10)
+-    )
+-    state["front_lift"] = torch.maximum(
+-        state["front_lift"],
+-        torch.where(lift, (velocity[:, :2, 2] / 0.5).clamp_max(1.0),
+-                    torch.zeros_like(state["front_lift"])),
+-    )
+-    # Bounded feedback during preparation, instead of withholding all lift
+-    # credit until touchdown. Only the expected leg (either first lead) may
+-    # earn it, with two other wheels supporting and no repeated-height credit.
+-    rise = (state["target_z"] - state["source_z"] + 0.02).clamp_min(0.06)
+-    height_fraction = ((wheel[:, :2, 2] - state["source_z"][:, None] - front_radius)
+-                       / rise[:, None]).clamp(0, 1)
+-    support_others = contact.sum(dim=1, keepdim=True) - contact[:, :2].long()
+-    lift_eligible = (state["active"][:, None] & torch.isfinite(front_radius)
+-                     & (front_x >= -0.45) & (front_x <= 0.02) & ~contact[:, :2]
+-                     & (support_others >= 2) & (context["command_x"][:, None] > 0.1))
+-    fractions = torch.where(lift_eligible, height_fraction, torch.zeros_like(height_fraction))
+-    lead = torch.where(state["front_expected"] >= 0, state["front_expected"], state["front_lift_lead"])
+-    lead = torch.where(lead >= 0, lead, fractions.argmax(dim=1))
+-    selected_fraction = fractions.gather(1, lead[:, None]).squeeze(1)
+-    gain = (selected_fraction - state["front_lift_max"]).clamp_min(0)
+-    # Even ambiguous edge identities under turns cannot turn exploration into
+-    # an infinite reward source: each confirmed landing unlocks at most one
+-    # further preparation credit for the episode.
+-    remaining = (1.0 + state["front_successes"] - state["front_lift_credit"]).clamp_min(0)
+-    gain = torch.minimum(gain, remaining)
+-    state["front_lift_lead"] = torch.where(gain > 0, lead, state["front_lift_lead"])
+-    state["front_lift_max"] = torch.maximum(state["front_lift_max"], selected_fraction)
+-    active_ids = torch.nonzero(state["active"], as_tuple=False).squeeze(-1)
+-    state["lift_history_max"][active_ids, state["lift_history_index"][active_ids]] = state["front_lift_max"][active_ids]
+-    state["front_lift_gain"] = gain
+-    state["front_lift_credit"] += gain
+-    crossing = (
+-        state["active"][:, None] & state["front_prev_valid"]
+-        & (state["front_prev_x"] < 0) & (front_x >= 0)
+-    )
+-    clear = (
+-        torch.isfinite(front_radius)
+-        & (wheel[:, :2, 2] - state["target_z"][:, None] - front_radius >= 0.02)
+-    )
+-    state["front_failed"] |= crossing & ~clear
+-    state["front_safe"] |= crossing & clear & ~state["front_failed"]
+-    state["front_lift"][crossing & ~clear] = 0.0
+-    state["front_prev_x"] = front_x.clone()
+-    state["front_prev_valid"] = state["active"][:, None].expand_as(state["front_prev_valid"]).clone()
+-
+-    front_physical = (
+-        state["active"][:, None]
+-        & _contact_on_tread(
+-            wheel[:, :2, 2], state["target_z"][:, None], front_radius,
+-            force_z[:, :2], force_norm[:, :2], front_x, torch.zeros_like(front_x), 0.06,
+-        )
+-    )
+-    state["front_physical_time"] = torch.where(
+-        front_physical, state["front_physical_time"] + env.step_dt,
+-        torch.zeros_like(state["front_physical_time"]),
+-    )
+-    candidates = state["front_physical_time"] >= 0.04
+-    one = candidates.sum(dim=1) == 1
+-    side = candidates.long().argmax(dim=1)
+-    expected = state["front_expected"]
+-    ordered = (expected < 0) | (side == expected)
+-    safe_side = state["front_safe"].gather(1, side[:, None]).squeeze(1)
+-    valid = state["active"] & one & ordered & safe_side
+-    physical = state["active"] & candidates.any(dim=1)
+-    violation = physical & ~valid
+-    state["front_event"] = candidates & valid[:, None]
+-    state["front_violation_event"] = violation
+-    state["front_lift_settlement"] = state["front_event"].float() * state["front_lift"]
+-    state["front_successes"] += valid.float()
+-    state["front_violations"] += violation.float()
+-
+-    # Even a wrong landing advances the physical target, so one mistake does
+-    # not close all later local learning. It earns no completion credit.
+-    retired = valid | violation
+-    ids = torch.nonzero(retired, as_tuple=False).squeeze(-1)
+-    slots = count[ids]
+-    state["front_history_xy"][ids, slots] = state["edge_xy"][ids]
+-    state["front_history_heading"][ids, slots] = state["heading"][ids]
+-    state["front_history_source_z"][ids, slots] = state["source_z"][ids]
+-    state["front_history_target_z"][ids, slots] = state["target_z"][ids]
+-    state["front_count"][ids] += 1
+-    state["front_expected"][ids] = torch.where(
+-        one[ids], 1 - side[ids], torch.full_like(side[ids], -1),
+-    )
+-    state["retired_valid"][retired] = True
+-    state["retired_xy"][retired] = state["edge_xy"][retired]
+-    state["retired_z"][retired] = state["target_z"][retired]
+-    state["active"][retired] = False
+-    state["age"][state["active"]] += env.step_dt
+-    # Keep a blocked target retryable for the episode. A ten-second timeout
+-    # used to blacklist the same edge, closing all subsequent local feedback.
+-    far_from_target = torch.linalg.vector_norm(asset.data.root_pos_w[:, :2] - state["edge_xy"], dim=-1) > 1.5
+-    abandoned = state["active"] & far_from_target & (context["up_gate"] == 0)
+-    state["abandoned_targets"] += abandoned.float()
+-    state["retired_valid"][abandoned] = True
+-    state["retired_xy"][abandoned] = state["edge_xy"][abandoned]
+-    state["retired_z"][abandoned] = state["target_z"][abandoned]
+-    state["active"][abandoned] = False
+-    commanded_forward = state["active"] & (context["command_x"] > 0.1)
+-    forward_speed = asset.data.root_lin_vel_b[:, 0]
+-    state["forward_steps"] += commanded_forward.float()
+-    state["retreat_steps"] += (commanded_forward & (forward_speed < -0.05)).float()
+-    state["stationary_steps"] += (commanded_forward & (forward_speed.abs() < 0.05)).float()
+-
+-    # Rear target k is the physical riser previously reached by a front wheel.
+-    rear_i = state["rear_count"]
+-    target_available = rear_i < state["front_count"]
+-    ri = rear_i.clamp(max=63)
+-    rear_edge = state["front_history_xy"][row, ri]
+-    rear_heading = state["front_history_heading"][row, ri]
+-    rear_target_z = state["front_history_target_z"][row, ri]
+-    new_rear_target = target_available & (state["rear_target_index"] != rear_i)
+-    state["rear_target_index"][new_rear_target] = rear_i[new_rear_target]
+-    state["rear_target_age"][new_rear_target] = 0.0
+-    for key in ("rear_prev_valid", "rear_safe", "rear_failed", "rear_physical_time"):
+-        state[key][new_rear_target] = 0
+-
+-    rear_x = ((wheel[:, 2:, :2] - rear_edge[:, None]) * rear_heading[:, None]).sum(dim=-1)
+-    rear_radius = state["radius"][:, 2:]
+-    rear_retry = target_available[:, None] & (rear_x < -0.06) & state["rear_failed"]
+-    state["rear_failed"][rear_retry] = False
+-    state["rear_safe"][rear_x < -0.06] = False
+-    rear_crossing = (
+-        target_available[:, None] & state["rear_prev_valid"]
+-        & (state["rear_prev_x"] < 0) & (rear_x >= 0)
+-    )
+-    rear_clear = (
+-        torch.isfinite(rear_radius)
+-        & (wheel[:, 2:, 2] - rear_target_z[:, None] - rear_radius >= 0.02)
+-    )
+-    state["rear_failed"] |= rear_crossing & ~rear_clear
+-    state["rear_safe"] |= rear_crossing & rear_clear & ~state["rear_failed"]
+-    state["rear_prev_x"] = rear_x.clone()
+-    state["rear_prev_valid"] = target_available[:, None].expand_as(state["rear_prev_valid"]).clone()
+-    rear_physical = (
+-        target_available[:, None]
+-        & _contact_on_tread(
+-            wheel[:, 2:, 2], rear_target_z[:, None], rear_radius,
+-            force_z[:, 2:], force_norm[:, 2:], rear_x, torch.zeros_like(rear_x), 0.06,
+-        )
+-    )
+-    state["rear_physical_time"] = torch.where(
+-        rear_physical, state["rear_physical_time"] + env.step_dt,
+-        torch.zeros_like(state["rear_physical_time"]),
+-    )
+-    rear_candidates = state["rear_physical_time"] >= 0.04
+-    rear_one = rear_candidates.sum(dim=1) == 1
+-    rear_side = rear_candidates.long().argmax(dim=1)
+-    rear_ordered = (state["rear_expected"] < 0) | (rear_side == state["rear_expected"])
+-    rear_safe_side = state["rear_safe"].gather(1, rear_side[:, None]).squeeze(1)
+-    rear_valid = target_available & rear_one & rear_ordered & rear_safe_side
+-    rear_physical_event = target_available & rear_candidates.any(dim=1)
+-    rear_violation = rear_physical_event & ~rear_valid
+-    state["rear_event"] = rear_candidates & rear_valid[:, None]
+-    state["rear_violation_event"] = rear_violation
+-    state["rear_successes"] += rear_valid.float()
+-    state["rear_violations"] += rear_violation.float()
+-    rear_retired = rear_valid | rear_violation
+-    state["rear_target_age"][target_available] += env.step_dt
+-    # Waiting is not a physical crossing; the rear target also stays retryable.
+-    state["rear_count"][rear_retired] += 1
+-    state["rear_expected"][rear_retired] = torch.where(
+-        rear_one[rear_retired], 1 - rear_side[rear_retired],
+-        torch.full_like(rear_side[rear_retired], -1),
+-    )
+-
+-    # Two wheels on the same stair are a style violation even if one arrived
+-    # after the target was already retired. The event is paid once per riser.
+-    front_last = (state["front_count"] - 1).clamp_min(0)
+-    front_last_z = state["front_history_target_z"][row, front_last]
+-    front_last_xy = state["front_history_xy"][row, front_last]
+-    front_last_heading = state["front_history_heading"][row, front_last]
+-    front_last_x = ((wheel[:, :2, :2] - front_last_xy[:, None]) * front_last_heading[:, None]).sum(-1)
+-    front_pair = (
+-        (state["front_count"] > 0) & contact[:, :2].all(dim=1)
+-        & (front_last_x > 0.06).all(dim=1)
+-        & ((wheel[:, :2, 2] - front_last_z[:, None] - state["radius"][:, :2]).abs() <= 0.05).all(dim=1)
+-    )
+-    # A platform is allowed to carry both legs. Require evidence of another
+-    # higher riser on this flight before labelling the pair a style violation.
+-    front_intermediate = _visible_higher_riser(
+-        context, scanner.data.pos_w[:, :2], heading, front_last_xy, front_last_heading, front_last_z)
+-    commanded_forward = context["command_x"] > 0.1
+-    front_pair &= front_intermediate & commanded_forward
+-    state["front_same_tread_event"] = front_pair & (state["front_same_tread_paid"] != front_last)
+-    state["front_same_tread_paid"] = torch.where(
+-        state["front_same_tread_event"], front_last, state["front_same_tread_paid"],
+-    )
+-    rear_last = (state["rear_count"] - 1).clamp_min(0)
+-    rear_last_z = state["front_history_target_z"][row, rear_last]
+-    rear_last_xy = state["front_history_xy"][row, rear_last]
+-    rear_last_heading = state["front_history_heading"][row, rear_last]
+-    rear_last_x = ((wheel[:, 2:, :2] - rear_last_xy[:, None]) * rear_last_heading[:, None]).sum(-1)
+-    rear_pair = (
+-        (state["rear_count"] > 0) & contact[:, 2:].all(dim=1)
+-        & (rear_last_x > 0.06).all(dim=1)
+-        & ((wheel[:, 2:, 2] - rear_last_z[:, None] - state["radius"][:, 2:]).abs() <= 0.05).all(dim=1)
+-    )
+-    # Front scan may already be flat on the top landing while rear wheels
+-    # still have recorded intermediate risers to cross.
+-    next_rear = state["rear_count"].clamp_max(63)
+-    queued_higher = ((state["rear_count"] < state["front_count"])
+-                     & (state["front_history_target_z"][row, next_rear] > rear_last_z + 0.06))
+-    visible_higher = _visible_higher_riser(
+-        context, scanner.data.pos_w[:, :2], heading, rear_last_xy, rear_last_heading, rear_last_z)
+-    rear_intermediate = queued_higher | visible_higher
+-    rear_pair &= rear_intermediate & commanded_forward
+-    state["rear_same_tread_event"] = rear_pair & (state["rear_same_tread_paid"] != rear_last)
+-    state["rear_same_tread_paid"] = torch.where(
+-        state["rear_same_tread_event"], rear_last, state["rear_same_tread_paid"],
+-    )
+-    pairs = torch.stack((front_pair, rear_pair), dim=1)
+-    risers = torch.stack((front_last, rear_last), dim=1)
+-    new_riser = risers != state["same_tread_riser"]
+-    state["same_tread_time"][new_riser] = 0.0
+-    state["same_tread_riser"] = risers
+-    # A command pause, turn, or temporary scan loss only closes the gate;
+-    # it cannot renew the already consumed grace on this physical riser.
+-    # The grace budget belongs to the tread, not every contact episode: briefly
+-    # lifting/replacing a wheel on that same tread cannot renew the free time.
+-    state["same_tread_time"] += pairs.float() * env.step_dt
+-    # Permit a brief transfer of support, then charge time rather than only
+-    # a one-shot event. The rate is bounded per axle and stops when a leg leaves.
+-    state["same_tread_dwell"] = (pairs & (state["same_tread_time"] > TUNING["same_tread_grace"])).float()
+-    state["same_tread_events_total"] += torch.stack(
+-        (state["front_same_tread_event"], state["rear_same_tread_event"]), dim=1).float()
+-    state["same_tread_seconds_total"] += state["same_tread_dwell"] * env.step_dt
+-
+-    env._m20_ascent_cache = {"step": step, "state": state}
++    face = known[:,:,None] & (x[:,:,:2] >= -0.12) & (x[:,:,:2] <= 0.03) & (
++        wheels[:,None,:2,2] < state["map_z"][:,:,None] + state["radius"][:,None,:2] + 0.05) & (
++        face_force[:,None] > 50) & (face_force[:,None] > 1.5*force[:,None,:2,2].clamp_min(0))
++    new_face = face & ~state["map_face_paid"] & enabled[:,None,None]
++    state["front_face_event"] = new_face.any(1)
++    state["map_face_paid"] |= new_face
++    for axle, name in enumerate(("front", "rear")):
++        sl = slice(2*axle, 2*axle+2)
++        pair = state["map_landed"][:, :, sl]
++        first = pair.any(-1) & ~state["map_paid"][:, :, axle] & known
++        candidate = torch.where(first, state["map_z"], torch.inf).argmin(-1)
++        available = first.any(-1) & enabled
++        landed = pair[row, candidate]
++        single = landed.sum(-1) == 1
++        side = landed.long().argmax(-1)
++        last = state["axis_last_slot"][:, axle]
++        candidate_flight = state["map_flight"][row, candidate]
++        new_flight = available & (last >= 0) & (
++            candidate_flight != state["map_flight"][row,last.clamp_min(0)])
++        last = torch.where(new_flight, -1, last)
++        state[name+"_expected"][new_flight] = -1
++        state["axis_run"][new_flight,axle] = 0
++        last_z = state["map_z"][row, last.clamp_min(0)]
++        last_xy = state["map_xy"][row, last.clamp_min(0)]
++        last_h = state["map_heading"][row, last.clamp_min(0)]
++        advance = ((state["map_xy"][row, candidate] - last_xy) * last_h).sum(-1)
++        source = state["map_lower_z"][row, candidate]
++        adjacent = (last < 0) | ((source-last_z).abs() < TUNING["riser_height_tolerance"]) & (
++            advance >= TUNING["riser_min_spacing"]) & (advance <= TUNING["riser_max_spacing"])
++        # If a first observed landing skips a known lower tread, it is a skip,
++        # including when neither front leg ever paid a completion reward.
++        lower_before = known & (state["map_z"] < state["map_z"][row, candidate, None] - 0.05)
++        lower_before &= state["map_flight"] == candidate_flight[:,None]
++        lower_before &= (last < 0)[:,None] | (state["map_z"] > last_z[:,None]+0.05)
++        lower_unvisited = (lower_before & ~state["map_paid"][:, :, axle]).any(-1)
++        skipped = (~adjacent | lower_unvisited) & available
++        expected = state[name+"_expected"]
++        ordered = (expected < 0) | (side == expected)
++        safe = state["map_safe"][row, candidate, sl].gather(1, side[:, None]).squeeze(-1)
++        correct = available & single & ordered & safe & ~skipped
++        violation = available & ~correct
++        state[name+"_event"] = landed & correct[:, None]
++        state[name+"_violation_event"] = violation
++        state[name+"_successes"] += correct.float()
++        state[name+"_violations"] += violation.float()
++        state["skip_total"][:, axle] += skipped.float()
++        state["physical_total"][:, axle] += available.float()
++        state["unsafe_total"][:, axle] += (available & ~safe).float()
++        state["axis_run"][:, axle] = torch.where(available,
++            torch.where(correct, state["axis_run"][:, axle]+1, 0), state["axis_run"][:, axle])
++        state["axis_max_run"][:, axle] = torch.maximum(state["axis_max_run"][:, axle], state["axis_run"][:, axle])
++        ids = torch.nonzero(available, as_tuple=False).squeeze(-1)
++        slots = candidate[ids]
++        state["map_paid"][ids, slots, axle] = True
++        state["map_correct"][ids, slots, axle] = correct[ids]
++        state["map_side"][ids, slots, axle] = torch.where(single[ids], side[ids], -1)
++        # Physical progress is monotonic; late lower contacts cannot rewind the
++        # sequence or unlock more preparation credit.
++        further = available & ((last < 0) | (state["map_z"][row, candidate] > last_z+0.05))
++        state["axis_last_slot"][further, axle] = candidate[further]
++        state[name+"_expected"][further] = torch.where(single[further], 1-side[further], -1)
++        state[name+"_count"] += available.long()
++        # All historical treads remain checked, including after the first leg
++        # has left. Each axle/tread pays once, and both axles add independently.
++        duplicate = pair.all(-1) & state["map_intermediate"] & known
++        new_duplicate = duplicate & ~state["map_duplicate_paid"][:, :, axle] & enabled[:, None]
++        state["map_duplicate_paid"][:, :, axle] |= new_duplicate
++        state["map_correct"][:, :, axle] &= ~duplicate
++        state[name+"_same_tread_event"] = new_duplicate.any(-1)
++        state["duplicate_event_count"][:, axle] = new_duplicate.sum(-1)
++        state["same_tread_events_total"][:, axle] += new_duplicate.sum(-1)
++        state["axis_run"][new_duplicate.any(-1), axle] = 0
++        current_last = state["axis_last_slot"][:,axle]
++        ambiguous_pair = (current_last >= 0) & new_duplicate[row,current_last.clamp_min(0)]
++        # After both feet occupy one tread, either may restart the sequence.
++        # Requiring an invisible historical leader would make a memoryless
++        # actor's identical current posture receive contradictory targets.
++        state[name+"_expected"][ambiguous_pair] = -1
++        current_pair = stable[:, :, sl].all(-1) & state["map_intermediate"] & known & enabled[:, None]
++        state["map_dwell"][:, :, axle] += current_pair.float()*env.step_dt
++        dwelling = current_pair & (state["map_dwell"][:, :, axle] > TUNING["same_tread_grace"])
++        state["same_tread_dwell"][:, axle] = dwelling.any(-1).float()
++        state["same_tread_seconds_total"][:, axle] += dwelling.any(-1)*env.step_dt
++        # Geometric next target per axle, independent of the other axle queue.
++        last = state["axis_last_slot"][:, axle]
++        last_z = state["map_z"][row, last.clamp_min(0)]
++        last_flight = state["map_flight"][row,last.clamp_min(0)]
++        same_flight = state["map_flight"] == last_flight[:,None]
++        wheel_x = x[:,:,sl].mean(-1)
++        new_flight_ahead = ~same_flight & (wheel_x > -TUNING["prep_distance"]) & (wheel_x < 0.03)
++        ahead = known & ~state["map_paid"][:, :, axle] & (
++            (last < 0)[:, None] | (same_flight & (state["map_z"] > last_z[:, None]+0.05)) | new_flight_ahead)
++        target = torch.where(ahead, state["map_z"], torch.inf).argmin(-1)
++        has_target = ahead.any(-1)
++        changed = has_target & (target != state["axis_target_slot"][:, axle])
++        state["targets_started"] += changed.float() if axle == 0 else 0
++        state["axis_target_slot"][:, axle] = torch.where(has_target, target, -1)
++        expected = state[name+"_expected"]
++        lead = state["map_lead"][row, target, axle]
++        lead = torch.where(expected >= 0, expected, lead)
++        hfrac = (wheels[:, sl, 2] - state["radius"][:, sl] - state["map_lower_z"][row, target, None]) / (
++            state["map_z"][row, target, None] - state["map_lower_z"][row, target, None] + 0.02).clamp_min(0.06)
++        tx = x[row, target, sl]
++        progress = hfrac.clamp(0,1) * ((tx+TUNING["prep_distance"])/TUNING["prep_distance"]).clamp(0,1)
++        other_support = loaded.sum(-1,keepdim=True) - loaded[:, sl].long()
++        eligible = has_target[:, None] & enabled[:, None] & ~loaded[:, sl] & (other_support >= 2) & (
++            tx > -TUNING["prep_distance"]) & (tx < 0.03)
++        progress = torch.where(eligible, progress, 0)
++        lead = torch.where(lead >= 0, lead, progress.argmax(-1))
++        current = progress.gather(1,lead[:, None]).squeeze(-1)
++        gain = (current-state["map_prep_max"][row, target, axle]).clamp_min(0)
++        budget = (1+state[name+"_successes"]-state[name+"_lift_credit"]).clamp_min(0)
++        gain = torch.minimum(gain,budget)*has_target
++        state["map_lead"][row, target, axle] = torch.where(gain > 0,lead,state["map_lead"][row,target,axle])
++        state["map_prep_max"][row,target,axle] = torch.maximum(state["map_prep_max"][row,target,axle],current)
++        state[name+"_lift_gain"] = gain
++        state[name+"_lift_credit"] += gain
++    state["previous_wheel"] = wheels.clone()
++    state["wheel_history_valid"].fill_(True)
++    # Retain unpaid tread history on departure, but do not apply stair posture
++    # shaping on unrelated flat terrain. Rear feet can keep the phase active
++    # after the forward scan has cleared, while an actual lateral exit cannot.
++    nearby = known[:,:,None] & (cross < TUNING["tread_observation_corridor"]) & (
++        x > -TUNING["prep_distance"]) & (
++        x < torch.where(torch.isfinite(state["map_next_x"]),
++                        state["map_next_x"],TUNING["riser_max_spacing"])[:,:,None]+0.20) & (
++        wheels[:,None,:,2]-state["radius"][:,None] >= state["map_lower_z"][:,:,None]-0.10) & (
++        wheels[:,None,:,2]-state["radius"][:,None] <= state["map_z"][:,:,None]+0.50)
++    state["active"] = enabled & (state["axis_target_slot"] >= 0).any(-1) & nearby.any((1,2))
++    target = torch.where(state["axis_target_slot"][:,0]>=0,state["axis_target_slot"][:,0],
++        torch.where(state["axis_target_slot"][:,1]>=0,state["axis_target_slot"][:,1],state["axis_last_slot"][:,0])).clamp_min(0)
++    state["edge_xy"] = state["map_xy"][row,target].clone()
++    state["heading"] = state["map_heading"][row,target].clone()
++    state["source_z"] = state["map_lower_z"][row,target].clone()
++    state["target_z"] = state["map_z"][row,target].clone()
++    state["forward_steps"] += state["active"].float()
++    state["retreat_steps"] += (state["active"] & (robot.data.root_lin_vel_b[:,0] < -0.05)).float()
++    state["stationary_steps"] += (state["active"] & (robot.data.root_lin_vel_b[:,0].abs() < 0.05)).float()
++    env._m20_ascent_cache = {"step":step,"state":state}
+     return state
++
++
++def stair_rear_wheel_lift(env, asset_cfg, sensor_cfg, contact_sensor_cfg, command_name="base_velocity"):
++    """One bounded preparation budget per rear target; no cyclic leg-dance pay."""
++    return ascent_state(env,asset_cfg,sensor_cfg,contact_sensor_cfg,command_name)["rear_lift_gain"] / env.step_dt
++
++
+ 
+ 
+ # =============================================================================
+@@ -1420,7 +1443,7 @@
+ ) -> torch.Tensor:
+     """One-shot cost for unsafe, simultaneous, or wrong-side riser landings."""
+     state = ascent_state(env, asset_cfg, sensor_cfg, contact_sensor_cfg)
+-    return (state["front_violation_event"] | state["rear_violation_event"]).float() / env.step_dt
++    return (state["front_violation_event"].float() + state["rear_violation_event"].float()) / env.step_dt
+ 
+ 
+ def stair_up_same_tread_cost(
+@@ -1429,7 +1452,7 @@
+ ) -> torch.Tensor:
+     """Cost once per riser if both front or both rear wheels share its tread."""
+     state = ascent_state(env, asset_cfg, sensor_cfg, contact_sensor_cfg)
+-    return (state["front_same_tread_event"] | state["rear_same_tread_event"]).float() / env.step_dt
++    return state["duplicate_event_count"].sum(-1) / env.step_dt
+ 
+ 
+ def stair_up_same_tread_dwell_cost(env, asset_cfg, sensor_cfg, contact_sensor_cfg):
+@@ -1473,18 +1496,24 @@
+     env, std: float, command_name: str,
+     sensor_cfg: SceneEntityCfg = SceneEntityCfg("height_scanner"),
+     asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+-) -> torch.Tensor:
+-    """Keep native tracking for every direction, including commands after a turn.
+-
+-    Stair completion still needs an actual riser crossing. The old frozen
+-    route multiplier could erase tracking reward after a legitimate turn.
++    hip_cfg=None, knee_cfg=None, contact_sensor_cfg=None,
++) -> torch.Tensor:
++    """Retain most native tracking; unsafe posture forfeits a bounded fraction.
++
++    Do not suppress driving throughout an entire swing/target or require a
++    periodic gait clock. Legacy saved calls without gait entities stay native.
+     """
+     from .rewards import track_lin_vel_xy_exp
+-    native = track_lin_vel_xy_exp(env, std, command_name, asset_cfg)
+-    return native
+-
+-
+-def stair_step_completion_metrics(env, env_ids) -> dict[str, torch.Tensor]:
++    native = track_lin_vel_xy_exp(env,std,command_name,asset_cfg)
++    if hip_cfg is None or knee_cfg is None or contact_sensor_cfg is None:
++        return native
++    c = _context(env,asset_cfg,hip_cfg,knee_cfg,sensor_cfg,contact_sensor_cfg,command_name)
++    severity = torch.maximum((c["front_fold"]+c["front_swing_fold"]).mean(-1),c["rear_forward"].mean(-1))
++    severity = torch.maximum(severity,c["body_gap"])
++    return native*(1-TUNING["pose_tracking_discount"]*severity)
++
++
++def _legacy_step_completion_metrics(env, env_ids) -> dict[str, torch.Tensor]:
+     """Report front and rear ascent sequence results alongside descent results."""
+     down_state = getattr(env, "_m20_stair_step_state", None)
+     up_state = getattr(env, "_m20_ascent_state", None)
+@@ -1719,14 +1748,17 @@
+     command = env.command_manager.get_command(command_name)
+     down = scan["down_gate"] > 0
+     descent = getattr(env, "_m20_stair_step_state", None)
++    down_follow = torch.zeros(env.num_envs,dtype=torch.bool,device=env.device)
+     if descent is not None:
+-        down |= descent["active"] & ~descent["up"] & (env.episode_length_buf > 1)
++        close = torch.linalg.vector_norm(wheels[:,:,:2]-descent["edge_xy"][:,None],dim=-1).amin(-1) < TUNING["pose_phase_radius"]
++        down_follow = descent["active"] & ~descent["up"] & (env.episode_length_buf > 1) & close
++        down |= down_follow
+     down &= command[:, 0] > TUNING["translation_threshold"]
+     # All visible upward edges include the one recently passed by the trunk.
+     # An active target also keeps the gate through a temporary scan transition.
+     rising_edges = scan.get("ascending_edges_valid")
+     up = (scan["up_gate"] > 0) if rising_edges is None else rising_edges.any(dim=1)
+-    ascent = getattr(env, "_m20_ascent_state", None)
++    ascent = ascent_state(env,asset_cfg,sensor_cfg,contact_sensor_cfg,command_name)
+     if ascent is not None:
+         up |= ascent["active"] & (env.episode_length_buf > 1)
+     up &= (command[:, 0] > TUNING["translation_threshold"]) & ~down
+@@ -1736,24 +1768,72 @@
+     turn = pure_turn(command)
+     size = turn_size_excess(clearance, reach, scan["terrain_gate"])
+     size = torch.where(ground_valid & airborne, size, 0.0)
+-    fold = torch.where(support[:, 2:] & down[:, None], fold_excess(extension[:, 2:], knee[:, 2:]), 0.0)
+-    front_support = (support[:, :2]
+-                     & (contact.data.current_contact_time[:, contact_sensor_cfg.body_ids][:, :2]
+-                        >= TUNING["front_support_grace"]) & up[:, None])
+-    front_fold = torch.where(front_support, fold_excess(
+-        extension[:, :2], knee[:, :2], TUNING["front_min_extension"], TUNING["front_max_knee"]), 0.0)
+-    front_swing = airborne[:, :2] & ground_valid[:, :2] & up[:, None]
+-    # Swing needs substantial flexion to clear a riser. Only the wider severe
+-    # envelope is charged, at a weaker rate than settled support.
+-    front_swing_fold = torch.where(front_swing, fold_excess(
+-        extension[:, :2], knee[:, :2], TUNING["front_swing_min_extension"],
+-        TUNING["front_swing_max_knee"]), 0.0)
++    # Force-supported posture is measurable without a terrain-nearest point.
++    # Ground validity remains required only by ground-relative turn/clearance.
++    load = (force[...,2] > 5) & (force[...,2] > 0.5*torch.linalg.vector_norm(force,dim=-1)) & ~airborne
++    load_gain = (force[...,2] / TUNING["pose_load_force_scale"]).clamp(0,1)
++    fold = torch.where(load[:,2:] & down[:,None], fold_excess(extension[:,2:],knee[:,2:]),0)
++    rise = scan["edge_delta"].abs()
++    if ascent is not None:
++        rise = torch.maximum(rise,torch.where(ascent["active"],
++            (ascent["target_z"]-ascent["source_z"]).abs(),0))
++    if descent is not None:
++        rise = torch.maximum(rise,torch.where(down_follow,
++            (descent["target_z"]-descent["source_z"]).abs(),0))
++    relax = ((rise-TUNING["pose_low_rise"]) / (TUNING["pose_high_rise"]-TUNING["pose_low_rise"])).clamp(0,1)
++    a_support = TUNING["front_a_support_low_deg"] + relax*(TUNING["front_a_support_high_deg"]-TUNING["front_a_support_low_deg"])
++    a_swing = TUNING["front_a_swing_low_deg"] + relax*(TUNING["front_a_swing_high_deg"]-TUNING["front_a_swing_low_deg"])
++    front_a = (torch.pi-knee[:,:2].abs()).clamp_min(0)
++    front_support = load[:,:2] & up[:,None]
++    # Face brushing cannot pretend to be valid support and escape the wider
++    # swing envelope; no initial 0.2s free deep fold and no nearest-map veto.
++    front_swing = ~load[:,:2] & up[:,None]
++    def bounded(value):
++        square = value.clamp_min(0).square()
++        return square/(1+square)
++    front_loaded_angle = bounded((torch.deg2rad(a_support)[:,None]-front_a)/TUNING["pose_angle_scale"])
++    front_air_angle = bounded((torch.deg2rad(a_swing)[:,None]-front_a)/TUNING["pose_angle_scale"])
++    support_length = TUNING["front_min_extension"]+relax*(TUNING["front_support_length_high"]-TUNING["front_min_extension"])
++    swing_length = TUNING["front_swing_min_extension_v3"]+relax*(TUNING["front_swing_length_high"]-TUNING["front_swing_min_extension_v3"])
++    front_loaded_length = bounded((support_length[:,None]-extension[:,:2])/TUNING["pose_length_scale"])
++    front_air_length = bounded((swing_length[:,None]-extension[:,:2])/TUNING["pose_length_scale"])
++    # Use the worse of angle/length, since both describe the same flexion.
++    front_fold = torch.maximum(front_loaded_angle,front_loaded_length)*front_support*load_gain[:,:2]
++    front_swing_fold = torch.maximum(front_air_angle,front_air_length)*front_swing
++    delta = wheels-hips
++    qb = robot.data.root_quat_w[:,None].expand(-1,4,-1).reshape(-1,4)
++    body_delta = quat_apply_inverse(qb,delta.reshape(-1,3)).reshape(-1,4,3)
++    qy = yaw_quat(robot.data.root_quat_w)[:,None].expand(-1,4,-1).reshape(-1,4)
++    gravity_delta = quat_apply_inverse(qy,delta.reshape(-1,3)).reshape(-1,4,3)
++    body_angle = torch.atan2(body_delta[...,0],(-body_delta[...,2]).clamp_min(1e-6))
++    gravity_angle = torch.atan2(gravity_delta[...,0],(-gravity_delta[...,2]).clamp_min(1e-6))
++    rear_limit = relax[:,None]*TUNING["rear_forward_relax"]
++    excess_b = (body_angle[:,2:]-TUNING["rear_b_limit"]-rear_limit)/TUNING["pose_angle_scale"]
++    excess_g = (gravity_angle[:,2:]-TUNING["rear_g_limit"]-rear_limit)/TUNING["pose_angle_scale"]
++    rear_load = load[:,2:] & down[:,None]
++    rear_forward = bounded(torch.maximum(excess_b,excess_g))*rear_load*load_gain[:,2:]
++    # A gravity-aligned safety lower envelope is a height-map proxy, not an
++    # exact collision mesh distance. It alone requires local map validity.
++    points = wheels.new_tensor([[x,y,TUNING["body_bottom_z"]] for x in (0.10,0.22,0.34) for y in (-0.16,0,0.16)])
++    count = points.shape[0]
++    q = robot.data.root_quat_w[:,None].expand(-1,count,-1).reshape(-1,4)
++    world = quat_apply(q,points[None].expand(env.num_envs,-1,-1).reshape(-1,3)).reshape(env.num_envs,count,3)+robot.data.root_pos_w[:,None]
++    distances = torch.linalg.vector_norm(world[:,:,None,:2]-hits[:,None,:,:2],dim=-1)
++    local = valid[:,None] & (distances < TUNING["nearest_valid_distance"])
++    floor = torch.where(local,hits[:,None,:,2],-torch.inf).amax(-1)
++    gap_valid = local.any(-1).any(-1) & up
++    gap = torch.where(local.any(-1),world[...,2]-floor,torch.inf).amin(-1)
++    body_gap = torch.where(gap_valid,bounded((TUNING["body_gap_target"]-gap)/TUNING["body_gap_scale"]),0)
++    _update_pose_stats(env,up,down,front_a,front_support,front_swing,front_loaded_angle,front_air_angle,
++                       body_angle[:,2:],gravity_angle[:,2:],rear_load,rear_forward,gap,gap_valid,load,ground_valid)
+     tracking = turn_tracking_quality(robot.data.root_ang_vel_b[:, 2], command[:, 2])
+     cached = dict(step=step, turn=turn, tracking=tracking, support=support, airborne=airborne, clearance=clearance,
+                   ground_valid=ground_valid, extension=extension, knee=knee, reach=reach,
+                   size=size, fold=fold, down=down, up=up,
+                   front_fold=front_fold, front_support=front_support,
+-                  front_swing=front_swing, front_swing_fold=front_swing_fold)
++                  front_swing=front_swing, front_swing_fold=front_swing_fold,
++                  rear_forward=rear_forward, body_angle=body_angle, gravity_angle=gravity_angle,
++                  body_gap=body_gap, body_gap_m=gap, body_gap_valid=gap_valid, load=load, rear_load=rear_load)
+     env._m20_gait_context = cached
+     # Once per control step, independently of how many reward terms use it.
+     stats = getattr(env, "_m20_gait_stats", None)
+@@ -1774,7 +1854,7 @@
+     stats["turn_reach_sum"] += torch.where(valid_turn, reach.mean(dim=1), 0)
+     stats["turn_size_sum"] += size.mean(dim=1) * turn.float()
+     stats["turn_yaw_error_sum"] += (robot.data.root_ang_vel_b[:, 2] - command[:, 2]).abs() * valid_turn.float()
+-    rear_samples = support[:, 2:] & down[:, None]
++    rear_samples = load[:, 2:] & down[:, None]
+     stats["rear_support_samples"] += rear_samples.sum(dim=1)
+     stats["rear_extension_sum"] += (extension[:, 2:] * rear_samples.float()).sum(dim=1)
+     stats["rear_fold_samples"] += ((fold > 0) & rear_samples).sum(dim=1)
+@@ -1801,11 +1881,11 @@
+ def ascent_front_fold_cost(env, asset_cfg, hip_cfg, knee_cfg, sensor_cfg, contact_sensor_cfg):
+     """Bounded cost for excessive front flexion with separate support/swing envelopes.
+ 
+-    Normal swing and initial touchdown compliance are free; only severe swing
+-    flexion is charged. Commands and missing local ground close the gates.
++    Support and swing have height-adaptive soft envelopes. Genuine vertical
++    load activates posture immediately, independently of nearest-map validity.
+     """
+     c = _context(env, asset_cfg, hip_cfg, knee_cfg, sensor_cfg, contact_sensor_cfg)
+-    return (c["front_fold"] + TUNING["front_swing_scale"] * c["front_swing_fold"]).mean(dim=1)
++    return (c["front_fold"] + c["front_swing_fold"]).mean(dim=1)
+ 
+ 
+ def compact_turn_air_time(env, command_name, sensor_cfg, asset_cfg, threshold,
+@@ -1840,7 +1920,7 @@
+     return pattern.float() * c["turn"].float() * c["tracking"] * get_gait_level_tensor(env)
+ 
+ 
+-def gait_quality_metrics(env, env_ids):
++def _legacy_gait_quality_metrics(env, env_ids):
+     stats = getattr(env, "_m20_gait_stats", None)
+     if stats is None:
+         return {"samples": torch.zeros((), device=env.device)}
+@@ -1864,6 +1944,138 @@
+             "front_extreme_swing_fold_fraction": s["front_swing_fold_samples"] / swing}
+ 
+ 
++def descent_rear_forward_cost(env, asset_cfg, hip_cfg, knee_cfg, sensor_cfg, contact_sensor_cfg):
++    """Penalize excess rear forward reach while actually bearing vertical load."""
++    return _context(env,asset_cfg,hip_cfg,knee_cfg,sensor_cfg,contact_sensor_cfg)["rear_forward"].mean(-1)
++
++
++def ascent_front_body_clearance_cost(env, asset_cfg, hip_cfg, knee_cfg, sensor_cfg, contact_sensor_cfg):
++    """Map-based front belly clearance; invalid cells cannot fabricate a cost."""
++    return _context(env,asset_cfg,hip_cfg,knee_cfg,sensor_cfg,contact_sensor_cfg)["body_gap"]
++
++
++def _update_pose_stats(env,up,down,front_a,front_load,front_air,loaded_cost,air_cost,
++                       rear_b,rear_g,rear_load,rear_cost,gap,gap_valid,load,ground_valid):
++    names = ("front_loaded_samples","front_loaded_a_sum","front_loaded_bad",
++             "front_swing_samples","front_swing_a_sum","front_swing_bad",
++             "rear_loaded_samples","rear_b_sum","rear_g_sum","rear_bad",
++             "rear_entry_samples","rear_entry_b_sum","rear_entry_g_sum")
++    state = getattr(env,"_m20_pose_stats",None)
++    if state is None:
++        state = {name:torch.zeros(env.num_envs,2,device=env.device) for name in names}
++        state.update({name:torch.zeros(env.num_envs,device=env.device) for name in
++                      ("gap_samples","gap_sum","gap_bad","up_steps","down_steps","loaded_without_local_map")})
++        state["front_loaded_a_min"] = torch.full((env.num_envs,2),torch.pi,device=env.device)
++        state["front_swing_a_min"] = torch.full((env.num_envs,2),torch.pi,device=env.device)
++        state["rear_b_max"] = torch.full((env.num_envs,2),-torch.pi,device=env.device)
++        state["rear_g_max"] = torch.full((env.num_envs,2),-torch.pi,device=env.device)
++        env._m20_pose_stats = state
++    reset = env.episode_length_buf <= 1
++    for key,value in state.items():
++        value[reset] = torch.pi if key.endswith("_min") else (-torch.pi if key.endswith("_max") else 0)
++    state["up_steps"] += up; state["down_steps"] += down
++    for phase,mask,cost in (("loaded",front_load,loaded_cost),("swing",front_air,air_cost)):
++        state[f"front_{phase}_samples"] += mask
++        state[f"front_{phase}_a_sum"] += front_a*mask
++        state[f"front_{phase}_bad"] += (cost>0)&mask
++        state[f"front_{phase}_a_min"] = torch.minimum(state[f"front_{phase}_a_min"],torch.where(mask,front_a,torch.pi))
++    state["rear_loaded_samples"] += rear_load
++    state["rear_b_sum"] += rear_b*rear_load; state["rear_g_sum"] += rear_g*rear_load
++    state["rear_bad"] += (rear_cost>0)&rear_load
++    state["rear_b_max"] = torch.maximum(state["rear_b_max"],torch.where(rear_load,rear_b,-torch.pi))
++    state["rear_g_max"] = torch.maximum(state["rear_g_max"],torch.where(rear_load,rear_g,-torch.pi))
++    descent = getattr(env,"_m20_stair_step_state",None)
++    entry = torch.zeros(env.num_envs,dtype=torch.bool,device=env.device)
++    if descent is not None:
++        # Mixed support: at least one front wheel has transferred down but rear
++        # support has not completed, rather than time since first seeing stairs.
++        entry = descent["active"] & ~descent["up"] & descent["front_reached"].any(-1) & ~descent["rear_support_paid"].all(-1)
++    mask = rear_load & entry[:,None]
++    state["rear_entry_samples"] += mask
++    state["rear_entry_b_sum"] += rear_b*mask; state["rear_entry_g_sum"] += rear_g*mask
++    state["gap_samples"] += gap_valid
++    state["gap_sum"] += torch.where(gap_valid,gap,0)
++    state["gap_bad"] += gap_valid&(gap<TUNING["body_gap_target"])
++    state["loaded_without_local_map"] += (load&~ground_valid&(up|down)[:,None]).sum(-1)
++
++
++def gait_quality_metrics(env,env_ids):
++    result = _legacy_gait_quality_metrics(env,env_ids)
++    state = getattr(env,"_m20_pose_stats",None)
++    if state is None:
++        return result
++    sums = {key:value[env_ids].sum(0) for key,value in state.items()}
++    def average(total,count):
++        return torch.rad2deg(total.sum()/count.sum().clamp_min(1))
++    for phase in ("loaded","swing"):
++        count = sums[f"front_{phase}_samples"]
++        result[f"front_{phase}_a_mean_deg"] = average(sums[f"front_{phase}_a_sum"],count)
++        result[f"front_{phase}_a_low_fraction"] = sums[f"front_{phase}_bad"].sum()/count.sum().clamp_min(1)
++        observed = state[f"front_{phase}_a_min"][env_ids]
++        result[f"front_{phase}_a_min_deg"] = torch.rad2deg(observed.amin()) if observed.numel() and count.sum()>0 else count.new_zeros(())
++        for leg,i in (("fl",0),("fr",1)):
++            result[f"{leg}_{phase}_samples"] = count[i]
++            result[f"{leg}_{phase}_a_mean_deg"] = torch.rad2deg(sums[f"front_{phase}_a_sum"][i]/count[i].clamp_min(1))
++            result[f"{leg}_{phase}_a_low_fraction"] = sums[f"front_{phase}_bad"][i]/count[i].clamp_min(1)
++    rear = sums["rear_loaded_samples"]
++    result["rear_forward_samples"] = rear.sum()
++    result["rear_forward_excess_fraction"] = sums["rear_bad"].sum()/rear.sum().clamp_min(1)
++    result["rear_body_b_mean_deg"] = average(sums["rear_b_sum"],rear)
++    result["rear_gravity_g_mean_deg"] = average(sums["rear_g_sum"],rear)
++    for coord in ("b","g"):
++        peak = state[f"rear_{coord}_max"][env_ids]
++        result[f"rear_{coord}_max_deg"] = torch.rad2deg(peak.amax()) if peak.numel() and rear.sum()>0 else rear.new_zeros(())
++    for leg,i in (("hl",0),("hr",1)):
++        result[f"{leg}_loaded_samples"] = rear[i]
++        result[f"{leg}_body_b_mean_deg"] = torch.rad2deg(sums["rear_b_sum"][i]/rear[i].clamp_min(1))
++        result[f"{leg}_gravity_g_mean_deg"] = torch.rad2deg(sums["rear_g_sum"][i]/rear[i].clamp_min(1))
++        result[f"{leg}_forward_excess_fraction"] = sums["rear_bad"][i]/rear[i].clamp_min(1)
++    entry = sums["rear_entry_samples"]
++    result["rear_entry_samples"] = entry.sum()
++    result["rear_entry_b_mean_deg"] = average(sums["rear_entry_b_sum"],entry)
++    result["rear_entry_g_mean_deg"] = average(sums["rear_entry_g_sum"],entry)
++    result["front_body_gap_samples"] = sums["gap_samples"]
++    result["front_body_gap_mean_m"] = sums["gap_sum"]/sums["gap_samples"].clamp_min(1)
++    result["front_body_gap_low_fraction"] = sums["gap_bad"]/sums["gap_samples"].clamp_min(1)
++    result["loaded_without_local_map_samples"] = sums["loaded_without_local_map"]
++    return result
++
++
++def stair_step_completion_metrics(env,env_ids):
++    result = _legacy_step_completion_metrics(env,env_ids)
++    state = getattr(env,"_m20_ascent_state",None)
++    if state is None:
++        return result
++    ids = torch.arange(env.num_envs,device=env.device)[env_ids]
++    known = torch.arange(64,device=env.device)[None] < state["map_count"][ids,None]
++    intermediate = state["map_intermediate"][ids]&known
++    result["registered_risers"] = state["map_count"][ids].float().mean()
++    for axle,name in enumerate(("front","rear")):
++        paid = state["map_paid"][ids,:,axle]&known
++        strict = state["map_correct"][ids,:,axle]&~state["map_duplicate_paid"][ids,:,axle]&intermediate
++        result[f"up_{name}_registered_intermediate_risers"] = intermediate.sum().float()
++        result[f"up_{name}_landing_coverage"] = paid.sum().float()/known.sum().clamp_min(1)
++        result[f"up_{name}_strict_coverage"] = strict.sum().float()/intermediate.sum().clamp_min(1)
++        result[f"up_{name}_physical_landings"] = state["physical_total"][ids,axle].float().mean()
++        result[f"up_{name}_skipped_riser_events"] = state["skip_total"][ids,axle].float().mean()
++        result[f"up_{name}_unsafe_events"] = state["unsafe_total"][ids,axle].float().mean()
++        # Longest surviving strict run. A later duplicate invalidates an earlier
++        # tread; future detected-but-unlanded treads contribute no success.
++        order = (state["map_flight"][ids].float()*1e6+state["map_z"][ids]).argsort(dim=-1,stable=True)
++        good = strict.gather(1,order)
++        flight = state["map_flight"][ids].gather(1,order)
++        group_start = torch.ones_like(good); group_start[:,1:] = flight[:,1:]!=flight[:,:-1]
++        total = good.long().cumsum(-1)
++        restart = torch.where(~good,total,torch.where(group_start,total-good.long(),0)).cummax(-1).values
++        runs = (total-restart).amax(-1)
++        result[f"up_{name}_longest_strict_run"] = runs.float().mean()
++        result[f"up_{name}_six_step_strict_fraction"] = (runs>=6).float().mean()
++        for side,leg in enumerate((("fl","fr"),("hl","hr"))[axle]):
++            result[f"{leg}_stable_treads"] = (state["map_landed"][ids,:,axle*2+side]&known).sum(-1).float().mean()
++    result["up_rear_lift_credit"] = state["rear_lift_credit"][ids].mean()
++    return result
++
++
+ # =============================================================================
+ # 7. Terrain curriculum and per-terrain level metrics
+ # =============================================================================
+--- .scratch/gait_v3_20261008/before/stair_teacher_env_cfg.py
++++ source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_teacher_env_cfg.py
+@@ -113,7 +113,7 @@
+     )
+     stair_front_wheel_lift = RewTerm(
+         func=stair_teacher.stair_front_wheel_lift,
+-        weight=1.0,
++        weight=stair_teacher.TUNING["prep_weight"],
+         params={
+             "asset_cfg": SceneEntityCfg("robot", body_names=["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], preserve_order=True),
+             "sensor_cfg": SceneEntityCfg("height_scanner"),
+@@ -134,7 +134,7 @@
+     )
+     stair_front_wheel_touchdown = RewTerm(
+         func=stair_teacher.stair_front_wheel_touchdown,
+-        weight=1.0,
++        weight=stair_teacher.TUNING["front_touchdown_weight"],
+         params={
+             "asset_cfg": SceneEntityCfg("robot", body_names=["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], preserve_order=True),
+             "sensor_cfg": SceneEntityCfg("height_scanner"),
+@@ -194,7 +194,7 @@
+     )
+     stair_up_rear_step_completion = RewTerm(
+         func=stair_teacher.stair_up_rear_step_completion,
+-        weight=2.0,
++        weight=stair_teacher.TUNING["rear_completion_weight"],
+         params={
+             "asset_cfg": SceneEntityCfg(
+                 "robot", body_names=["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], preserve_order=True
+@@ -205,6 +205,19 @@
+                 body_names=["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], preserve_order=True,
+             ),
+         },
++    )
++    stair_rear_wheel_lift = RewTerm(
++        func=stair_teacher.stair_rear_wheel_lift,
++        weight=stair_teacher.TUNING["prep_weight"],
++        params={k:v for k,v in _gait_entities().items() if k not in ("hip_cfg","knee_cfg")},
++    )
++    stair_descent_rear_forward_cost = RewTerm(
++        func=stair_teacher.descent_rear_forward_cost,
++        weight=stair_teacher.TUNING["rear_forward_weight"], params=_gait_entities(),
++    )
++    stair_ascent_front_body_clearance_cost = RewTerm(
++        func=stair_teacher.ascent_front_body_clearance_cost,
++        weight=stair_teacher.TUNING["body_gap_weight"], params=_gait_entities(),
+     )
+     stair_up_order_violation_cost = RewTerm(
+         func=stair_teacher.stair_up_order_violation_cost,
+@@ -538,7 +551,7 @@
+         # Keep the official velocity reward but prevent sideways bypassing a
+         # detected forward stair route from earning its full dense reward.
+         self.rewards.track_lin_vel_xy_exp.func = stair_teacher.stair_route_track_lin_vel_xy_exp
+-        self.rewards.track_lin_vel_xy_exp.params["sensor_cfg"] = SceneEntityCfg("height_scanner")
++        self.rewards.track_lin_vel_xy_exp.params.update(_gait_entities())
+ 
+         # Replace the flat orientation term with a map-gated L2 cost.
+         self.rewards.flat_orientation_l2.weight = 0.0
+--- .scratch/gait_v3_20261008/before/smoke_stair_rewards.py
++++ scripts/tools/smoke_stair_rewards.py
+@@ -64,12 +64,14 @@
+     unified_names = ('stair_up_step_completion', 'stair_up_rear_step_completion',
+                      'stair_descent_rear_fold_cost', 'stair_ascent_front_fold_cost',
+                      'stair_ascent_direction_cost',
++                     'stair_rear_wheel_lift', 'stair_descent_rear_forward_cost',
++                     'stair_ascent_front_body_clearance_cost',
+                      'turn_swing_size_cost', 'rotation_gait_status', 'feet_air_time_ang_z_M20')
+     unified_bindings = {name: base.reward_manager.get_term_cfg(name).func.__module__ for name in unified_names}
+     assert all(module == canonical_module for module in unified_bindings.values()), unified_bindings
+     term_peak = torch.zeros(len(base.reward_manager.active_terms), device=base.device)
+     binding = {}
+-    for name in ('stair_descent_rear_fold_cost', 'stair_ascent_front_fold_cost', 'stair_ascent_direction_cost', 'turn_swing_size_cost', 'rotation_gait_status'):
++    for name in ('stair_descent_rear_fold_cost', 'stair_ascent_front_fold_cost', 'stair_ascent_direction_cost', 'stair_rear_wheel_lift', 'stair_descent_rear_forward_cost', 'stair_ascent_front_body_clearance_cost', 'turn_swing_size_cost', 'rotation_gait_status', 'track_lin_vel_xy_exp'):
+         term = base.reward_manager.get_term_cfg(name)
+         binding[name] = {}
+         for key, entity in term.params.items():
+@@ -117,8 +119,9 @@
+         finite=True, mean_return=reward_sum,
+         targets_started=float(state['targets_started'].sum()),
+         front_lift_credit=float(state['front_lift_credit'].sum()),
+-        unique_lift_targets=int(state['lift_history_count'].sum()),
+-        calibrated_wheel_fraction=float(torch.isfinite(state['radius']).float().mean()),
++        observed_risers=int(state['map_count'].sum()),
++        nominal_radius_finite_fraction=float(torch.isfinite(state['radius']).float().mean()),
++        calibrated_wheel_fraction=float(state['radius_calibrated'].float().mean()),
+         unified_reward_modules=unified_bindings, legacy_aliases_identical=True,
+         active_reward_weights=weights, resolved_gait_entities=binding,
+         reward_abs_peaks={name:float(term_peak[i]) for i,name in enumerate(base.reward_manager.active_terms)})
+@@ -129,6 +132,11 @@
+     result['step_metrics'] = {key:float(value) for key,value in stair_teacher.stair_step_completion_metrics(base, slice(None)).items()}
+     result['gait_tuning'] = stair_teacher.TUNING
+     result['canonical_source_sha256'] = hashlib.sha256(Path(stair_teacher.__file__).read_bytes()).hexdigest()
++    assert result['observed_risers'] > 0, 'Smoke never observed a riser'
++    for tag in ('up_front_strict_coverage','up_rear_strict_coverage','up_rear_lift_credit'):
++        assert tag in result['step_metrics'],tag
++    for tag in ('front_loaded_a_low_fraction','rear_forward_excess_fraction','rear_entry_samples'):
++        assert tag in result['gait_metrics'],tag
+     args.output.parent.mkdir(parents=True, exist_ok=True)
+     args.output.write_text(json.dumps(result, indent=2)+'\n')
+     print('STAIR_SMOKE_RESULT='+json.dumps(result), flush=True)

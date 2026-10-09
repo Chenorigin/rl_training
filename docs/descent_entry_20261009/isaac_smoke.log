@@ -1,0 +1,306 @@
+Loading user config located at: '/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20261009_014923.log
+2026-10-08T17:49:23Z [69ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 1 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 2 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 3 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 4 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 5 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 6 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 7 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 8 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 9 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 10 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 11 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 12 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 13 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 14 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 15 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 16 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 17 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 18 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 19 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 20 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 21 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 22 belongs to.
+2026-10-08T17:49:24Z [247ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 23 belongs to.
+MESA: warning: Driver does not support the 0x7d67 PCI ID.
+MESA: warning: Driver does not support the 0x7d67 PCI ID.
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/ubuntu/xyproject/m20_wzh/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO]: Parsing configuration from: rl_training.tasks.manager_based.locomotion.velocity.config.wheeled.deeprobotics_m20.stair_teacher_env_cfg:DeeproboticsM20StairTeacherEnvCfg
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-10-09_01-49-29.log[0m
+[36m======================================================================================[0m
+
+[33m01:49:29 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 42
+	Physics step-size     : 0.005
+	Rendering step-size   : 0.02
+	Environment step-size : 0.02
+[INFO] Generating terrains based on curriculum took : 0.352759 seconds
+[INFO]: Time taken for scene creation : 0.530065 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 16
+	Environment spacing   : 2.5
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : ['/World/ground']
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 0.437160 seconds
+[INFO] Command Manager:  <CommandManager> contains 1 active terms.
++-----------------------------------------------------+
+|                 Active Command Terms                |
++-------+---------------+-----------------------------+
+| Index | Name          |             Type            |
++-------+---------------+-----------------------------+
+|   0   | base_velocity | StairTeacherVelocityCommand |
++-------+---------------+-----------------------------+
+
+[INFO] Event Manager:  <EventManager> contains 3 active terms.
++----------------------------------------+
+| Active Event Terms in Mode: 'startup'  |
++-------+--------------------------------+
+| Index | Name                           |
++-------+--------------------------------+
+|   0   | randomize_rigid_body_material  |
+|   1   | randomize_rigid_body_mass      |
+|   2   | randomize_rigid_body_mass_base |
+|   3   | randomize_rigid_body_inertia   |
+|   4   | randomize_com_positions        |
++-------+--------------------------------+
++-----------------------------------------------+
+|      Active Event Terms in Mode: 'reset'      |
++-------+---------------------------------------+
+| Index | Name                                  |
++-------+---------------------------------------+
+|   0   | randomize_apply_external_force_torque |
+|   1   | randomize_reset_joints                |
+|   2   | randomize_actuator_gains              |
+|   3   | randomize_reset_base                  |
++-------+---------------------------------------+
++--------------------------------------------------------+
+|         Active Event Terms in Mode: 'interval'         |
++-------+----------------------+-------------------------+
+| Index | Name                 | Interval time range (s) |
++-------+----------------------+-------------------------+
+|   0   | randomize_push_robot |       (10.0, 15.0)      |
++-------+----------------------+-------------------------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 2 active terms.
++------------------------------------+
+|  Active Action Terms (shape: 16)   |
++--------+-------------+-------------+
+| Index  | Name        |   Dimension |
++--------+-------------+-------------+
+|   0    | joint_pos   |          12 |
+|   1    | joint_vel   |           4 |
++--------+-------------+-------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 2 groups.
++----------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (244,)) |
++-----------+--------------------------------+-------------+
+|   Index   | Name                           |    Shape    |
++-----------+--------------------------------+-------------+
+|     0     | base_ang_vel                   |     (3,)    |
+|     1     | projected_gravity              |     (3,)    |
+|     2     | velocity_commands              |     (3,)    |
+|     3     | joint_pos                      |    (16,)    |
+|     4     | joint_vel                      |    (16,)    |
+|     5     | actions                        |    (16,)    |
+|     6     | height_scan                    |    (187,)   |
++-----------+--------------------------------+-------------+
++--------------------------------------------------------------+
+| Active Observation Terms in Group: 'critic' (shape: (285,))  |
++---------+-----------------------------------------+----------+
+|  Index  | Name                                    |  Shape   |
++---------+-----------------------------------------+----------+
+|    0    | base_lin_vel                            |   (3,)   |
+|    1    | base_ang_vel                            |   (3,)   |
+|    2    | projected_gravity                       |   (3,)   |
+|    3    | velocity_commands                       |   (3,)   |
+|    4    | joint_pos                               |  (16,)   |
+|    5    | joint_vel                               |  (16,)   |
+|    6    | actions                                 |  (16,)   |
+|    7    | height_scan                             |  (187,)  |
+|    8    | joint_acceleration                      |  (16,)   |
+|    9    | applied_torque                          |  (16,)   |
+|    10   | wheel_contact_force_magnitude           |   (4,)   |
+|    11   | material_friction                       |   (2,)   |
++---------+-----------------------------------------+----------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 3 active terms.
++------------------------------------------+
+|         Active Termination Terms         |
++-------+-----------------------+----------+
+| Index | Name                  | Time Out |
++-------+-----------------------+----------+
+|   0   | time_out              |   True   |
+|   1   | terrain_out_of_bounds |   True   |
+|   2   | bad_orientation_2     |  False   |
++-------+-----------------------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 53 active terms.
++-----------------------------------------------------------+
+|                    Active Reward Terms                    |
++-------+----------------------------------------+----------+
+| Index | Name                                   |   Weight |
++-------+----------------------------------------+----------+
+|   0   | lin_vel_z_l2                           |     -2.0 |
+|   1   | ang_vel_xy_l2                          |    -0.02 |
+|   2   | joint_torques_l2                       | -2.5e-05 |
+|   3   | joint_acc_l2                           |   -2e-07 |
+|   4   | hipx_joint_pos_penalty                 |     -3.0 |
+|   5   | hipy_joint_pos_penalty                 |     -1.5 |
+|   6   | knee_joint_pos_penalty                 |    -0.75 |
+|   7   | joint_mirror                           |    -0.03 |
+|   8   | action_rate_l2                         |    -0.01 |
+|   9   | action_smooth_l2                       |   -0.025 |
+|   10  | undesired_contacts                     |     -1.0 |
+|   11  | contact_forces                         | -0.00015 |
+|   12  | track_lin_vel_xy_exp                   |      5.0 |
+|   13  | track_ang_vel_z_exp                    |      3.0 |
+|   14  | feet_air_time_ang_z_M20                |     50.0 |
+|   15  | feet_slide_ang_z_cmd                   |     -2.0 |
+|   16  | stand_still                            |     -1.0 |
+|   17  | rotation_gait_status                   |      1.0 |
+|   18  | rotation_gait_symmetry                 |      2.0 |
+|   19  | bad_orientation_penalty                |  -1000.0 |
+|   20  | joint_acc_wheel_l2                     |   -1e-07 |
+|   21  | stair_orientation_cost                 |     -1.0 |
+|   22  | stair_forward_progress                 |      1.0 |
+|   23  | stair_front_wheel_lift                 |      0.5 |
+|   24  | stair_forward_motion_cost              |     -2.0 |
+|   25  | stair_ascent_direction_cost            |     -1.0 |
+|   26  | stair_front_wheel_touchdown            |     0.25 |
+|   27  | stair_front_single_support             |      0.1 |
+|   28  | stair_diagonal_support_symmetry        |     0.05 |
+|   29  | stair_front_alternation                |     0.25 |
+|   30  | stair_up_step_completion               |      3.0 |
+|   31  | stair_up_task_crossing                 |      2.0 |
+|   32  | stair_up_rear_step_completion          |      3.0 |
+|   33  | stair_rear_wheel_lift                  |      0.5 |
+|   34  | stair_descent_rear_forward_cost        |     -2.0 |
+|   35  | stair_descent_entry_retract            |     0.75 |
+|   36  | stair_descent_entry_position_cost      |    -0.25 |
+|   37  | stair_ascent_front_body_clearance_cost |     -1.0 |
+|   38  | stair_up_order_violation_cost          |     -0.5 |
+|   39  | stair_up_same_tread_cost               |     -1.5 |
+|   40  | stair_up_same_tread_dwell_cost         |     -0.2 |
+|   41  | stair_descent_rear_fold_cost           |     -1.0 |
+|   42  | stair_ascent_front_fold_cost           |     -1.0 |
+|   43  | turn_swing_size_cost                   |     -1.0 |
+|   44  | stair_down_step_completion             |      3.0 |
+|   45  | stair_front_riser_face_cost            |     -0.5 |
+|   46  | stair_descent_rear_support             |     0.35 |
+|   47  | stair_impact_cost                      |     -0.2 |
+|   48  | stair_non_wheel_contact_cost           |     -0.2 |
+|   49  | stair_non_wheel_scrape_cost            |     -0.1 |
+|   50  | stair_joint_effort_cost                |     -0.1 |
+|   51  | stair_joint_acceleration_cost          |    -0.02 |
+|   52  | stair_mechanical_power_cost            |     -0.1 |
++-------+----------------------------------------+----------+
+/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/rsl_rl/utils/utils.py:220: UserWarning: The observation configuration dictionary 'obs_groups' is empty and thus likely not configured. Consider configuring the 'obs_groups' dictionary explicitly
+  warnings.warn(
+/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/rsl_rl/utils/utils.py:251: UserWarning: The observation configuration dictionary 'obs_groups' does not contain the 'actor' key. As an observation group with the name 'policy' was found, this is assumed to be the appropriate observation. Consider adding the 'actor' key to the 'obs_groups' dictionary for clarity. This behavior will be removed in a future version.
+  warnings.warn(
+/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/rsl_rl/utils/utils.py:243: UserWarning: The observation configuration dictionary 'obs_groups' does not contain the 'critic' key. As an observation group with the name 'critic' was found, this is assumed to be the appropriate observation. Consider adding the 'critic' key to the 'obs_groups' dictionary for clarity. This behavior will be removed in a future version.
+  warnings.warn(
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 13 active terms.
++--------------------------------------------+
+|          Active Curriculum Terms           |
++-------+------------------------------------+
+| Index | Name                               |
++-------+------------------------------------+
+|   0   | terrain_levels                     |
+|   1   | gait_level                         |
+|   2   | step_completion                    |
+|   3   | gait_quality                       |
+|   4   | ascent_direction                   |
+|   5   | terrain_level_overall              |
+|   6   | terrain_level_pyramid_stairs       |
+|   7   | terrain_level_pyramid_stairs_inv   |
+|   8   | terrain_level_boxes                |
+|   9   | terrain_level_random_rough         |
+|   10  | terrain_level_hf_pyramid_slope     |
+|   11  | terrain_level_hf_pyramid_slope_inv |
+|   12  | terrain_level_flat                 |
++-------+------------------------------------+
+
+[INFO]: Completed setting up the environment...
+[INFO]: Parsing configuration from: rl_training.tasks.manager_based.locomotion.velocity.config.wheeled.deeprobotics_m20.agents.stair_teacher_ppo_cfg:DeeproboticsM20StairTeacherPPORunnerCfg
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ['policy']
+	 critic :  ['critic']
+--------------------------------------------------------------------------------
+Actor Model: MLPModel(
+  (obs_normalizer): Identity()
+  (distribution): GaussianDistribution()
+  (mlp): MLP(
+    (0): Linear(in_features=244, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=16, bias=True)
+  )
+)
+Critic Model: MLPModel(
+  (obs_normalizer): Identity()
+  (mlp): MLP(
+    (0): Linear(in_features=285, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=1, bias=True)
+  )
+)
+STAIR_SMOKE_RUNNER_OK
+STAIR_SMOKE_ACTOR_LOADED
+STAIR_SMOKE_RESET_OK
+STAIR_SMOKE_PROGRESS=25/100
+STAIR_SMOKE_PROGRESS=50/100
+STAIR_SMOKE_PROGRESS=75/100
+STAIR_SMOKE_PROGRESS=100/100
+STAIR_SMOKE_RESULT={"steps": 100, "num_envs": 16, "trained": false, "actor_checkpoint": "logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-06_22-06-56_stair_resume/model_199998.pt", "observation_shapes": {"policy": [16, 244], "critic": [16, 285]}, "finite": true, "mean_return": 14.571564331650734, "targets_started": 2.0, "front_lift_credit": 1.11449134349823, "observed_risers": 2, "nominal_radius_finite_fraction": 1.0, "calibrated_wheel_fraction": 1.0, "unified_reward_modules": {"stair_up_step_completion": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_up_rear_step_completion": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_descent_rear_fold_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_ascent_front_fold_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_ascent_direction_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_rear_wheel_lift": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_descent_rear_forward_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_ascent_front_body_clearance_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "turn_swing_size_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "rotation_gait_status": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "feet_air_time_ang_z_M20": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher"}, "legacy_aliases_identical": true, "active_reward_weights": {"lin_vel_z_l2": -2.0, "ang_vel_xy_l2": -0.02, "joint_torques_l2": -2.5e-05, "joint_acc_l2": -2e-07, "hipx_joint_pos_penalty": -3.0, "hipy_joint_pos_penalty": -1.5, "knee_joint_pos_penalty": -0.75, "joint_mirror": -0.03, "action_rate_l2": -0.01, "action_smooth_l2": -0.025, "undesired_contacts": -1.0, "contact_forces": -0.00015, "track_lin_vel_xy_exp": 5.0, "track_ang_vel_z_exp": 3.0, "feet_air_time_ang_z_M20": 50.0, "feet_slide_ang_z_cmd": -2.0, "stand_still": -1.0, "rotation_gait_status": 1.0, "rotation_gait_symmetry": 2.0, "bad_orientation_penalty": -1000.0, "joint_acc_wheel_l2": -1e-07, "stair_orientation_cost": -1.0, "stair_forward_progress": 1.0, "stair_front_wheel_lift": 0.5, "stair_forward_motion_cost": -2.0, "stair_ascent_direction_cost": -1.0, "stair_front_wheel_touchdown": 0.25, "stair_front_single_support": 0.1, "stair_diagonal_support_symmetry": 0.05, "stair_front_alternation": 0.25, "stair_up_step_completion": 3.0, "stair_up_task_crossing": 2.0, "stair_up_rear_step_completion": 3.0, "stair_rear_wheel_lift": 0.5, "stair_descent_rear_forward_cost": -2.0, "stair_descent_entry_retract": 0.75, "stair_descent_entry_position_cost": -0.25, "stair_ascent_front_body_clearance_cost": -1.0, "stair_up_order_violation_cost": -0.5, "stair_up_same_tread_cost": -1.5, "stair_up_same_tread_dwell_cost": -0.2, "stair_descent_rear_fold_cost": -1.0, "stair_ascent_front_fold_cost": -1.0, "turn_swing_size_cost": -1.0, "stair_down_step_completion": 3.0, "stair_front_riser_face_cost": -0.5, "stair_descent_rear_support": 0.35, "stair_impact_cost": -0.2, "stair_non_wheel_contact_cost": -0.2, "stair_non_wheel_scrape_cost": -0.1, "stair_joint_effort_cost": -0.1, "stair_joint_acceleration_cost": -0.02, "stair_mechanical_power_cost": -0.1}, "resolved_gait_entities": {"stair_descent_rear_fold_cost": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "stair_ascent_front_fold_cost": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "stair_ascent_direction_cost": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "stair_rear_wheel_lift": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "stair_descent_rear_forward_cost": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "stair_ascent_front_body_clearance_cost": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "turn_swing_size_cost": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "rotation_gait_status": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "track_lin_vel_xy_exp": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}}, "reward_abs_peaks": {"lin_vel_z_l2": 0.20576603710651398, "ang_vel_xy_l2": 0.08357726037502289, "joint_torques_l2": 0.0, "joint_acc_l2": 0.7984064817428589, "hipx_joint_pos_penalty": 0.3916243016719818, "hipy_joint_pos_penalty": 0.48128542304039, "knee_joint_pos_penalty": 0.7493388652801514, "joint_mirror": 0.0, "action_rate_l2": 0.0, "action_smooth_l2": 0.0, "undesired_contacts": 0.0, "contact_forces": 0.0, "track_lin_vel_xy_exp": 4.999876499176025, "track_ang_vel_z_exp": 3.0, "feet_air_time_ang_z_M20": 0.0, "feet_slide_ang_z_cmd": 0.0, "stand_still": 0.7671250700950623, "rotation_gait_status": 0.0, "rotation_gait_symmetry": 0.0, "bad_orientation_penalty": 0.0, "joint_acc_wheel_l2": 2.497957468032837, "stair_orientation_cost": 0.2083258032798767, "stair_forward_progress": 0.66840660572052, "stair_front_wheel_lift": 21.243051528930664, "stair_forward_motion_cost": 0.1782369613647461, "stair_ascent_direction_cost": 0.16277891397476196, "stair_front_wheel_touchdown": 0.0, "stair_front_single_support": 0.06684066355228424, "stair_diagonal_support_symmetry": 0.03342033177614212, "stair_front_alternation": 0.0, "stair_up_step_completion": 0.0, "stair_up_task_crossing": 0.0, "stair_up_rear_step_completion": 0.0, "stair_rear_wheel_lift": 0.0, "stair_descent_rear_forward_cost": 0.0, "stair_descent_entry_retract": 0.0, "stair_descent_entry_position_cost": 0.0, "stair_ascent_front_body_clearance_cost": 0.0, "stair_up_order_violation_cost": 0.0, "stair_up_same_tread_cost": 0.0, "stair_up_same_tread_dwell_cost": 0.0, "stair_descent_rear_fold_cost": 0.0, "stair_ascent_front_fold_cost": 0.0, "turn_swing_size_cost": 0.0, "stair_down_step_completion": 0.0, "stair_front_riser_face_cost": 0.0, "stair_descent_rear_support": 0.0, "stair_impact_cost": 0.02771403267979622, "stair_non_wheel_contact_cost": 0.0, "stair_non_wheel_scrape_cost": 0.0, "stair_joint_effort_cost": 0.013594657182693481, "stair_joint_acceleration_cost": 0.019999999552965164, "stair_mechanical_power_cost": 0.002443708246573806}, "gait_metrics": {"turn_samples": 800.0, "descent_samples": 0.0, "rear_support_samples": 0.0, "turn_clearance_mean_m": 0.0038479010108858347, "turn_reach_mean_m": 0.15933454036712646, "turn_yaw_error_mean": 0.12510235607624054, "rear_extension_mean_m": 0.0, "rear_fold_support_fraction": 0.0, "ascent_samples": 16.0, "front_support_samples": 15.0, "front_extension_mean_m": 0.4938529431819916, "front_knee_abs_mean_rad": 0.7136948704719543, "front_fold_support_fraction": 0.0, "front_swing_samples": 17.0, "front_extreme_swing_fold_fraction": 0.0, "front_loaded_a_mean_deg": 139.10830688476562, "front_loaded_a_low_fraction": 0.0, "front_loaded_a_min_deg": 129.33920288085938, "fl_loaded_samples": 7.0, "fl_loaded_a_mean_deg": 138.63441467285156, "fl_loaded_a_low_fraction": 0.0, "fr_loaded_samples": 8.0, "fr_loaded_a_mean_deg": 139.52294921875, "fr_loaded_a_low_fraction": 0.0, "front_swing_a_mean_deg": 103.01367950439453, "front_swing_a_low_fraction": 0.0, "front_swing_a_min_deg": 78.68809509277344, "fl_swing_samples": 9.0, "fl_swing_a_mean_deg": 102.10814666748047, "fl_swing_a_low_fraction": 0.0, "fr_swing_samples": 8.0, "fr_swing_a_mean_deg": 104.03240203857422, "fr_swing_a_low_fraction": 0.0, "rear_forward_samples": 0.0, "rear_forward_excess_fraction": 0.0, "rear_body_b_mean_deg": 0.0, "rear_gravity_g_mean_deg": 0.0, "rear_b_max_deg": 0.0, "rear_g_max_deg": 0.0, "hl_loaded_samples": 0.0, "hl_body_b_mean_deg": 0.0, "hl_gravity_g_mean_deg": 0.0, "hl_forward_excess_fraction": 0.0, "hr_loaded_samples": 0.0, "hr_body_b_mean_deg": 0.0, "hr_gravity_g_mean_deg": 0.0, "hr_forward_excess_fraction": 0.0, "rear_entry_samples": 0.0, "rear_entry_b_mean_deg": 0.0, "rear_entry_g_mean_deg": 0.0, "front_body_gap_samples": 16.0, "front_body_gap_mean_m": 0.48406726121902466, "front_body_gap_low_fraction": 0.0, "loaded_without_local_map_samples": 0.0, "rear_swing_samples": 0.0, "rear_swing_excess_fraction": 0.0, "rear_swing_b_positive_mean_deg": 0.0, "rear_swing_b_max_deg": 0.0, "rear_swing_g_positive_mean_deg": 0.0, "rear_swing_g_max_deg": 0.0, "hl_swing_excess_fraction": 0.0, "hr_swing_excess_fraction": 0.0, "hl_loaded_b_p95_upper_deg": 0.0, "hr_loaded_b_p95_upper_deg": 0.0, "hl_loaded_g_p95_upper_deg": 0.0, "hr_loaded_g_p95_upper_deg": 0.0, "hl_swing_b_p95_upper_deg": 0.0, "hr_swing_b_p95_upper_deg": 0.0, "hl_swing_g_p95_upper_deg": 0.0, "hr_swing_g_p95_upper_deg": 0.0, "descent_entry_started": 0.0, "hl_entry_samples": 0.0, "hl_entry_x_mean_m": 0.0, "hl_entry_in_band_fraction": 0.0, "hl_entry_too_forward_fraction": 0.0, "hl_entry_too_rearward_fraction": 0.0, "hl_entry_retract_credit": 0.0, "hl_entry_blocked_fraction": 0.0, "hr_entry_samples": 0.0, "hr_entry_x_mean_m": 0.0, "hr_entry_in_band_fraction": 0.0, "hr_entry_too_forward_fraction": 0.0, "hr_entry_too_rearward_fraction": 0.0, "hr_entry_retract_credit": 0.0, "hr_entry_blocked_fraction": 0.0}, "ascent_direction_metrics": {"samples": 16.0, "lateral_error_mean_m": 0.004034318961203098, "lateral_error_max_m": 0.007310341577976942, "lateral_speed_mean_m_s": 0.04535581171512604, "heading_error_mean_deg": 1.0581157207489014, "outside_tolerance_fraction": 0.0, "cost_mean": 0.01560702733695507, "activation_fraction": 0.019999999552965164, "large_error_fraction": 0.0}, "step_metrics": {"up_attempts": 0.0625, "up_successes": 0.0625, "up_success_rate": 1.0, "up_rear_successes": 0.0, "up_front_violations": 0.0, "up_rear_violations": 0.0, "up_front_same_tread_events": 0.0, "up_front_same_tread_dwell_s": 0.0, "up_rear_same_tread_events": 0.0, "up_rear_same_tread_dwell_s": 0.0, "up_targets_started": 0.125, "up_lift_credit": 0.06965570896863937, "up_retries": 0.0, "up_abandoned_targets": 0.0, "up_retreat_fraction": 0.0, "up_stationary_fraction": 0.0, "down_attempts": 0.0, "down_successes": 0.0, "down_success_rate": 0.0, "forward_gate_fraction": 0.009999999776482582, "nearby_gate_fraction": 0.009999999776482582, "registered_risers": 0.125, "up_whole_body_crossings": 0.0, "up_whole_body_crossing_coverage": 0.0, "up_front_registered_intermediate_risers": 0.0, "up_front_landing_coverage": 0.5, "up_front_strict_coverage": 0.0, "up_front_physical_landings": 0.0625, "up_front_transition_successes": 0.0, "up_front_transition_per_landing": 0.0, "up_front_skipped_riser_events": 0.0, "up_front_unsafe_events": 0.0, "up_front_skip_fraction": 0.0, "up_front_visited_intermediate_risers": 0.0, "up_front_same_tread_fraction": 0.0, "up_front_longest_strict_run": 0.0, "up_front_six_step_strict_fraction": 0.0, "fl_stable_treads": 0.0625, "fr_stable_treads": 0.0, "up_rear_registered_intermediate_risers": 0.0, "up_rear_landing_coverage": 0.0, "up_rear_strict_coverage": 0.0, "up_rear_physical_landings": 0.0, "up_rear_transition_successes": 0.0, "up_rear_transition_per_landing": 0.0, "up_rear_skipped_riser_events": 0.0, "up_rear_unsafe_events": 0.0, "up_rear_skip_fraction": 0.0, "up_rear_visited_intermediate_risers": 0.0, "up_rear_same_tread_fraction": 0.0, "up_rear_longest_strict_run": 0.0, "up_rear_six_step_strict_fraction": 0.0, "hl_stable_treads": 0.0, "hr_stable_treads": 0.0, "up_rear_lift_credit": 0.0}, "gait_tuning": {"translation_threshold": 0.1, "yaw_threshold": 0.1, "turn_posture_scale": 0.2, "air_min": 0.1, "air_target": 0.2, "air_max": 0.35, "turn_height_flat": 0.08, "turn_height_terrain": 0.16, "turn_reach_flat": 0.22, "turn_reach_terrain": 0.3, "height_scale": 0.08, "reach_scale": 0.1, "rear_min_extension": 0.35, "extension_scale": 0.1, "rear_max_knee": 1.9, "knee_scale": 0.5, "front_min_extension": 0.35, "front_max_knee": 2.0, "front_support_grace": 0.0, "front_fold_weight": -1.0, "front_swing_min_extension": 0.22, "front_swing_max_knee": 2.5, "front_swing_scale": 0.5, "support_grace": 0.12, "same_tread_grace": 0.12, "wheel_radius": 0.09, "nearest_valid_distance": 0.12, "turn_size_weight": -1.0, "rear_fold_weight": -1.0, "same_tread_event_weight": -1.5, "same_tread_dwell_weight": -0.2, "task_crossing_weight": 2.0, "turn_status_weight": 1.0, "turn_symmetry_weight": 2.0, "ascent_direction_weight": -1.0, "direction_lateral_tolerance": 0.1, "direction_lateral_scale": 0.25, "direction_speed_tolerance": 0.05, "direction_speed_scale": 0.2, "direction_heading_tolerance": 0.08726646259971647, "direction_heading_scale": 0.2617993877991494, "direction_velocity_mix": 1.0, "direction_heading_mix": 1.0, "direction_soft_cap": 4.0, "direction_command_change": 0.2617993877991494, "direction_exit_inset": 0.06, "direction_exit_height_tolerance": 0.05, "direction_exit_contact_time": 0.06, "riser_identity_distance": 0.12, "riser_height_tolerance": 0.04, "riser_lateral_corridor": 0.45, "riser_min_spacing": 0.15, "riser_observation_half_width": 0.35, "tread_observation_corridor": 0.8, "riser_max_spacing": 0.5, "riser_cross_clearance": 0.01, "riser_default_half_width": 0.05, "tread_inset": 0.025, "tread_height_tolerance": 0.04, "landing_time": 0.04, "prep_distance": 0.6, "prep_weight": 0.5, "rear_completion_weight": 3.0, "front_touchdown_weight": 0.25, "front_a_support_low_deg": 90.0, "front_a_support_high_deg": 80.0, "front_a_swing_low_deg": 75.0, "front_a_swing_high_deg": 55.0, "pose_low_rise": 0.15, "pose_high_rise": 0.25, "pose_angle_scale": 0.3490658503988659, "pose_length_scale": 0.1, "pose_load_force_scale": 60.0, "rear_b_limit": 0.4363323129985824, "rear_g_limit": 0.3490658503988659, "rear_swing_b_limit": 0.7853981633974483, "rear_swing_g_limit": 0.6108652381980153, "rear_swing_mix": 0.4, "rear_load_floor": 0.5, "rear_target_x_scale": 0.3, "rear_target_z_scale": 0.2, "rear_forward_relax": 0.08726646259971647, "rear_forward_weight": -2.0, "front_swing_min_extension_v3": 0.3, "front_swing_length_high": 0.26, "front_support_length_high": 0.33, "body_gap_target": 0.22, "body_gap_scale": 0.1, "body_bottom_z": -0.07, "body_gap_weight": -1.0, "pose_tracking_discount": 0.0, "pose_phase_radius": 1.5, "entry_x_lower": -0.05, "entry_x_upper": 0.15, "entry_x_high_rise_relax": 0.02, "entry_angle_upper": 0.3490658503988659, "entry_x_scale": 0.1, "entry_start_distance": 0.6, "entry_ground_tolerance": 0.04, "entry_contact_time": 0.06, "entry_forward_speed": 0.05, "entry_wheel_reverse_tolerance": 0.05, "entry_rearm_time": 0.5, "entry_retract_weight": 0.75, "entry_range_cost_weight": -0.25}, "canonical_source_sha256": "d9f9ef07d53693cfa72b8ae736e292cef372a0de4bb2155ec1cbf20db7c751dd"}
+2026-10-08T17:49:24Z [357ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-10-08T17:49:24Z [362ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.173.02    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4090          | Yes: 0 |     | 81898   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | cd550f3e.. |
+|     |                                  |        |     |            | 1         |            |
+|=============================================================================================|
+| OS: 22.04.5 LTS (Jammy Jellyfish) ubuntu, Version: 22.04.5, Kernel: 6.8.0-138-generic
+| XServer Vendor: The X.Org Foundation, XServer Version: 12101004 (1.21.1.4)
+| Processor: Intel(R) Core(TM) Ultra 9 285K
+| Cores: 1 | Logical Cores: 1
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 128145 | Free Memory: 106022
+| Total Page/Swap (MB): 2047 | Free Page/Swap: 2012
+|---------------------------------------------------------------------------------------------|
+2026-10-08T17:49:28Z [4,783ms] [Warning] [gpu.foundation.plugin] Different types of CPU governors are being used accross cores.
+2026-10-08T17:49:28Z [4,783ms] [Warning] [gpu.foundation.plugin] CPU performance profile is set to powersave. This profile sets the CPU to the lowest frequency reducing performance.

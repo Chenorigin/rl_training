@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 离散障碍：分别调整每个方块的位置与长宽高，可增加更多行。
+     本文件供 deploy_mujoco.py 的 terrain-xml 参数使用。
+     参数化模板由 terrain_loader.py 在加载时生成碰撞体，不含机器人。
+     编辑 data 后重新启动部署；无需再改 Python，命令行覆盖值会打印在运行摘要中。 -->
+<mujoco model="obstacles_terrain">
+  <compiler angle="radian"/>
+  <custom>
+    <text name="terrain_kind" data="obstacles"/>
+    <!-- 公共参数：长度单位 m；世界 +X 为路线前进方向，+Y 为左，+Z 为上。 -->
+    <!-- width：路线宽度；生成障碍之外保留 z=0 无限平面，方便自由操控。 -->
+    <numeric name="width" data="4.0"/>
+    <!-- friction：滑动 / 扭转 / 滚动摩擦；应用于生成的地面和障碍。 -->
+    <numeric name="friction" data="1.0 0.01 0.01"/>
+    <!-- spawn_xy：机器人出生世界坐标 x y；z 自动射线查询 + 站立/趴下偏置。 -->
+    <numeric name="spawn_xy" data="-1.0 0.0"/>
+    <!-- spawn_yaw_deg：出生偏航角，单位度；0 表示朝 +X。 -->
+    <numeric name="spawn_yaw_deg" data="0"/>
+    <!-- start_x：第一段地形起点的世界 X 坐标。 -->
+    <numeric name="start_x" data="0.5"/>
+    <!-- boxes 每行五项：中心 x、中心 y、顶面高度、X 长度、Y 宽度，全部为 m。
+         位置为世界绝对坐标；直接改每行即可移动/缩放障碍。
+         start_x 仅作为空区域的参考起点，调整它不会平移 boxes。 -->
+    <numeric name="boxes" data="
+      1.0  0.0  0.12  0.40  1.20
+      2.2  0.6  0.20  0.60  0.80
+      3.4 -0.5  0.25  0.50  1.00
+      4.5  0.0  0.15  0.35  2.00"/>
+  </custom>
+</mujoco>

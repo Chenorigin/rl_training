@@ -1,0 +1,11 @@
+--- /home/ubuntu/cyq_shixi_projects/rl_training/.scratch/front_fold_20261003/baseline/smoke_stair_rewards.py	2026-10-03 14:28:15.077887979 +0800
++++ /home/ubuntu/cyq_shixi_projects/rl_training/scripts/tools/smoke_stair_rewards.py	2026-10-03 14:29:30.969292453 +0800
+@@ -56,7 +56,7 @@
+     base = env.unwrapped
+     term_peak = torch.zeros(len(base.reward_manager.active_terms), device=base.device)
+     binding = {}
+-    for name in ('stair_descent_rear_fold_cost', 'turn_swing_size_cost', 'rotation_gait_status'):
++    for name in ('stair_descent_rear_fold_cost', 'stair_ascent_front_fold_cost', 'turn_swing_size_cost', 'rotation_gait_status'):
+         term = base.reward_manager.get_term_cfg(name)
+         binding[name] = {key: {'bodies': cfg.body_ids if cfg.body_names else None,
+                               'joints': cfg.joint_ids if cfg.joint_names else None}

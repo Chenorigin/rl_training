@@ -1,0 +1,51 @@
+{
+  "initial_pose_unpaid": true,
+  "toward_band_gain": [
+    0.6954599618911743,
+    0.6954599618911743
+  ],
+  "oscillation_unpaid": true,
+  "overrear_cost": [
+    1.1456866264343262,
+    1.1456866264343262
+  ],
+  "stopped_progress_not_banked": true,
+  "reverse_trunk_unpaid": true,
+  "reverse_wheel_unpaid": true,
+  "following_stair_not_new_entry": true,
+  "lateral_reentry_unpaid": true,
+  "support_switch_unpaid": true,
+  "collapsed_leg_unpaid": true,
+  "extension_cycle_unpaid": true,
+  "band_depth35_45cm": {
+    "lower": [
+      [
+        -0.05000000074505806,
+        -0.05000000074505806
+      ]
+    ],
+    "upper": [
+      [
+        0.1273895800113678,
+        0.15000000596046448
+      ]
+    ]
+  },
+  "good_entry_then_bad_is_penalized": [
+    1.3425991535186768,
+    1.3425991535186768
+  ],
+  "lower_ray_airborne_guard_retained": true,
+  "command_pause_resumes_guard": true,
+  "both_true_lower_support_clear_guard": true,
+  "descent_huber_cost": [
+    0.0,
+    0.0,
+    0.22291240096092224,
+    0.6862914562225342,
+    1.5278640985488892,
+    2.0779755115509033,
+    3.9207959175109863
+  ],
+  "invalid_map_closed": true
+}

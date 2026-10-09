@@ -1,0 +1,247 @@
+def _register_ascent_risers(state, scan, scanner, heading, command):
+    """Observe every ascending riser; registration never depends on actor success."""
+    n, device = heading.shape[0], heading.device
+    row = torch.arange(n, device=device)
+    xs = scan.get("ascending_edges_x", scan["edge_x"])
+    if "ascending_edges_x" in scan:
+        valid = scan["ascending_edges_valid"]
+        upper = scan["ascending_edges_upper_z"]
+        lower = scan["ascending_edges_lower_z"]
+        xy = scanner.data.pos_w[:, None, :2] + heading[:, None] * xs[None, :, None]
+    else:
+        valid = (scan["up_gate"] > 0)[:, None]
+        upper, lower = scan["upper_z"][:, None], scan["lower_z"][:, None]
+        xy = scanner.data.pos_w[:, None, :2] + heading[:, None] * xs[:, None, None]
+    for j in range(valid.shape[1]):
+        enabled = valid[:, j] & (command[:, 0] > TUNING["translation_threshold"])
+        delta = xy[:, j, None] - state["map_xy"]
+        along = (delta * state["map_heading"]).sum(-1)
+        lateral = (delta[..., 0] * state["map_heading"][..., 1]
+                   - delta[..., 1] * state["map_heading"][..., 0]).abs()
+        known = torch.arange(64, device=device)[None] < state["map_count"][:, None]
+        aligned = (state["map_heading"] * heading[:, None]).sum(-1) > 0.8
+        match = known & aligned & (along.abs() < TUNING["riser_identity_distance"]) & (
+            lateral < TUNING["riser_lateral_corridor"]) & (
+            (state["map_z"] - upper[:, j, None]).abs() < TUNING["riser_height_tolerance"])
+        add = enabled & ~match.any(-1) & (state["map_count"] < 64)
+        slot = torch.where(match.any(-1), match.long().argmax(-1), state["map_count"]).clamp_max(63)
+        ids = torch.nonzero(add, as_tuple=False).squeeze(-1)
+        state["map_xy"][ids, slot[ids]] = xy[ids, j]
+        state["map_heading"][ids, slot[ids]] = heading[ids]
+        state["map_z"][ids, slot[ids]] = upper[ids, j]
+        state["map_lower_z"][ids, slot[ids]] = lower[ids, j]
+        state["map_count"][ids] += 1
+        # A successor confirms an intermediate tread and bounds its upper end.
+        # Update both directions so rear observations/registration order cannot
+        # change tread identity. No N*64*64 pairwise allocation is needed.
+        own_xy = state["map_xy"][row, slot]
+        own_h = state["map_heading"][row, slot]
+        own_z = state["map_z"][row, slot]
+        delta = own_xy[:, None] - state["map_xy"]
+        dist = (delta * state["map_heading"]).sum(-1)
+        cross = (delta[..., 0] * state["map_heading"][..., 1]
+                 - delta[..., 1] * state["map_heading"][..., 0]).abs()
+        known = torch.arange(64, device=device)[None] < state["map_count"][:, None]
+        parallel = (state["map_heading"] * own_h[:, None]).sum(-1) > 0.8
+        pred = known & parallel & (dist >= TUNING["riser_min_spacing"]) & (
+            dist <= TUNING["riser_max_spacing"]) & (cross < TUNING["riser_lateral_corridor"]) & (
+            (state["map_z"] - lower[:, j, None]).abs() < TUNING["riser_height_tolerance"]) & enabled[:, None]
+        state["map_next_x"] = torch.minimum(state["map_next_x"], torch.where(pred, dist, torch.inf))
+        dz = state["map_lower_z"] - own_z[:, None]
+        successor = known & parallel & (-dist >= TUNING["riser_min_spacing"]) & (
+            -dist <= TUNING["riser_max_spacing"]) & (cross < TUNING["riser_lateral_corridor"]) & (
+            dz.abs() < TUNING["riser_height_tolerance"]) & enabled[:, None]
+        next_dist = torch.where(successor, -dist, torch.inf).amin(-1)
+        state["map_next_x"][row, slot] = torch.minimum(state["map_next_x"][row, slot], next_dist)
+    state["map_intermediate"] = torch.isfinite(state["map_next_x"])
+
+
+def ascent_state(env, asset_cfg, sensor_cfg, contact_sensor_cfg, command_name="base_velocity"):
+    """Physical tread ledger shared by two independently learning alternating axles.
+
+    Every observed riser is registered before either axle's reward is considered.
+    Stable landings, clearance, style, duplicate history and preparation budgets
+    are separate records. Missing a tread advances physical progress without
+    rewarding the skipped/wrong step or permanently trapping the next target.
+    """
+    step = int(env.common_step_counter)
+    cache = getattr(env, "_m20_ascent_cache", None)
+    if cache is not None and cache["step"] == step:
+        return cache["state"]
+    scan = _stair_scan_context(env, sensor_cfg, command_name)
+    robot, scanner = env.scene[asset_cfg.name], env.scene[sensor_cfg.name]
+    sensor = env.scene.sensors[contact_sensor_cfg.name]
+    state = getattr(env, "_m20_ascent_state", None)
+    if state is None or state["active"].shape[0] != env.num_envs:
+        state = _new_state(env)
+        env._m20_ascent_state = state
+    reset = env.episode_length_buf <= 1
+    _reset(state, reset)
+    wheels = robot.data.body_pos_w[:, asset_cfg.body_ids]
+    force = sensor.data.net_forces_w[:, contact_sensor_cfg.body_ids]
+    norm = torch.linalg.vector_norm(force, dim=-1)
+    loaded = (force[..., 2] > 5) & (force[..., 2] > 0.5 * norm)
+    loaded &= sensor.data.current_contact_time[:, contact_sensor_cfg.body_ids] > 0
+    command = env.command_manager.get_command(command_name)
+    enabled = command[:, 0] > TUNING["translation_threshold"]
+    row = torch.arange(env.num_envs, device=env.device)
+    forward = torch.zeros(env.num_envs, 3, device=env.device); forward[:, 0] = 1
+    heading = quat_apply(yaw_quat(scanner.data.quat_w), forward)[:, :2]
+    _register_ascent_risers(state, scan, scanner, heading, command)
+    known = torch.arange(64, device=env.device)[None] < state["map_count"][:, None]
+    # Known model wheel radius is available immediately. Sensor-based estimates
+    # only calibrate it on flat loaded support, never disable landing attribution.
+    hits = scanner.data.ray_hits_w
+    valid_hits = torch.isfinite(hits).all(-1)
+    distance = torch.linalg.vector_norm(wheels[:, :, None, :2] - hits[:, None, :, :2], dim=-1)
+    distance = torch.where(valid_hits[:, None], distance, torch.inf)
+    near, nearest = distance.min(-1)
+    surface = hits[..., 2].gather(1, nearest)
+    measured = wheels[..., 2] - surface
+    local = distance < 0.16
+    lo = torch.where(local, hits[:, None, :, 2], torch.inf).amin(-1)
+    hi = torch.where(local, hits[:, None, :, 2], -torch.inf).amax(-1)
+    flat = (local.sum(-1) >= 2) & ((hi-lo) < 0.025)
+    calibrate = ~state["radius_calibrated"] & loaded & flat & (near < 0.08) & (
+        (measured - TUNING["wheel_radius"]).abs() < 0.025)
+    state["radius"][calibrate] = measured[calibrate]
+    state["radius_calibrated"] |= calibrate
+    relative = wheels[:, None, :, :2] - state["map_xy"][:, :, None]
+    x = (relative * state["map_heading"][:, :, None]).sum(-1)
+    cross = (relative[..., 0] * state["map_heading"][:, :, None, 1]
+             - relative[..., 1] * state["map_heading"][:, :, None, 0]).abs()
+    prev = state["previous_wheel"][:, None, :, :2] - state["map_xy"][:, :, None]
+    prev_x = (prev * state["map_heading"][:, :, None]).sum(-1)
+    crossing = (prev_x < 0) & (x >= 0) & state["wheel_history_valid"][:, None, None]
+    # Interpolate center height at the riser plane, not the post-impact sample.
+    fraction = (-prev_x / (x-prev_x).clamp_min(1e-6)).clamp(0, 1)
+    plane_z = state["previous_wheel"][:, None, :, 2] + fraction * (
+        wheels[:, None, :, 2] - state["previous_wheel"][:, None, :, 2])
+    clearance = plane_z - state["map_z"][:, :, None] - state["radius"][:, None]
+    state["map_safe"] |= crossing & (clearance >= TUNING["riser_cross_clearance"]) & known[:, :, None]
+    occupancy = known[:, :, None] & loaded[:, None] & (x > TUNING["tread_inset"]) & (
+        x < state["map_next_x"][:, :, None] - TUNING["tread_inset"]) & (
+        cross < TUNING["riser_lateral_corridor"]) & (
+        (wheels[:, None, :, 2] - state["map_z"][:, :, None] - state["radius"][:, None]).abs()
+        <= TUNING["tread_height_tolerance"])
+    state["map_stable_time"] = torch.where(occupancy, state["map_stable_time"] + env.step_dt, 0)
+    stable = state["map_stable_time"] >= TUNING["landing_time"]
+    state["map_landed"] |= stable
+    for key in ("front_event", "rear_event", "front_face_event", "front_violation_event",
+                "rear_violation_event", "front_same_tread_event", "rear_same_tread_event"):
+        state[key].zero_()
+    state["front_lift_gain"].zero_(); state["rear_lift_gain"].zero_()
+    state["front_lift_settlement"].zero_()
+    for axle, name in enumerate(("front", "rear")):
+        sl = slice(2*axle, 2*axle+2)
+        pair = state["map_landed"][:, :, sl]
+        first = pair.any(-1) & ~state["map_paid"][:, :, axle] & known
+        candidate = torch.where(first, state["map_z"], torch.inf).argmin(-1)
+        available = first.any(-1) & enabled
+        landed = pair[row, candidate]
+        single = landed.sum(-1) == 1
+        side = landed.long().argmax(-1)
+        last = state["axis_last_slot"][:, axle]
+        last_z = state["map_z"][row, last.clamp_min(0)]
+        last_xy = state["map_xy"][row, last.clamp_min(0)]
+        last_h = state["map_heading"][row, last.clamp_min(0)]
+        advance = ((state["map_xy"][row, candidate] - last_xy) * last_h).sum(-1)
+        source = state["map_lower_z"][row, candidate]
+        adjacent = (last < 0) | ((source-last_z).abs() < TUNING["riser_height_tolerance"]) & (
+            advance >= TUNING["riser_min_spacing"]) & (advance <= TUNING["riser_max_spacing"])
+        # If a first observed landing skips a known lower tread, it is a skip,
+        # including when neither front leg ever paid a completion reward.
+        lower_before = known & (state["map_z"] < state["map_z"][row, candidate, None] - 0.05)
+        lower_unvisited = (lower_before & ~state["map_paid"][:, :, axle]).any(-1)
+        skipped = (~adjacent | lower_unvisited) & available
+        expected = state[name+"_expected"]
+        ordered = (expected < 0) | (side == expected)
+        safe = state["map_safe"][row, candidate, sl].gather(1, side[:, None]).squeeze(-1)
+        correct = available & single & ordered & safe & ~skipped
+        violation = available & ~correct
+        state[name+"_event"] = landed & correct[:, None]
+        state[name+"_violation_event"] = violation
+        state[name+"_successes"] += correct.float()
+        state[name+"_violations"] += violation.float()
+        state["skip_total"][:, axle] += skipped.float()
+        state["physical_total"][:, axle] += available.float()
+        state["unsafe_total"][:, axle] += (available & ~safe).float()
+        state["axis_run"][:, axle] = torch.where(available,
+            torch.where(correct, state["axis_run"][:, axle]+1, 0), state["axis_run"][:, axle])
+        state["axis_max_run"][:, axle] = torch.maximum(state["axis_max_run"][:, axle], state["axis_run"][:, axle])
+        ids = torch.nonzero(available, as_tuple=False).squeeze(-1)
+        slots = candidate[ids]
+        state["map_paid"][ids, slots, axle] = True
+        state["map_correct"][ids, slots, axle] = correct[ids]
+        state["map_side"][ids, slots, axle] = torch.where(single[ids], side[ids], -1)
+        # Physical progress is monotonic; late lower contacts cannot rewind the
+        # sequence or unlock more preparation credit.
+        further = available & ((last < 0) | (state["map_z"][row, candidate] > last_z+0.05))
+        state["axis_last_slot"][further, axle] = candidate[further]
+        state[name+"_expected"][further] = torch.where(single[further], 1-side[further], -1)
+        state[name+"_count"] += available.long()
+        # All historical treads remain checked, including after the first leg
+        # has left. Each axle/tread pays once, and both axles add independently.
+        duplicate = pair.all(-1) & state["map_intermediate"] & known
+        new_duplicate = duplicate & ~state["map_duplicate_paid"][:, :, axle] & enabled[:, None]
+        state["map_duplicate_paid"][:, :, axle] |= new_duplicate
+        state["map_correct"][:, :, axle] &= ~duplicate
+        state[name+"_same_tread_event"] = new_duplicate.any(-1)
+        state["duplicate_event_count"][:, axle] = new_duplicate.sum(-1)
+        state["same_tread_events_total"][:, axle] += new_duplicate.sum(-1)
+        state["axis_run"][duplicate.any(-1) & enabled, axle] = 0
+        current_pair = stable[:, :, sl].all(-1) & state["map_intermediate"] & known & enabled[:, None]
+        state["map_dwell"][:, :, axle] += current_pair.float()*env.step_dt
+        dwelling = current_pair & (state["map_dwell"][:, :, axle] > TUNING["same_tread_grace"])
+        state["same_tread_dwell"][:, axle] = dwelling.any(-1).float()
+        state["same_tread_seconds_total"][:, axle] += dwelling.any(-1)*env.step_dt
+        # Geometric next target per axle, independent of the other axle queue.
+        last = state["axis_last_slot"][:, axle]
+        last_z = state["map_z"][row, last.clamp_min(0)]
+        ahead = known & ~state["map_paid"][:, :, axle] & (
+            (last < 0)[:, None] | (state["map_z"] > last_z[:, None]+0.05))
+        target = torch.where(ahead, state["map_z"], torch.inf).argmin(-1)
+        has_target = ahead.any(-1)
+        changed = has_target & (target != state["axis_target_slot"][:, axle])
+        state["targets_started"] += changed.float() if axle == 0 else 0
+        state["axis_target_slot"][:, axle] = torch.where(has_target, target, -1)
+        expected = state[name+"_expected"]
+        lead = state["map_lead"][row, target, axle]
+        lead = torch.where(expected >= 0, expected, lead)
+        hfrac = (wheels[:, sl, 2] - state["radius"][:, sl] - state["map_lower_z"][row, target, None]) / (
+            state["map_z"][row, target, None] - state["map_lower_z"][row, target, None] + 0.02).clamp_min(0.06)
+        tx = x[row, target, sl]
+        progress = hfrac.clamp(0,1) * ((tx+TUNING["prep_distance"])/TUNING["prep_distance"]).clamp(0,1)
+        other_support = loaded.sum(-1,keepdim=True) - loaded[:, sl].long()
+        eligible = has_target[:, None] & enabled[:, None] & ~loaded[:, sl] & (other_support >= 2) & (
+            tx > -TUNING["prep_distance"]) & (tx < 0.03)
+        progress = torch.where(eligible, progress, 0)
+        lead = torch.where(lead >= 0, lead, progress.argmax(-1))
+        current = progress.gather(1,lead[:, None]).squeeze(-1)
+        gain = (current-state["map_prep_max"][row, target, axle]).clamp_min(0)
+        budget = (1+state[name+"_successes"]-state[name+"_lift_credit"]).clamp_min(0)
+        gain = torch.minimum(gain,budget)*has_target
+        state["map_lead"][row, target, axle] = torch.where(gain > 0,lead,state["map_lead"][row,target,axle])
+        state["map_prep_max"][row,target,axle] = torch.maximum(state["map_prep_max"][row,target,axle],current)
+        state[name+"_lift_gain"] = gain
+        state[name+"_lift_credit"] += gain
+    state["previous_wheel"] = wheels.clone()
+    state["wheel_history_valid"].fill_(True)
+    state["active"] = enabled & ((state["axis_target_slot"] >= 0).any(-1))
+    target = state["axis_target_slot"][:, 0].clamp_min(0)
+    state["edge_xy"] = state["map_xy"][row,target].clone()
+    state["heading"] = state["map_heading"][row,target].clone()
+    state["source_z"] = state["map_lower_z"][row,target].clone()
+    state["target_z"] = state["map_z"][row,target].clone()
+    state["forward_steps"] += state["active"].float()
+    state["retreat_steps"] += (state["active"] & (robot.data.root_lin_vel_b[:,0] < -0.05)).float()
+    state["stationary_steps"] += (state["active"] & (robot.data.root_lin_vel_b[:,0].abs() < 0.05)).float()
+    env._m20_ascent_cache = {"step":step,"state":state}
+    return state
+
+
+def stair_rear_wheel_lift(env, asset_cfg, sensor_cfg, contact_sensor_cfg, command_name="base_velocity"):
+    """One bounded preparation budget per rear target; no cyclic leg-dance pay."""
+    return ascent_state(env,asset_cfg,sensor_cfg,contact_sensor_cfg,command_name)["rear_lift_gain"] / env.step_dt
+
+

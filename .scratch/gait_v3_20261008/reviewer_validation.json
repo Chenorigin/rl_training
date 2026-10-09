@@ -1,0 +1,18 @@
+{
+  "family": "Codex/GPT: same family independent reviewer, heterogeneous family unavailable",
+  "source_sha256": "5b089ff048e9847b9141423430ce43a9430d5ff2ae287eba6f4309f3c8d8d7b1",
+  "env_cfg_sha256": "a16d22f2bc2ad466aa51f555d5381ec40bcdd1a27268d640162c29ff1e71fd33",
+  "cpu_checks_passed": [
+    "check_gait_v3.py",
+    "reviewer_identity.py",
+    "reviewer_exit_gate.py",
+    "reviewer_early_landing.py",
+    "reviewer_vector_v3.py",
+    "reviewer_flights.py",
+    "reviewer_final_replay.py",
+    "reviewer_down_replay.py"
+  ],
+  "gpu_runs": 0,
+  "training_runs": 0,
+  "source_writes": 0
+}

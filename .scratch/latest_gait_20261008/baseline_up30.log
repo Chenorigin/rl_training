@@ -1,0 +1,82 @@
+[TERRAIN] {"terrain": "ascent", "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml", "terrain_parameters": {"width": [4.0], "friction": [1.0, 0.01, 0.01], "spawn_xy": [-1.0, 0.0], "spawn_yaw_deg": [0.0], "start_x": [0.25], "step_height": [0.15], "tread_depth": [0.3], "step_count": [8.0], "platform_length": [10.0]}, "goal_x": 2.65, "course_width": 4.0}
+[KEYS] Z stand | C teacher policy | X lie down | R damping | H height scan | Esc quit
+[HEIGHTMAP] 187 points: green=local ground, red=higher, blue=lower
+[KEYS] W/S forward/back | A/D left/right | Q/E turn left/right
+[KEYS] Input: MuJoCo window or focused terminal
+[KEYS] Window motion: hold/release state (X11)
+[MODE] prone
+step=0000 mode=prone t=0.02s x=-1.000 z=0.199 cmd=[0.0, 0.0, 0.0]
+[MODE] standing t=0.26s
+[MODE] ready t=5.28s
+[MODE] policy t=5.82s
+{
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/latest_gait_20261008/baseline.pt",
+  "model": "/home/ubuntu/\u684c\u9762/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+  "terrain": "ascent",
+  "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml",
+  "terrain_parameters": {
+    "width": [
+      4.0
+    ],
+    "friction": [
+      1.0,
+      0.01,
+      0.01
+    ],
+    "spawn_xy": [
+      -1.0,
+      0.0
+    ],
+    "spawn_yaw_deg": [
+      0.0
+    ],
+    "start_x": [
+      0.25
+    ],
+    "step_height": [
+      0.15
+    ],
+    "tread_depth": [
+      0.3
+    ],
+    "step_count": [
+      8.0
+    ],
+    "platform_length": [
+      10.0
+    ]
+  },
+  "goal_x": 2.65,
+  "course_width": 4.0,
+  "crossed_finish": false,
+  "inside_course": true,
+  "cleared_terrain": false,
+  "cleared_stairs": false,
+  "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked",
+  "steps_executed": 722,
+  "final_mode": "policy",
+  "transitions": [
+    {
+      "time": 0.0,
+      "mode": "prone"
+    },
+    {
+      "time": 0.26,
+      "mode": "standing"
+    },
+    {
+      "time": 5.28,
+      "mode": "ready"
+    },
+    {
+      "time": 5.82,
+      "mode": "policy"
+    }
+  ],
+  "max_x": 3.116269830386855,
+  "final_x": 3.116269830386855,
+  "final_z": 1.7686717019729503,
+  "fell_in_policy": false,
+  "critic_used": false
+}
+RESULT {"stop_reasons": ["all_wheels_crossed"], "fell_in_policy": false, "phase_duration_s": 6.79, "force": {"contact_samples": 3622, "mean_n": 136.18369892306438, "p95_n": 274.16078536190116, "p99_n": 395.0496072725841, "max_n": 1463.739947062841}, "mechanical_power_mean_w": 227.54043541877306, "front_support": {"samples": 40, "extension_min_m": 0.3703779974526563, "extension_p05_m": 0.3803400065254016, "knee_abs_max_deg": 95.88115039289181, "knee_abs_p95_deg": 92.44319403671905}, "front_swing": {"samples": 225, "extension_min_m": 0.24782394802246047, "extension_p05_m": 0.2551375272071607, "knee_abs_max_deg": 135.1187260288469, "knee_abs_p95_deg": 132.77670625246162}, "descent_entry": {"first_front_down_s": null, "first_rear_down_s": null, "stable_rear_samples": 0, "rear_tilt_body_p95_deg": null, "rear_tilt_yaw_p95_deg": null, "rear_forward_body_max_m": null, "pitch_min_deg": null, "rear_fold": {"samples": 0, "extension_min_m": null, "extension_p05_m": null, "knee_abs_max_deg": null, "knee_abs_p95_deg": null}}}

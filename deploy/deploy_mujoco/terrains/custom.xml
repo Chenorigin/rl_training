@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 原生 MJCF 地形示例：直接编辑 worldbody 下的 geom，即时生效。
+     本文件供 deploy_mujoco.py 的 terrain-xml 参数使用。
+     参数化模板由 terrain_loader.py 在加载时生成碰撞体，不含机器人。
+     编辑 data 后重新启动部署；无需再改 Python，命令行覆盖值会打印在运行摘要中。 -->
+<mujoco model="custom_terrain">
+  <compiler angle="radian"/>
+  <custom>
+    <text name="terrain_kind" data="custom"/>
+    <!-- 公共参数：长度单位 m；世界 +X 为路线前进方向，+Y 为左，+Z 为上。 -->
+    <!-- width：路线宽度；生成障碍之外保留 z=0 无限平面，方便自由操控。 -->
+    <numeric name="width" data="4.0"/>
+    <!-- friction：滑动 / 扭转 / 滚动摩擦；应用于生成的地面和障碍。 -->
+    <numeric name="friction" data="1.0 0.01 0.01"/>
+    <!-- spawn_xy：机器人出生世界坐标 x y；z 自动射线查询 + 站立/趴下偏置。 -->
+    <numeric name="spawn_xy" data="-1.0 0.0"/>
+    <!-- spawn_yaw_deg：出生偏航角，单位度；0 表示朝 +X。 -->
+    <numeric name="spawn_yaw_deg" data="0"/>
+    <!-- 自定义路线的统计终点，修改几何后自行同步；所有长度为 m。 -->
+    <numeric name="goal_x" data="3.0"/>
+  </custom>
+  <!-- 原生 geom 的 pos 为中心位置、size 为半尺寸，friction 为三项摩擦。
+       自定义 geom 的摩擦由各 geom 独立设置；上方 friction 用于自动补充的平地。
+       group=0 且启用碰撞，才会被 187 点高程扫描检测；不要放机器人或动态 body。
+       下面方块：x=[0.8,1.2]、y=[-0.6,0.6]、z=[0,0.2]。 -->
+  <worldbody>
+    <geom name="test_box" type="box" pos="1.0 0.0 0.1" size="0.2 0.6 0.1"
+          group="0" contype="1" conaffinity="1" condim="3"
+          friction="1.0 0.01 0.01" rgba="0.6 0.4 0.3 1"/>
+  </worldbody>
+</mujoco>

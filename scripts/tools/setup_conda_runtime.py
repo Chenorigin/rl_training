@@ -10,22 +10,22 @@ import sys
 
 
 ACTIVATE = '''# Isaac Sim must load Conda's C++ runtime before the system copy (ICU needs CXXABI_1.3.15).
-if [ -z "${_DR02_CXX_RUNTIME_ACTIVE+x}" ]; then
-    export _DR02_CXX_RUNTIME_ACTIVE=1
-    export _DR02_CXX_RUNTIME_PRELOAD_SET="${LD_PRELOAD+x}"
-    export _DR02_CXX_RUNTIME_PRELOAD_OLD="${LD_PRELOAD-}"
+if [ -z "${_RL_TRAINING_CXX_RUNTIME_ACTIVE+x}" ]; then
+    export _RL_TRAINING_CXX_RUNTIME_ACTIVE=1
+    export _RL_TRAINING_CXX_RUNTIME_PRELOAD_SET="${LD_PRELOAD+x}"
+    export _RL_TRAINING_CXX_RUNTIME_PRELOAD_OLD="${LD_PRELOAD-}"
     export LD_PRELOAD="$CONDA_PREFIX/lib/libstdc++.so.6${LD_PRELOAD:+:$LD_PRELOAD}"
 fi
 '''
 
 DEACTIVATE = '''# Restore the preload setting from before this environment was activated.
-if [ "${_DR02_CXX_RUNTIME_ACTIVE-}" = 1 ]; then
-    if [ "${_DR02_CXX_RUNTIME_PRELOAD_SET-}" = x ]; then
-        export LD_PRELOAD="$_DR02_CXX_RUNTIME_PRELOAD_OLD"
+if [ "${_RL_TRAINING_CXX_RUNTIME_ACTIVE-}" = 1 ]; then
+    if [ "${_RL_TRAINING_CXX_RUNTIME_PRELOAD_SET-}" = x ]; then
+        export LD_PRELOAD="$_RL_TRAINING_CXX_RUNTIME_PRELOAD_OLD"
     else
         unset LD_PRELOAD
     fi
-    unset _DR02_CXX_RUNTIME_ACTIVE _DR02_CXX_RUNTIME_PRELOAD_SET _DR02_CXX_RUNTIME_PRELOAD_OLD
+    unset _RL_TRAINING_CXX_RUNTIME_ACTIVE _RL_TRAINING_CXX_RUNTIME_PRELOAD_SET _RL_TRAINING_CXX_RUNTIME_PRELOAD_OLD
 fi
 '''
 
@@ -47,7 +47,7 @@ def main():
         )
 
     for directory, contents in (("activate.d", ACTIVATE), ("deactivate.d", DEACTIVATE)):
-        hook = prefix / "etc/conda" / directory / "dr02-cxx-runtime.sh"
+        hook = prefix / "etc/conda" / directory / "rl-training-cxx-runtime.sh"
         hook.parent.mkdir(parents=True, exist_ok=True)
         hook.write_text(contents)
         print(f"Installed {hook}")

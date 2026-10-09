@@ -1,0 +1,15 @@
+{
+  "short_swing_cost": [
+    0.80689537525177,
+    0.80689537525177
+  ],
+  "normal_swing_cost": [
+    0.0,
+    0.0
+  ],
+  "loaded_short_no_compact_cost": [
+    0.0,
+    0.0
+  ],
+  "source_sha256": "8df8ef14d2929a9d471cff86beec1cfc5d53a364d2ede1265433c8fee85f8afb"
+}

@@ -1,0 +1,76 @@
+{
+  "case": "up",
+  "leg": "fr",
+  "time_s": 13.780000000000754,
+  "checkpoint": "model_196600.pt",
+  "physical_closed_loop": true,
+  "phase_tag": "landing_support",
+  "terrain": {
+    "terrain": "ascent",
+    "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml",
+    "terrain_parameters": {
+      "width": [
+        4.0
+      ],
+      "friction": [
+        1.0,
+        0.01,
+        0.01
+      ],
+      "spawn_xy": [
+        -1.0,
+        0.0
+      ],
+      "spawn_yaw_deg": [
+        0.0
+      ],
+      "start_x": [
+        0.25
+      ],
+      "step_height": [
+        0.15
+      ],
+      "tread_depth": [
+        0.2
+      ],
+      "step_count": [
+        20.0
+      ],
+      "platform_length": [
+        10.0
+      ]
+    },
+    "goal_x": 4.25,
+    "course_width": 4.0
+  },
+  "command_x": 0.7,
+  "H_hip_joint_world": [
+    3.146846782188176,
+    0.2651606805073278,
+    2.650983664795271
+  ],
+  "K_knee_joint_world": [
+    3.1178857879201565,
+    0.11048337341700698,
+    2.433225194277372
+  ],
+  "W_wheel_center_world": [
+    3.3567854425388965,
+    0.11510600857712838,
+    2.5279184424169476
+  ],
+  "knee_q_signed_deg": 123.09429987785843,
+  "knee_inner_hinge_plane_deg": 56.905700122141624,
+  "knee_inner_3d_deg": 65.8480392772923,
+  "whole_leg_forward_tilt_body_deg": 28.73284008851666,
+  "whole_leg_forward_tilt_gravity_deg": 52.75546328528488,
+  "thigh_forward_tilt_body_deg": -36.14833710234477,
+  "body_pitch_positive_nose_down_deg": -20.833067386684554,
+  "wheel_force_world_n": [
+    -66.69433070891219,
+    1.4655327346073013,
+    27.28137635751481
+  ],
+  "wheel_ground_m": 2.3999999999999986,
+  "contact_phase": "loaded stair contact without >=0.2s stable-contact requirement"
+}

@@ -1,0 +1,25 @@
+{
+  "files": {
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/gait_refinement.py": "771bedf909c64226b8ea4d8ceba280bab5691003c378ca784e055aaddd239d85",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_ascent.py": "0ac91ded1bea3934b224fb8b2d5157ee01836f587ecf88f082104b54200868e2",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_teacher.py": "f2b3201558bf086acf6ad7ea5b504d00521160472f17d84e73663d45b2205b3f",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_teacher_env_cfg.py": "b6fcae3f3bfba183bc5674c52ff8c49846b3ef3e0c2fcaa360246aa9e275700b",
+    "scripts/tools/check_stair_rewards.py": "6f7b742467c289be0860f279a28b7cb9de8577c7ce379dee5e3b4892ed2d2734",
+    "scripts/tools/check_gait_refinement.py": "032d16e6f63a25a072f8873d6f9bdc3e0562bdbb24ffeffdd56e8cb92acc063d",
+    "scripts/tools/smoke_stair_rewards.py": "ae16dc19a66a646be4d039203fa5e6f5117b8b8d48b954601ded6c2675f3f67f",
+    "scripts/tools/evaluate_stair_gait.py": "511a947fa953d2e2cfd675d88019cb35af03046b54581b6ee1cc69f04ace57b4",
+    "deploy/deploy_mujoco/gait_metrics.py": "06bc9ff35309a1984bf3d00d562fd22f68c6e70636934c15b4a40069cf2ce4a1"
+  },
+  "frozen_files_unchanged": {
+    "pre_teacher_env_cfg.py": true,
+    "deploy_mujoco.py": true
+  },
+  "actor_input_dim": 244,
+  "critic_input_dim": 285,
+  "numerical_checks_passed": true,
+  "isaac_steps": 60,
+  "isaac_envs": 16,
+  "review": "Independent Codex reviewer; alternate model family unavailable",
+  "training_started": false,
+  "physical_robot_run": false
+}

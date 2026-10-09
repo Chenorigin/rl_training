@@ -1,0 +1,57 @@
+--- /home/ubuntu/cyq_shixi_projects/rl_training/.scratch/gait_refinement_20261002/baseline/stair_teacher.py	2026-10-01 23:50:36.056741010 +0800
++++ /home/ubuntu/cyq_shixi_projects/rl_training/source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_teacher.py	2026-10-02 15:46:23.556387658 +0800
+@@ -177,6 +177,11 @@
+         "terrain_gate": terrain_gate,
+         "up_gate": up_gate,
+         "down_gate": down_gate,
++        # Keep all visible ascending edges for style checks. The nearest edge
++        # can still be the riser the front wheels have already climbed.
++        "ascending_edges_x": edge_x,
++        "ascending_edges_valid": nearby & (delta > 0.0),
++        "ascending_edges_upper_z": profile[:, 1:],
+         "edge_x": torch.where(has_edge, selected_x, torch.zeros_like(selected_x)),
+         "edge_delta": torch.where(has_edge, selected_delta, torch.zeros_like(selected_delta)),
+         "lower_z": torch.where(has_edge, lower_z, torch.zeros_like(lower_z)),
+@@ -239,6 +244,7 @@
+     y_cmd_threshold: float = 0.1,
+     xy_norm_max: float = 0.1,
+     xz_norm_max: float = 0.1,
++    turn_penalty_scale: float = 0.0,
+ ) -> torch.Tensor:
+     """Keep the M20 posture cost, relaxing it near a visible stair edge."""
+     cost = joint_pos_penalty(
+@@ -250,7 +256,10 @@
+         side = (cmd[:, 1].abs() > y_cmd_threshold) & (
+             torch.linalg.vector_norm(cmd[:, [0, 2]], dim=1) < xz_norm_max
+         )
+-        cost = cost * (~(turn | side)).to(cost.dtype)
++        # Sideways relaxation remains available. Pure yaw keeps a weak posture
++        # reference rather than removing the hip/knee constraint altogether.
++        scale = torch.where(turn, turn_penalty_scale, 1.0)
++        cost = cost * torch.where(side, 0.0, scale)
+     gate = _stair_scan_context(env, stair_sensor_cfg, command_name)["terrain_gate"]
+     return cost * (1.0 - (1.0 - stair_penalty_scale) * gate)
+ 
+@@ -739,6 +748,12 @@
+     return (state["front_same_tread_event"] | state["rear_same_tread_event"]).float() / env.step_dt
+ 
+ 
++def stair_up_same_tread_dwell_cost(env, asset_cfg, sensor_cfg, contact_sensor_cfg):
++    """Bounded time cost on intermediate treads; short support transfers are free."""
++    state = ascent_state(env, asset_cfg, sensor_cfg, contact_sensor_cfg)
++    return state["same_tread_dwell"].mean(dim=1)
++
++
+ def stair_down_step_completion(
+     env, asset_cfg: SceneEntityCfg, sensor_cfg: SceneEntityCfg,
+     contact_sensor_cfg: SceneEntityCfg,
+@@ -803,6 +818,9 @@
+         result["up_rear_successes"] = up_state["rear_successes"][env_ids].mean()
+         result["up_front_violations"] = up_state["front_violations"][env_ids].mean()
+         result["up_rear_violations"] = up_state["rear_violations"][env_ids].mean()
++        for axle, name in enumerate(("front", "rear")):
++            result[f"up_{name}_same_tread_events"] = up_state["same_tread_events_total"][env_ids, axle].mean()
++            result[f"up_{name}_same_tread_dwell_s"] = up_state["same_tread_seconds_total"][env_ids, axle].mean()
+         for metric, field in (("up_targets_started", "targets_started"),
+                               ("up_lift_credit", "front_lift_credit"), ("up_retries", "retry_count"),
+                               ("up_abandoned_targets", "abandoned_targets")):

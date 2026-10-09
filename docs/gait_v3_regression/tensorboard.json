@@ -1,0 +1,639 @@
+{
+  "Episode_Reward/lin_vel_z_l2": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.033520941906026565,
+    "late": -0.12801596336066723,
+    "last": -0.12945419549942017
+  },
+  "Episode_Reward/ang_vel_xy_l2": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.015551434170047286,
+    "late": -0.03649757008999586,
+    "last": -0.037115678191185
+  },
+  "Episode_Reward/joint_torques_l2": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.0027970617856010447,
+    "late": -0.1197402710467577,
+    "last": -0.1172780990600586
+  },
+  "Episode_Reward/joint_acc_l2": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.05061147437081672,
+    "late": -0.08622145004570485,
+    "last": -0.09008210897445679
+  },
+  "Episode_Reward/hipx_joint_pos_penalty": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.2164265547762625,
+    "late": -0.6754957783222199,
+    "last": -0.7019311189651489
+  },
+  "Episode_Reward/hipy_joint_pos_penalty": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.11045767640694976,
+    "late": -0.30968068689107897,
+    "last": -0.31318074464797974
+  },
+  "Episode_Reward/knee_joint_pos_penalty": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.1306494936114177,
+    "late": -0.5892204850912094,
+    "last": -0.5748775601387024
+  },
+  "Episode_Reward/joint_mirror": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.0031848184683622095,
+    "late": -0.07859660118818283,
+    "last": -0.08012449741363525
+  },
+  "Episode_Reward/action_rate_l2": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.003483867329786108,
+    "late": -0.13140758723020554,
+    "last": -0.12772512435913086
+  },
+  "Episode_Reward/action_smooth_l2": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.01619430683110295,
+    "late": -0.6408498859405518,
+    "last": -0.6181015372276306
+  },
+  "Episode_Reward/undesired_contacts": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.005695985890633892,
+    "late": -0.0390058178268373,
+    "last": -0.04067106172442436
+  },
+  "Episode_Reward/contact_forces": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.0016102413493274525,
+    "late": -0.04634850163012743,
+    "last": -0.04377877712249756
+  },
+  "Episode_Reward/track_lin_vel_xy_exp": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 3.5515626695379616,
+    "late": 2.946607167720795,
+    "last": 2.954364776611328
+  },
+  "Episode_Reward/track_ang_vel_z_exp": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 2.1887898357212543,
+    "late": 2.2631772232055662,
+    "last": 2.206467628479004
+  },
+  "Episode_Reward/feet_air_time_ang_z_M20": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.0001593122474407238,
+    "late": 0.0010767689743079246,
+    "last": 0.0011032531037926674
+  },
+  "Episode_Reward/feet_slide_ang_z_cmd": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.0021309148015461687,
+    "late": -0.07600491248071194,
+    "last": -0.10281442105770111
+  },
+  "Episode_Reward/stand_still": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.036859669997356834,
+    "late": -0.33208577528595923,
+    "last": -0.4162869453430176
+  },
+  "Episode_Reward/rotation_gait_status": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 3.0345364349670945e-06,
+    "late": 0.00014476781490515122,
+    "last": 7.737153646303341e-05
+  },
+  "Episode_Reward/rotation_gait_symmetry": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.0006190481042330021,
+    "late": 0.016306380294263362,
+    "last": 0.02383936010301113
+  },
+  "Episode_Reward/bad_orientation_penalty": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.0001527777872979641,
+    "late": -0.04048053603619337,
+    "last": -0.06000330671668053
+  },
+  "Episode_Reward/joint_acc_wheel_l2": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.04732127656461671,
+    "late": -0.12263388991355896,
+    "last": -0.1282791942358017
+  },
+  "Episode_Reward/stair_orientation_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.059423004101845436,
+    "late": -0.2989653214812279,
+    "last": -0.30818670988082886
+  },
+  "Episode_Reward/stair_forward_progress": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.038014760759542694,
+    "late": 0.014847014248371124,
+    "last": 0.0188217181712389
+  },
+  "Episode_Reward/stair_front_wheel_lift": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.03475745996576734,
+    "late": 0.02744153367355466,
+    "last": 0.026157017797231674
+  },
+  "Episode_Reward/stair_forward_motion_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.01653750387207765,
+    "late": -0.07762928266078234,
+    "last": -0.057710062712430954
+  },
+  "Episode_Reward/stair_ascent_direction_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.2742299041041406,
+    "late": -0.3924747744202614,
+    "last": -0.3483290672302246
+  },
+  "Episode_Reward/stair_front_wheel_touchdown": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.011093329133291262,
+    "late": 0.012706975974142552,
+    "last": 0.012796379625797272
+  },
+  "Episode_Reward/stair_front_single_support": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.0023636218599494894,
+    "late": 0.0006641386673436501,
+    "last": 0.0009110725950449705
+  },
+  "Episode_Reward/stair_diagonal_support_symmetry": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.0008933326533951913,
+    "late": 0.00026242399020702577,
+    "last": 0.00031702578417025506
+  },
+  "Episode_Reward/stair_front_alternation": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.002831190265060286,
+    "late": 0.0026514737628167495,
+    "last": 0.002368345158174634
+  },
+  "Episode_Reward/stair_up_step_completion": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.033974282656563444,
+    "late": 0.03181768499314785,
+    "last": 0.028420140966773033
+  },
+  "Episode_Reward/stair_up_rear_step_completion": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.00890281877364032,
+    "late": 0.016201962333871053,
+    "last": 0.017259426414966583
+  },
+  "Episode_Reward/stair_rear_wheel_lift": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.02589624359170557,
+    "late": 0.021465296391397715,
+    "last": 0.021367615088820457
+  },
+  "Episode_Reward/stair_descent_rear_forward_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.0006184056587562736,
+    "late": -0.0027416460029780865,
+    "last": -0.0020186787005513906
+  },
+  "Episode_Reward/stair_ascent_front_body_clearance_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -8.554344499710158e-06,
+    "late": -0.0022007365059107543,
+    "last": -0.001922374009154737
+  },
+  "Episode_Reward/stair_up_order_violation_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.20244964825804346,
+    "late": -0.15212502874433995,
+    "last": -0.1278902143239975
+  },
+  "Episode_Reward/stair_up_same_tread_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.2784963829861954,
+    "late": -0.10119628876447678,
+    "last": -0.1176004558801651
+  },
+  "Episode_Reward/stair_up_same_tread_dwell_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -5.044023163009115e-05,
+    "late": -3.084490808760165e-06,
+    "last": 0.0
+  },
+  "Episode_Reward/stair_descent_rear_fold_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.00011013440541205455,
+    "late": -0.0013918857008684428,
+    "last": -0.0011443011462688446
+  },
+  "Episode_Reward/stair_ascent_front_fold_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.008897246573105803,
+    "late": -0.04054202342405915,
+    "last": -0.034898970276117325
+  },
+  "Episode_Reward/turn_swing_size_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -1.2290920570151576e-05,
+    "late": -0.0015672163097769953,
+    "last": -0.002705751685425639
+  },
+  "Episode_Reward/stair_down_step_completion": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.038524269671179355,
+    "late": 0.04269935505464673,
+    "last": 0.04400297999382019
+  },
+  "Episode_Reward/stair_front_riser_face_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.017451447793864646,
+    "late": -0.01734254002571106,
+    "last": -0.013376323506236076
+  },
+  "Episode_Reward/stair_descent_rear_support": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.009548542249103776,
+    "late": 0.011097762044519186,
+    "last": 0.011739584617316723
+  },
+  "Episode_Reward/stair_impact_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.0007337080041634181,
+    "late": -0.00231506816111505,
+    "last": -0.0026404540985822678
+  },
+  "Episode_Reward/stair_non_wheel_contact_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.00046320471824401466,
+    "late": -0.002937442663824186,
+    "last": -0.0034044263884425163
+  },
+  "Episode_Reward/stair_non_wheel_scrape_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.0003448453342343782,
+    "late": -0.0016538262891117484,
+    "last": -0.0018136175349354744
+  },
+  "Episode_Reward/stair_joint_effort_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.001085487845875832,
+    "late": -0.003255161226261407,
+    "last": -0.0032950739841908216
+  },
+  "Episode_Reward/stair_joint_acceleration_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.0026677584814387956,
+    "late": -0.005433604987338185,
+    "last": -0.005784781649708748
+  },
+  "Episode_Reward/stair_mechanical_power_cost": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": -0.0003703291281271959,
+    "late": -0.001114536410314031,
+    "last": -0.0011531775817275047
+  },
+  "Curriculum/terrain_levels": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.3313820501153532,
+    "late": 5.818827295303345,
+    "last": 5.846333980560303
+  },
+  "Curriculum/gait_level": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.061794783249497415,
+    "late": 1.0,
+    "last": 1.0
+  },
+  "Curriculum/step_completion/up_successes": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 1.3645189013704657,
+    "late": 1.083448688387871,
+    "last": 0.899553656578064
+  },
+  "Curriculum/step_completion/up_success_rate": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.22942037470638751,
+    "late": 0.23765932977199555,
+    "last": 0.248051255941391
+  },
+  "Curriculum/step_completion/up_rear_successes": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.9861670500598848,
+    "late": 1.062143915295601,
+    "last": 0.8319114446640015
+  },
+  "Curriculum/step_completion/up_front_same_tread_events": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.6065462018549442,
+    "late": 0.1921293682605028,
+    "last": 0.21339285373687744
+  },
+  "Curriculum/step_completion/up_front_same_tread_dwell_s": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.00021421624987851828,
+    "late": 5.1388884894549844e-05,
+    "last": 0.0
+  },
+  "Curriculum/step_completion/up_rear_same_tread_events": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.6312154862377792,
+    "late": 0.25763190977275374,
+    "last": 0.3092758357524872
+  },
+  "Curriculum/step_completion/up_rear_same_tread_dwell_s": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.001803392978181364,
+    "late": 7.199074403615668e-05,
+    "last": 0.0
+  },
+  "Curriculum/step_completion/down_successes": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.25682845851406455,
+    "late": 0.2846623669564724,
+    "last": 0.29335319995880127
+  },
+  "Curriculum/step_completion/down_success_rate": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.26700839947909116,
+    "late": 0.27861998781561853,
+    "last": 0.33449074625968933
+  },
+  "Curriculum/step_completion/up_front_transition_successes": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.22649521666578948,
+    "late": 0.2121178986877203,
+    "last": 0.18946760892868042
+  },
+  "Curriculum/step_completion/up_front_same_tread_fraction": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.17953871125355364,
+    "late": 0.09170697439461946,
+    "last": 0.16920539736747742
+  },
+  "Curriculum/step_completion/fl_stable_treads": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 3.797626129128039,
+    "late": 2.5798520708084105,
+    "last": 2.0466437339782715
+  },
+  "Curriculum/step_completion/fr_stable_treads": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 3.5254464883171024,
+    "late": 2.7303801262378693,
+    "last": 2.4299440383911133
+  },
+  "Curriculum/step_completion/up_rear_transition_successes": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.05935212585143745,
+    "late": 0.10801308230496943,
+    "last": 0.11506283283233643
+  },
+  "Curriculum/step_completion/up_rear_same_tread_fraction": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.14920700550079347,
+    "late": 0.07907092530280352,
+    "last": 0.13546840846538544
+  },
+  "Curriculum/step_completion/hl_stable_treads": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 3.4961869646422565,
+    "late": 2.9094051265716554,
+    "last": 2.508664131164551
+  },
+  "Curriculum/step_completion/hr_stable_treads": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 3.4290463216230274,
+    "late": 2.8930117404460907,
+    "last": 2.516038417816162
+  },
+  "Curriculum/gait_quality/rear_fold_support_fraction": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.02830255063949153,
+    "late": 0.08975159764289856,
+    "last": 0.08930264413356781
+  },
+  "Curriculum/gait_quality/front_fold_support_fraction": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.12439255030825734,
+    "late": 0.1918117582052946,
+    "last": 0.19491100311279297
+  },
+  "Curriculum/gait_quality/front_extreme_swing_fold_fraction": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.15570637606084348,
+    "late": 0.3087524452805519,
+    "last": 0.3307301104068756
+  },
+  "Curriculum/terrain_level_overall": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.3313820501153532,
+    "late": 5.818827295303345,
+    "last": 5.846333980560303
+  },
+  "Curriculum/terrain_level_pyramid_stairs": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.3454898982207669,
+    "late": 6.0169143390655515,
+    "last": 6.06601619720459
+  },
+  "Curriculum/terrain_level_pyramid_stairs_inv": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.3251031592898653,
+    "late": 5.6016433048248295,
+    "last": 5.625058174133301
+  },
+  "Curriculum/terrain_level_boxes": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.34484553907997906,
+    "late": 5.933807134628296,
+    "last": 5.8756103515625
+  },
+  "Curriculum/terrain_level_random_rough": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.32889095003716645,
+    "late": 5.710092248916626,
+    "last": 5.833333492279053
+  },
+  "Curriculum/terrain_level_hf_pyramid_slope": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.33189634889364245,
+    "late": 5.789473752975464,
+    "last": 5.931910991668701
+  },
+  "Curriculum/terrain_level_hf_pyramid_slope_inv": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.2945406612494844,
+    "late": 5.762878150939941,
+    "last": 5.597154140472412
+  },
+  "Curriculum/terrain_level_flat": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.31663510845508425,
+    "late": 5.925143013000488,
+    "last": 5.92573356628418
+  },
+  "Metrics/base_velocity/error_vel_xy": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.3230072993040085,
+    "late": 1.061911792755127,
+    "last": 1.054577350616455
+  },
+  "Metrics/base_velocity/error_vel_yaw": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.25688357072416695,
+    "late": 0.6699790406227112,
+    "last": 0.6972111463546753
+  },
+  "Metrics/base_velocity/base_z": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.56276950776577,
+    "late": 0.43434200912714005,
+    "last": 0.42123836278915405
+  },
+  "Metrics/base_velocity/knee_pos": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.5310399411618709,
+    "late": 1.5125083994865418,
+    "last": 1.55588698387146
+  },
+  "Episode_Termination/time_out": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.78393241295591,
+    "late": 0.9536408692598343,
+    "last": 0.95166015625
+  },
+  "Episode_Termination/terrain_out_of_bounds": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.010637207349936943,
+    "late": 0.007633870621211827,
+    "last": 0.00677490234375
+  },
+  "Episode_Termination/bad_orientation_2": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 0.0001222737631178461,
+    "late": 0.038827007338404655,
+    "last": 0.04156494140625
+  },
+  "Train/mean_reward": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 88.31106190562248,
+    "late": 17.122904543876647,
+    "last": 20.669462203979492
+  },
+  "Train/mean_episode_length": {
+    "first_step": 0,
+    "last_step": 1705,
+    "early": 790.3127013397217,
+    "late": 979.4715020751953,
+    "last": 973.6300048828125
+  },
+  "Train/mean_reward/time": {
+    "first_step": 3,
+    "last_step": 3686,
+    "early": 88.31106190562248,
+    "late": 17.122904543876647,
+    "last": 20.669462203979492
+  },
+  "Train/mean_episode_length/time": {
+    "first_step": 3,
+    "last_step": 3686,
+    "early": 790.3127013397217,
+    "late": 979.4715020751953,
+    "last": 973.6300048828125
+  }
+}

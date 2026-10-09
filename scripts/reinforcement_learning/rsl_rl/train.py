@@ -14,8 +14,13 @@
 """Launch Isaac Sim Simulator first."""
 
 import argparse
-import sys
 import os
+import sys
+from pathlib import Path
+
+# Use this checkout even when m20_wzh also has an older rl_training installation.
+_LOCAL_SOURCE = Path(__file__).resolve().parents[3] / "source" / "rl_training"
+sys.path.insert(0, str(_LOCAL_SOURCE))
 
 from isaaclab.app import AppLauncher
 
@@ -36,6 +41,14 @@ parser.add_argument(
 parser.add_argument("--seed", type=int, default=None, help="Seed used for the environment")
 parser.add_argument("--max_iterations", type=int, default=None, help="RL Policy training iterations.")
 parser.add_argument(
+    "--init_actor_from", type=str, default=None,
+    help="Initialize only the actor from an RSL-RL checkpoint; critic, optimizer, and iteration start fresh.",
+)
+parser.add_argument("--init_critic_from", type=str, default=None,
+                    help="Initialize critic weights with --init_actor_from, keeping a fresh optimizer.")
+parser.add_argument("--preserve_actor_from", type=str, default=None,
+                    help="Freeze a task-capable reference for StairGuardedPPO (also persisted in checkpoints).")
+parser.add_argument(
     "--distributed", action="store_true", default=False, help="Run training with multiple GPUs or nodes."
 )
 # append RSL-RL cli arguments
@@ -43,6 +56,10 @@ cli_args.add_rsl_rl_args(parser)
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 args_cli, hydra_args = parser.parse_known_args()
+if args_cli.init_actor_from and args_cli.resume:
+    parser.error("--init_actor_from and --resume cannot be used together")
+if args_cli.init_critic_from and (not args_cli.init_actor_from or args_cli.resume):
+    parser.error("--init_critic_from requires --init_actor_from and cannot be used with --resume")
 
 # always enable cameras to record video
 if args_cli.video:
@@ -101,7 +118,6 @@ from isaaclab_tasks.utils import get_checkpoint_path
 from isaaclab_tasks.utils.hydra import hydra_task_config
 
 import rl_training.tasks  # noqa: F401
-from rl_training.envs.amp_locomotion_env import AmpLocomotionEnv, AmpRslRlVecEnvWrapper
 
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
@@ -174,10 +190,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         env = gym.wrappers.RecordVideo(env, **video_kwargs)
 
     # wrap around environment for rsl-rl
-    if isinstance(env.unwrapped, AmpLocomotionEnv):
-        env = AmpRslRlVecEnvWrapper(env, clip_actions=agent_cfg.clip_actions)
-    else:
-        env = RslRlVecEnvWrapper(env, clip_actions=agent_cfg.clip_actions)
+    env = RslRlVecEnvWrapper(env, clip_actions=agent_cfg.clip_actions)
 
     # convert config to dict and create runner
     train_cfg = agent_cfg.to_dict()
@@ -193,6 +206,29 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         print(f"[INFO]: Loading model checkpoint from: {resume_path}")
         # load previously trained model
         runner.load(resume_path)
+    if args_cli.init_actor_from:
+        init_path = Path(args_cli.init_actor_from).expanduser().resolve()
+        if not init_path.is_file():
+            raise FileNotFoundError(f"Actor initialization checkpoint does not exist: {init_path}")
+        saved = torch.load(init_path, map_location="cpu", weights_only=True)
+        actor_state = saved.get("actor_state_dict")
+        if not isinstance(actor_state, dict):
+            raise ValueError(f"Checkpoint has no actor_state_dict: {init_path}")
+        runner.alg.actor.load_state_dict(actor_state, strict=True)
+        print(f"[INFO]: Initialized actor only from: {init_path}")
+
+    if args_cli.init_critic_from:
+        init_path = Path(args_cli.init_critic_from).expanduser().resolve()
+        saved = torch.load(init_path, map_location="cpu", weights_only=True)
+        runner.alg.critic.load_state_dict(saved["critic_state_dict"], strict=True)
+        print(f"[INFO]: Initialized critic weights (fresh optimizer) from: {init_path}")
+    reference_path = args_cli.preserve_actor_from or args_cli.init_actor_from
+    if hasattr(runner.alg, "set_reference") and reference_path:
+        reference = torch.load(Path(reference_path).expanduser().resolve(), map_location="cpu", weights_only=True)
+        runner.alg.set_reference(reference["actor_state_dict"])
+        print(f"[INFO]: Frozen task preservation actor from: {reference_path}")
+    elif args_cli.preserve_actor_from:
+        raise ValueError("--preserve_actor_from requires the StairGuardedPPO algorithm")
 
     # dump the configuration into log-directory
     dump_yaml(os.path.join(log_dir, "params", "env.yaml"), env_cfg)

@@ -1,0 +1,54 @@
+{
+  "model_sha256": "98ac70602d930dac0f0b65124309c59c9c98cca9186f071262981e0e32bceb7a",
+  "physics_step": false,
+  "samples": [
+    {
+      "a_deg": 110,
+      "hip_y_rad": 0.6108652381980153,
+      "knee_rad": -1.2217304763960306,
+      "hip_to_wheel_length_m": 0.4390222542100897,
+      "vertical_reach_m": 0.40957602214449595,
+      "lateral_offset_m": 0.158076
+    },
+    {
+      "a_deg": 90,
+      "hip_y_rad": 0.7853981633974483,
+      "knee_rad": -1.5707963267948966,
+      "hip_to_wheel_length_m": 0.3872828704913244,
+      "vertical_reach_m": 0.35355339059327373,
+      "lateral_offset_m": 0.158076
+    },
+    {
+      "a_deg": 80,
+      "hip_y_rad": 0.8726646259971648,
+      "knee_rad": -1.7453292519943295,
+      "hip_to_wheel_length_m": 0.3581647659494632,
+      "vertical_reach_m": 0.32139380484326974,
+      "lateral_offset_m": 0.158076
+    },
+    {
+      "a_deg": 75,
+      "hip_y_rad": 0.9162978572970231,
+      "knee_rad": -1.8325957145940461,
+      "hip_to_wheel_length_m": 0.34298052588767314,
+      "vertical_reach_m": 0.3043807145043602,
+      "lateral_offset_m": 0.158076
+    },
+    {
+      "a_deg": 55,
+      "hip_y_rad": 1.090830782496456,
+      "knee_rad": -2.181661564992912,
+      "hip_to_wheel_length_m": 0.2798052308877002,
+      "vertical_reach_m": 0.23087430661751696,
+      "lateral_offset_m": 0.158076
+    },
+    {
+      "a_deg": 40,
+      "hip_y_rad": 1.2217304763960306,
+      "knee_rad": -2.443460952792061,
+      "hip_to_wheel_length_m": 0.23287865163240654,
+      "vertical_reach_m": 0.17101007166283444,
+      "lateral_offset_m": 0.158076
+    }
+  ]
+}

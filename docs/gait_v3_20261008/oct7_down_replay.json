@@ -1,0 +1,42 @@
+{
+  "baseline": {
+    "recorded_frames": 461,
+    "phase_frames": 331,
+    "bad_rear_loaded_samples": 11,
+    "bad_samples_with_reward_gate": 8,
+    "entry_b_p95_deg": 35.95298843383788,
+    "entry_g_p95_deg": 23.507807159423823,
+    "measured_angle_b_max_abs_error_deg": 3.442108627993434e-05,
+    "measured_angle_g_max_abs_error_deg": 3.1997903025882124e-05,
+    "rear_forward_cost_rate_phase_mean": 0.0011089267232912534,
+    "rear_forward_cost_rate_entry_mean": 0.004318291122463586,
+    "rear_forward_cost_rate_entry_peak": 0.12063565105199814,
+    "cost_integral_entry": 0.007341094908188097,
+    "invalid_phase_gate_fraction": 0.0,
+    "metrics": {
+      "rear_forward_excess_fraction": 0.020151132717728615,
+      "rear_body_b_mean_deg": -3.465806722640991,
+      "rear_gravity_g_mean_deg": -12.230391502380371
+    }
+  },
+  "latest": {
+    "recorded_frames": 483,
+    "phase_frames": 326,
+    "bad_rear_loaded_samples": 30,
+    "bad_samples_with_reward_gate": 30,
+    "entry_b_p95_deg": 43.18309135437012,
+    "entry_g_p95_deg": 34.301468467712404,
+    "measured_angle_b_max_abs_error_deg": 4.916391722886715e-05,
+    "measured_angle_g_max_abs_error_deg": 5.1982607928380276e-05,
+    "rear_forward_cost_rate_phase_mean": 0.008224235243375408,
+    "rear_forward_cost_rate_entry_mean": 0.031917865349290274,
+    "rear_forward_cost_rate_entry_peak": 0.42628371715545654,
+    "cost_integral_entry": 0.05362201378680766,
+    "invalid_phase_gate_fraction": 0.0,
+    "metrics": {
+      "rear_forward_excess_fraction": 0.06741572916507721,
+      "rear_body_b_mean_deg": 6.784815788269043,
+      "rear_gravity_g_mean_deg": -1.9405568838119507
+    }
+  }
+}

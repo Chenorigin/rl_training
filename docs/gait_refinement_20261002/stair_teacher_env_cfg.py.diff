@@ -1,0 +1,88 @@
+--- /home/ubuntu/cyq_shixi_projects/rl_training/.scratch/gait_refinement_20261002/baseline/stair_teacher_env_cfg.py	2026-10-01 23:43:50.520579636 +0800
++++ /home/ubuntu/cyq_shixi_projects/rl_training/source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_teacher_env_cfg.py	2026-10-02 15:41:53.307947310 +0800
+@@ -14,7 +14,7 @@
+ from isaaclab.terrains.trimesh import MeshPlaneTerrainCfg
+ from isaaclab.utils import configclass
+ 
+-from rl_training.tasks.manager_based.locomotion.velocity.mdp import stair_teacher
++from rl_training.tasks.manager_based.locomotion.velocity.mdp import stair_teacher, gait_refinement
+ from rl_training.tasks.manager_based.locomotion.velocity.velocity_env_cfg import CurriculumCfg, ObservationsCfg
+ 
+ from .rough_env_cfg import DeeproboticsM20RewardsCfg, DeeproboticsM20RoughEnvCfg
+@@ -26,6 +26,18 @@
+ )
+ 
+ 
++def _gait_entities():
++    """Keep wheel/hip/knee order identical: FL, FR, HL, HR."""
++    legs = ("fl", "fr", "hl", "hr")
++    return {
++        "asset_cfg": SceneEntityCfg("robot", body_names=[f"{leg}_wheel" for leg in legs], preserve_order=True),
++        "hip_cfg": SceneEntityCfg("robot", body_names=[f"{leg}_hipy" for leg in legs], preserve_order=True),
++        "knee_cfg": SceneEntityCfg("robot", joint_names=[f"{leg}_knee_joint" for leg in legs], preserve_order=True),
++        "sensor_cfg": SceneEntityCfg("height_scanner"),
++        "contact_sensor_cfg": SceneEntityCfg("contact_forces", body_names=[f"{leg}_wheel" for leg in legs], preserve_order=True),
++    }
++
++
+ @configclass
+ class M20StairTeacherObservationsCfg(ObservationsCfg):
+     """Teacher receives the M20 proprioceptive vector and the height scan."""
+@@ -205,7 +217,7 @@
+     )
+     stair_up_same_tread_cost = RewTerm(
+         func=stair_teacher.stair_up_same_tread_cost,
+-        weight=-0.5,
++        weight=gait_refinement.TUNING["same_tread_event_weight"],
+         params={
+             "asset_cfg": SceneEntityCfg(
+                 "robot", body_names=["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], preserve_order=True
+@@ -217,6 +229,19 @@
+             ),
+         },
+     )
++    stair_up_same_tread_dwell_cost = RewTerm(
++        func=stair_teacher.stair_up_same_tread_dwell_cost,
++        weight=gait_refinement.TUNING["same_tread_dwell_weight"],
++        params={k: v for k, v in _gait_entities().items() if k not in ("hip_cfg", "knee_cfg")},
++    )
++    stair_descent_rear_fold_cost = RewTerm(
++        func=gait_refinement.descent_rear_fold_cost,
++        weight=gait_refinement.TUNING["rear_fold_weight"], params=_gait_entities(),
++    )
++    turn_swing_size_cost = RewTerm(
++        func=gait_refinement.turn_swing_size_cost,
++        weight=gait_refinement.TUNING["turn_size_weight"], params=_gait_entities(),
++    )
+     stair_down_step_completion = RewTerm(
+         func=stair_teacher.stair_down_step_completion,
+         weight=3.0,
+@@ -329,6 +354,7 @@
+     """Log each terrain type without changing level promotion or rewards."""
+ 
+     step_completion = CurrTerm(func=stair_teacher.stair_step_completion_metrics, params={})
++    gait_quality = CurrTerm(func=gait_refinement.gait_quality_metrics, params={})
+ 
+     terrain_level_overall = CurrTerm(
+         func=stair_teacher.stair_terrain_level_mean, params={"terrain_name": "overall"}
+@@ -384,9 +410,19 @@
+             term.params["stair_sensor_cfg"] = SceneEntityCfg("height_scanner")
+             term.params["stair_penalty_scale"] = scale
+             term.params["disable_turn_side_cmd"] = disable_turn_side
++            term.params["turn_penalty_scale"] = gait_refinement.TUNING["turn_posture_scale"]
+ 
+-        self.rewards.feet_air_time_ang_z_M20.func = stair_teacher.stair_pure_yaw_air_time
++        self.rewards.feet_air_time_ang_z_M20.func = gait_refinement.compact_turn_air_time
+         self.rewards.feet_air_time_ang_z_M20.params["stair_sensor_cfg"] = SceneEntityCfg("height_scanner")
++        self.rewards.feet_air_time_ang_z_M20.params["threshold"] = gait_refinement.TUNING["air_target"]
++        self.rewards.rotation_gait_status.func = gait_refinement.compact_turn_status
++        self.rewards.rotation_gait_status.params = _gait_entities()
++        self.rewards.rotation_gait_status.weight = gait_refinement.TUNING["turn_status_weight"]
++        # Narrow the existing duty-cycle shaping to actual in-place turns,
++        # and reduce its pressure relative to command tracking/completion.
++        self.rewards.rotation_gait_symmetry.params["lin_vel_threshold"] = gait_refinement.TUNING["translation_threshold"]
++        self.rewards.rotation_gait_symmetry.params["ang_vel_threshold"] = gait_refinement.TUNING["yaw_threshold"]
++        self.rewards.rotation_gait_symmetry.weight = gait_refinement.TUNING["turn_symmetry_weight"]
+ 
+         # Keep basic standing/turning practice while favoring traversal commands.
+         self.commands.base_velocity.class_type = stair_teacher.StairTeacherVelocityCommand

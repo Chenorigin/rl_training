@@ -1,0 +1,116 @@
+{
+  "lead0_front_transition_payments": 7.0,
+  "lead0_front_weighted_completion_return": 21.0,
+  "lead0_rear_transition_payments": 7.0,
+  "lead0_rear_weighted_completion_return": 21.0,
+  "lead0_front_successes": 8.0,
+  "lead0_rear_successes": 8.0,
+  "lead0_six_step_fraction": 1.0,
+  "lead1_front_transition_payments": 7.0,
+  "lead1_front_weighted_completion_return": 21.0,
+  "lead1_rear_transition_payments": 7.0,
+  "lead1_rear_weighted_completion_return": 21.0,
+  "lead1_front_successes": 8.0,
+  "lead1_rear_successes": 8.0,
+  "lead1_six_step_fraction": 1.0,
+  "rear_success_without_front": 2.0,
+  "front_1_to_3": {
+    "first_landing_credits": 1.0,
+    "skips": 1.0,
+    "skipped_landing_event_credit": false,
+    "skip_fraction": 0.5,
+    "next_target_height": null
+  },
+  "rear_1_to_3": {
+    "first_landing_credits": 1.0,
+    "skips": 1.0,
+    "skipped_landing_event_credit": false,
+    "skip_fraction": 0.5,
+    "next_target_height": 0.4000000059604645
+  },
+  "front_skip_then_same_tread": {
+    "sequence": [
+      "FL1",
+      "FR3",
+      "FL3"
+    ],
+    "target_after_FL1": {
+      "leg": "FR",
+      "tread_height": 0.2
+    },
+    "skip_events": 1.0,
+    "same_tread_events": 1.0,
+    "paid_transitions": 0.0,
+    "same_tread_penalty_units": 1.0,
+    "same_tread_fraction": 0.5,
+    "recovered_at_tread5": true
+  },
+  "rear_both_feet_every_tread": {
+    "duplicates": 3.0,
+    "longest_strict_run": 0.0,
+    "strict_coverage": 0.0,
+    "same_tread_fraction": 1.0,
+    "visited_intermediate_risers": 3.0,
+    "qualified_first_landings": 3.0,
+    "paid_transitions": 0.0,
+    "completion_plus_duplicate_return": -13.5
+  },
+  "rear_recovered_after_duplicate": true,
+  "rear_same_leg_consecutive": {
+    "credits": 1.0,
+    "violations": 1.0
+  },
+  "zero_samples_not_success": true,
+  "axle0_recovered_after_skip": 1.0,
+  "axle1_recovered_after_skip": 1.0,
+  "axle0_delayed_duplicate": 1.0,
+  "axle1_delayed_duplicate": 1.0,
+  "event_good_vs_duplicate_net": [
+    4.0,
+    -0.5
+  ],
+  "both_axles_units": 2.0,
+  "lifecycle": true,
+  "quantized_riser_clear_credit": 1.0,
+  "early_contact_then_cross_credit": 1.0,
+  "uncleared_riser_style_credit": 0.0,
+  "command_pause_preserves_ledger": true,
+  "front_loaded_monotonic": [
+    0.0,
+    0.0,
+    0.19999994337558746,
+    0.692307710647583,
+    0.8620689511299133,
+    0.9245283007621765
+  ],
+  "front_swing_monotonic": [
+    0.0,
+    0.0,
+    0.0,
+    0.35999995470046997,
+    0.7538460493087769,
+    0.883211612701416
+  ],
+  "loaded_bad_map_cost": 0.8620689511299133,
+  "flat_after_lateral_exit_cost": 0.0,
+  "body_gap_descending_costs": [
+    0.0,
+    0.4475136697292328,
+    0.7830802798271179
+  ],
+  "unknown_body_gap_cost": 0.0,
+  "rear_forward_cost": 0.591885507106781,
+  "rear_vertical_free": 0.0,
+  "flat_after_descent_exit_cost": 0.0,
+  "pose_tags": {
+    "front_loaded_a_mean_deg": 40.00000762939453,
+    "front_loaded_a_low_fraction": 1.0,
+    "front_loaded_a_min_deg": 40.00000762939453,
+    "fl_loaded_samples": 1.0,
+    "fl_loaded_a_mean_deg": 40.00000762939453,
+    "fl_loaded_a_low_fraction": 1.0,
+    "rear_forward_samples": 0.0,
+    "rear_forward_excess_fraction": 0.0
+  },
+  "deep_fold_tracking_factor": 0.7844827771186829
+}

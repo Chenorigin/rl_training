@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/home/ubuntu/cyq_shixi_projects/rl_training/scripts/tools/check_stair_rewards.py", line 257, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/home/ubuntu/cyq_shixi_projects/rl_training/scripts/tools/check_stair_rewards.py", line 242, in main
+    assert result['same_tread_cost'] and not result['same_tread_repeat_cost'], result
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'lift_before_landing': 0.5, 'repeat_lift_credit': 0.0, 'retry_after_low_crossing': 1.0, 'retry_after_face_contact': 1.0, 'third_front_target_active': True, 'three_alternating_front_landings': 3.0, 'alternating_rear_landings': 3.0, 'wrong_front_side_no_credit': 1.0, 'same_tread_cost': False, 'same_tread_repeat_cost': False, 'same_tread_completion_count': 1.0, 'real_height_profile_up_gate': 1.0, 'flat_orientation_coefficient': 50.00000596046448, 'stair_orientation_coefficient': 5.000000447034836, 'motion_cost_vx_-0.2': 1.399999976158142, 'motion_cost_vx_0.0': 1.0, 'motion_cost_vx_0.5': 0.0, 'backward_command_cost': 0.0, 'flat_motion_cost': 0.0, 'abandoned_target_cost': 0.0, 'rear_wait_cursor': 0, 'edge_radius_not_frozen': True, 'flat_tread_radius': 0.08999999612569809, 'two_targets_lift_credit_after_return': 1.0, 'lift_credit_after_turned_return': 1.0, 'descent_different_treads_completed': 1.0}

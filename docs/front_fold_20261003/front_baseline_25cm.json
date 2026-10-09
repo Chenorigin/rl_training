@@ -1,0 +1,22 @@
+{
+  "checkpoint": "model_80100.pt",
+  "samples": 922,
+  "scope": "stable front support on elevated surfaces, 25cm MuJoCo stairs; not teacher reward gate",
+  "fell": false,
+  "cleared_stairs": true,
+  "extension_quantiles_m": [
+    0.3543424006015085,
+    0.5008097163087588,
+    0.501653541221898,
+    0.5044077770190913,
+    0.5090483402948927
+  ],
+  "knee_abs_quantiles_rad": [
+    0.4425152718561463,
+    0.5839280525636907,
+    0.6208725599327055,
+    1.7639194176767878
+  ],
+  "short_extension_fraction": 0.0,
+  "large_knee_fraction": 0.0
+}

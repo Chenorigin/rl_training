@@ -1,0 +1,11 @@
+{
+  "clean_height": true,
+  "invalid_points": true,
+  "full_dropout": true,
+  "shared_snapshot": true,
+  "clone_isolation": true,
+  "partial_reset": true,
+  "repeated_reset_same_step": true,
+  "rejected_bad_inputs": 3,
+  "teacher_labels_detached": true
+}

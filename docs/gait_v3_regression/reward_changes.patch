@@ -1,0 +1,94 @@
+diff --git a/.scratch/gait_v3_regression/stair_teacher.before.py b/source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_teacher.py
+index a7271e8..08b0de7 100644
+--- a/.scratch/gait_v3_regression/stair_teacher.before.py
++++ b/source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_teacher.py
+@@ -38,13 +38,14 @@ TUNING = {
+     "rear_min_extension": 0.35, "extension_scale": 0.10,
+     "rear_max_knee": 1.90, "knee_scale": 0.50,
+     "front_min_extension": 0.35, "front_max_knee": 2.0,
+-    "front_support_grace": 0.0, "front_fold_weight": -3.0,
++    "front_support_grace": 0.0, "front_fold_weight": -1.0,
+     "front_swing_min_extension": 0.22, "front_swing_max_knee": 2.50,
+     "front_swing_scale": 0.50,
+     "support_grace": 0.12, "same_tread_grace": 0.12,
+     "wheel_radius": 0.09, "nearest_valid_distance": 0.12,
+     "turn_size_weight": -1.0, "rear_fold_weight": -1.0,
+-    "same_tread_event_weight": -4.5, "same_tread_dwell_weight": -1.0,
++    "same_tread_event_weight": -1.5, "same_tread_dwell_weight": -0.2,
++    "task_crossing_weight": 2.0,
+     "turn_status_weight": 1.0, "turn_symmetry_weight": 2.0,
+     "ascent_direction_weight": -2.0,
+     "direction_lateral_tolerance": 0.10, "direction_lateral_scale": 0.25,
+@@ -77,7 +78,7 @@ TUNING = {
+     "front_swing_length_high": 0.26, "front_support_length_high": 0.33,
+     "body_gap_target": 0.22, "body_gap_scale": 0.10,
+     "body_bottom_z": -0.07, "body_gap_weight": -1.0,
+-    "pose_tracking_discount": 0.25,
++    "pose_tracking_discount": 0.0,
+     "pose_phase_radius": 1.50,
+ 
+ }
+@@ -380,6 +381,8 @@ def _new_state(env):
+         "front_transition_successes": zeros(), "rear_transition_successes": zeros(),
+         "axis_run": zeros(2), "axis_max_run": zeros(2),
+         "duplicate_event_count": zeros(2),
++        "map_task_paid": flags(64), "task_crossing_event": zeros(),
++        "task_crossings_total": zeros(),
+     })
+     state["radius"].fill_(TUNING["wheel_radius"])
+     return state
+@@ -744,6 +747,15 @@ def ascent_state(env, asset_cfg, sensor_cfg, contact_sensor_cfg, command_name="b
+         state["map_prep_max"][row,target,axle] = torch.maximum(state["map_prep_max"][row,target,axle],current)
+         state[name+"_lift_gain"] = gain
+         state[name+"_lift_credit"] += gain
++    # Task credit is independent of stylistic alternation. Both axles must
++    # have actually supported the upper tread and the whole robot must pass
++    # the riser inside its corridor. History alone or sideways bypass is not
++    # enough. Pay once per physical riser, including after a same-tread error.
++    task_event = ascent_task_crossing_events(state, known, x, cross, wheels, loaded,
++                                            robot.data.root_pos_w, robot.data.root_quat_w) & enabled[:, None]
++    state["map_task_paid"] |= task_event
++    state["task_crossing_event"] = task_event.sum(-1).float()
++    state["task_crossings_total"] += state["task_crossing_event"]
+     state["previous_wheel"] = wheels.clone()
+     state["wheel_history_valid"].fill_(True)
+     # Retain unpaid tread history on departure, but do not apply stair posture
+@@ -1442,6 +1454,28 @@ def stair_up_step_completion(
+     return state["front_event"].any(dim=1).float() / env.step_dt
+ 
+ 
++def ascent_task_crossing_events(state, known, x, cross, wheels, loaded, root_pos, root_quat):
++    """Whole-body ascent, regardless of gait style; no pay for bypass/retreat."""
++    # map_safe requires the stylistic airborne edge crossing. Task completion
++    # instead requires genuine stable upper-tread support, and remains payable
++    # after a recovered face contact. Impact has a separate negative reward.
++    supported = state["map_landed"]
++    both_axles = supported[:, :, :2].any(-1) & supported[:, :, 2:].any(-1)
++    beyond = (x > state["map_half_width"][:, :, None]).all(-1)
++    corridor = (cross < TUNING["tread_observation_corridor"]).all(-1)
++    bottom = wheels[:, None, :, 2] - state["radius"][:, None]
++    above = (bottom >= state["map_z"][:, :, None] - TUNING["tread_height_tolerance"]).all(-1)
++    upright = (1 - 2 * root_quat[:, 1:3].square().sum(-1)) > 0.35
++    body_above = root_pos[:, 2, None] >= state["map_z"] + 0.22
++    return known & both_axles & beyond & corridor & above & body_above & upright[:, None] & (
++        loaded.sum(-1) >= 2)[:, None] & ~state["map_task_paid"]
++
++
++def stair_up_task_crossing(env, asset_cfg, sensor_cfg, contact_sensor_cfg):
++    state = ascent_state(env, asset_cfg, sensor_cfg, contact_sensor_cfg)
++    return state["task_crossing_event"] / env.step_dt
++
++
+ def stair_up_rear_step_completion(
+     env, asset_cfg: SceneEntityCfg, sensor_cfg: SceneEntityCfg,
+     contact_sensor_cfg: SceneEntityCfg,
+@@ -2064,6 +2098,9 @@ def stair_step_completion_metrics(env,env_ids):
+     known = torch.arange(64,device=env.device)[None] < state["map_count"][ids,None]
+     intermediate = state["map_intermediate"][ids]&known
+     result["registered_risers"] = state["map_count"][ids].float().mean()
++    result["up_whole_body_crossings"] = state["task_crossings_total"][ids].mean()
++    result["up_whole_body_crossing_coverage"] = (
++        (state["map_task_paid"][ids] & known).sum().float() / known.sum().clamp_min(1))
+     for axle,name in enumerate(("front","rear")):
+         paid = state["map_paid"][ids,:,axle]&known
+         strict = state["map_correct"][ids,:,axle]&~state["map_duplicate_paid"][ids,:,axle]&intermediate

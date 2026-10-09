@@ -1,0 +1,559 @@
+{
+  "steps": 100,
+  "num_envs": 16,
+  "trained": false,
+  "actor_checkpoint": "logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-06_22-06-56_stair_resume/model_199998.pt",
+  "observation_shapes": {
+    "policy": [
+      16,
+      244
+    ],
+    "critic": [
+      16,
+      285
+    ]
+  },
+  "finite": true,
+  "mean_return": 14.862255454063416,
+  "targets_started": 2.0,
+  "front_lift_credit": 1.208010196685791,
+  "unique_lift_targets": 2,
+  "calibrated_wheel_fraction": 1.0,
+  "unified_reward_modules": {
+    "stair_up_step_completion": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher",
+    "stair_up_rear_step_completion": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher",
+    "stair_descent_rear_fold_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher",
+    "stair_ascent_front_fold_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher",
+    "stair_ascent_direction_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher",
+    "turn_swing_size_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher",
+    "rotation_gait_status": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher",
+    "feet_air_time_ang_z_M20": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher"
+  },
+  "legacy_aliases_identical": true,
+  "active_reward_weights": {
+    "lin_vel_z_l2": -2.0,
+    "ang_vel_xy_l2": -0.02,
+    "joint_torques_l2": -2.5e-05,
+    "joint_acc_l2": -2e-07,
+    "hipx_joint_pos_penalty": -3.0,
+    "hipy_joint_pos_penalty": -1.5,
+    "knee_joint_pos_penalty": -0.75,
+    "joint_mirror": -0.03,
+    "action_rate_l2": -0.01,
+    "action_smooth_l2": -0.025,
+    "undesired_contacts": -1.0,
+    "contact_forces": -0.00015,
+    "track_lin_vel_xy_exp": 5.0,
+    "track_ang_vel_z_exp": 3.0,
+    "feet_air_time_ang_z_M20": 50.0,
+    "feet_slide_ang_z_cmd": -2.0,
+    "stand_still": -1.0,
+    "rotation_gait_status": 1.0,
+    "rotation_gait_symmetry": 2.0,
+    "bad_orientation_penalty": -1000.0,
+    "joint_acc_wheel_l2": -1e-07,
+    "stair_orientation_cost": -1.0,
+    "stair_forward_progress": 1.0,
+    "stair_front_wheel_lift": 1.0,
+    "stair_forward_motion_cost": -2.0,
+    "stair_ascent_direction_cost": -2.0,
+    "stair_front_wheel_touchdown": 1.0,
+    "stair_front_single_support": 0.1,
+    "stair_diagonal_support_symmetry": 0.05,
+    "stair_front_alternation": 0.25,
+    "stair_up_step_completion": 3.0,
+    "stair_up_rear_step_completion": 2.0,
+    "stair_up_order_violation_cost": -0.5,
+    "stair_up_same_tread_cost": -1.0,
+    "stair_up_same_tread_dwell_cost": -1.0,
+    "stair_descent_rear_fold_cost": -1.0,
+    "stair_ascent_front_fold_cost": -0.5,
+    "turn_swing_size_cost": -1.0,
+    "stair_down_step_completion": 3.0,
+    "stair_front_riser_face_cost": -0.5,
+    "stair_descent_rear_support": 0.35,
+    "stair_impact_cost": -0.2,
+    "stair_non_wheel_contact_cost": -0.2,
+    "stair_non_wheel_scrape_cost": -0.1,
+    "stair_joint_effort_cost": -0.1,
+    "stair_joint_acceleration_cost": -0.02,
+    "stair_mechanical_power_cost": -0.1
+  },
+  "resolved_gait_entities": {
+    "stair_descent_rear_fold_cost": {
+      "asset_cfg": {
+        "bodies": [
+          13,
+          14,
+          15,
+          16
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_wheel",
+          "fr_wheel",
+          "hl_wheel",
+          "hr_wheel"
+        ],
+        "resolved_joint_names": null
+      },
+      "hip_cfg": {
+        "bodies": [
+          5,
+          6,
+          7,
+          8
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_hipy",
+          "fr_hipy",
+          "hl_hipy",
+          "hr_hipy"
+        ],
+        "resolved_joint_names": null
+      },
+      "knee_cfg": {
+        "bodies": null,
+        "joints": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "resolved_body_names": null,
+        "resolved_joint_names": [
+          "fl_knee_joint",
+          "fr_knee_joint",
+          "hl_knee_joint",
+          "hr_knee_joint"
+        ]
+      },
+      "sensor_cfg": {
+        "bodies": null,
+        "joints": null,
+        "resolved_body_names": null,
+        "resolved_joint_names": null
+      },
+      "contact_sensor_cfg": {
+        "bodies": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_wheel",
+          "fr_wheel",
+          "hl_wheel",
+          "hr_wheel"
+        ],
+        "resolved_joint_names": null
+      }
+    },
+    "stair_ascent_front_fold_cost": {
+      "asset_cfg": {
+        "bodies": [
+          13,
+          14,
+          15,
+          16
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_wheel",
+          "fr_wheel",
+          "hl_wheel",
+          "hr_wheel"
+        ],
+        "resolved_joint_names": null
+      },
+      "hip_cfg": {
+        "bodies": [
+          5,
+          6,
+          7,
+          8
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_hipy",
+          "fr_hipy",
+          "hl_hipy",
+          "hr_hipy"
+        ],
+        "resolved_joint_names": null
+      },
+      "knee_cfg": {
+        "bodies": null,
+        "joints": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "resolved_body_names": null,
+        "resolved_joint_names": [
+          "fl_knee_joint",
+          "fr_knee_joint",
+          "hl_knee_joint",
+          "hr_knee_joint"
+        ]
+      },
+      "sensor_cfg": {
+        "bodies": null,
+        "joints": null,
+        "resolved_body_names": null,
+        "resolved_joint_names": null
+      },
+      "contact_sensor_cfg": {
+        "bodies": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_wheel",
+          "fr_wheel",
+          "hl_wheel",
+          "hr_wheel"
+        ],
+        "resolved_joint_names": null
+      }
+    },
+    "stair_ascent_direction_cost": {
+      "asset_cfg": {
+        "bodies": [
+          13,
+          14,
+          15,
+          16
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_wheel",
+          "fr_wheel",
+          "hl_wheel",
+          "hr_wheel"
+        ],
+        "resolved_joint_names": null
+      },
+      "sensor_cfg": {
+        "bodies": null,
+        "joints": null,
+        "resolved_body_names": null,
+        "resolved_joint_names": null
+      },
+      "contact_sensor_cfg": {
+        "bodies": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_wheel",
+          "fr_wheel",
+          "hl_wheel",
+          "hr_wheel"
+        ],
+        "resolved_joint_names": null
+      }
+    },
+    "turn_swing_size_cost": {
+      "asset_cfg": {
+        "bodies": [
+          13,
+          14,
+          15,
+          16
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_wheel",
+          "fr_wheel",
+          "hl_wheel",
+          "hr_wheel"
+        ],
+        "resolved_joint_names": null
+      },
+      "hip_cfg": {
+        "bodies": [
+          5,
+          6,
+          7,
+          8
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_hipy",
+          "fr_hipy",
+          "hl_hipy",
+          "hr_hipy"
+        ],
+        "resolved_joint_names": null
+      },
+      "knee_cfg": {
+        "bodies": null,
+        "joints": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "resolved_body_names": null,
+        "resolved_joint_names": [
+          "fl_knee_joint",
+          "fr_knee_joint",
+          "hl_knee_joint",
+          "hr_knee_joint"
+        ]
+      },
+      "sensor_cfg": {
+        "bodies": null,
+        "joints": null,
+        "resolved_body_names": null,
+        "resolved_joint_names": null
+      },
+      "contact_sensor_cfg": {
+        "bodies": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_wheel",
+          "fr_wheel",
+          "hl_wheel",
+          "hr_wheel"
+        ],
+        "resolved_joint_names": null
+      }
+    },
+    "rotation_gait_status": {
+      "asset_cfg": {
+        "bodies": [
+          13,
+          14,
+          15,
+          16
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_wheel",
+          "fr_wheel",
+          "hl_wheel",
+          "hr_wheel"
+        ],
+        "resolved_joint_names": null
+      },
+      "hip_cfg": {
+        "bodies": [
+          5,
+          6,
+          7,
+          8
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_hipy",
+          "fr_hipy",
+          "hl_hipy",
+          "hr_hipy"
+        ],
+        "resolved_joint_names": null
+      },
+      "knee_cfg": {
+        "bodies": null,
+        "joints": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "resolved_body_names": null,
+        "resolved_joint_names": [
+          "fl_knee_joint",
+          "fr_knee_joint",
+          "hl_knee_joint",
+          "hr_knee_joint"
+        ]
+      },
+      "sensor_cfg": {
+        "bodies": null,
+        "joints": null,
+        "resolved_body_names": null,
+        "resolved_joint_names": null
+      },
+      "contact_sensor_cfg": {
+        "bodies": [
+          4,
+          8,
+          12,
+          16
+        ],
+        "joints": null,
+        "resolved_body_names": [
+          "fl_wheel",
+          "fr_wheel",
+          "hl_wheel",
+          "hr_wheel"
+        ],
+        "resolved_joint_names": null
+      }
+    }
+  },
+  "reward_abs_peaks": {
+    "lin_vel_z_l2": 0.20576603710651398,
+    "ang_vel_xy_l2": 0.08357726037502289,
+    "joint_torques_l2": 0.0,
+    "joint_acc_l2": 0.7984064817428589,
+    "hipx_joint_pos_penalty": 0.3916243016719818,
+    "hipy_joint_pos_penalty": 0.48128542304039,
+    "knee_joint_pos_penalty": 0.7493388652801514,
+    "joint_mirror": 0.0,
+    "action_rate_l2": 0.0,
+    "action_smooth_l2": 0.0,
+    "undesired_contacts": 0.0,
+    "contact_forces": 0.0,
+    "track_lin_vel_xy_exp": 4.999876499176025,
+    "track_ang_vel_z_exp": 3.0,
+    "feet_air_time_ang_z_M20": 0.0,
+    "feet_slide_ang_z_cmd": 0.0,
+    "stand_still": 0.7671250700950623,
+    "rotation_gait_status": 0.0,
+    "rotation_gait_symmetry": 0.0,
+    "bad_orientation_penalty": 0.0,
+    "joint_acc_wheel_l2": 2.497957468032837,
+    "stair_orientation_cost": 0.2083258032798767,
+    "stair_forward_progress": 0.66840660572052,
+    "stair_front_wheel_lift": 50.0,
+    "stair_forward_motion_cost": 0.1782369613647461,
+    "stair_ascent_direction_cost": 0.15029731392860413,
+    "stair_front_wheel_touchdown": 50.0,
+    "stair_front_single_support": 0.06684066355228424,
+    "stair_diagonal_support_symmetry": 0.03342033177614212,
+    "stair_front_alternation": 0.0,
+    "stair_up_step_completion": 150.0,
+    "stair_up_rear_step_completion": 0.0,
+    "stair_up_order_violation_cost": 0.0,
+    "stair_up_same_tread_cost": 0.0,
+    "stair_up_same_tread_dwell_cost": 0.0,
+    "stair_descent_rear_fold_cost": 0.0,
+    "stair_ascent_front_fold_cost": 0.0,
+    "turn_swing_size_cost": 0.0,
+    "stair_down_step_completion": 0.0,
+    "stair_front_riser_face_cost": 0.0,
+    "stair_descent_rear_support": 0.0,
+    "stair_impact_cost": 0.02771403267979622,
+    "stair_non_wheel_contact_cost": 0.0,
+    "stair_non_wheel_scrape_cost": 0.0,
+    "stair_joint_effort_cost": 0.013594657182693481,
+    "stair_joint_acceleration_cost": 0.019999999552965164,
+    "stair_mechanical_power_cost": 0.002443708246573806
+  },
+  "gait_metrics": {
+    "turn_samples": 800.0,
+    "descent_samples": 0.0,
+    "rear_support_samples": 0.0,
+    "turn_clearance_mean_m": 0.0038479010108858347,
+    "turn_reach_mean_m": 0.15933454036712646,
+    "turn_yaw_error_mean": 0.12510235607624054,
+    "rear_extension_mean_m": 0.0,
+    "rear_fold_support_fraction": 0.0,
+    "ascent_samples": 16.0,
+    "front_support_samples": 7.0,
+    "front_extension_mean_m": 0.4917972683906555,
+    "front_knee_abs_mean_rad": 0.7352400422096252,
+    "front_fold_support_fraction": 0.0,
+    "front_swing_samples": 17.0,
+    "front_extreme_swing_fold_fraction": 0.0
+  },
+  "ascent_direction_metrics": {
+    "samples": 16.0,
+    "lateral_error_mean_m": 0.004034318961203098,
+    "lateral_error_max_m": 0.007310341577976942,
+    "lateral_speed_mean_m_s": 0.04535581171512604,
+    "heading_error_mean_deg": 1.0581157207489014,
+    "outside_tolerance_fraction": 0.0,
+    "cost_mean": 0.007345063611865044
+  },
+  "step_metrics": {
+    "up_attempts": 0.0625,
+    "up_successes": 0.0625,
+    "up_success_rate": 1.0,
+    "up_rear_successes": 0.0,
+    "up_front_violations": 0.0,
+    "up_rear_violations": 0.0,
+    "up_front_same_tread_events": 0.0,
+    "up_front_same_tread_dwell_s": 0.0,
+    "up_rear_same_tread_events": 0.0,
+    "up_rear_same_tread_dwell_s": 0.0,
+    "up_targets_started": 0.125,
+    "up_lift_credit": 0.07550063729286194,
+    "up_retries": 0.0,
+    "up_abandoned_targets": 0.0,
+    "up_retreat_fraction": 0.0,
+    "up_stationary_fraction": 0.0,
+    "down_attempts": 0.0,
+    "down_successes": 0.0,
+    "down_success_rate": 0.0,
+    "forward_gate_fraction": 0.009999999776482582,
+    "nearby_gate_fraction": 0.009999999776482582
+  },
+  "gait_tuning": {
+    "translation_threshold": 0.1,
+    "yaw_threshold": 0.1,
+    "turn_posture_scale": 0.2,
+    "air_min": 0.1,
+    "air_target": 0.2,
+    "air_max": 0.35,
+    "turn_height_flat": 0.08,
+    "turn_height_terrain": 0.16,
+    "turn_reach_flat": 0.22,
+    "turn_reach_terrain": 0.3,
+    "height_scale": 0.08,
+    "reach_scale": 0.1,
+    "rear_min_extension": 0.35,
+    "extension_scale": 0.1,
+    "rear_max_knee": 1.9,
+    "knee_scale": 0.5,
+    "front_min_extension": 0.35,
+    "front_max_knee": 2.0,
+    "front_support_grace": 0.2,
+    "front_fold_weight": -0.5,
+    "front_swing_min_extension": 0.22,
+    "front_swing_max_knee": 2.5,
+    "front_swing_scale": 0.5,
+    "support_grace": 0.12,
+    "same_tread_grace": 0.12,
+    "wheel_radius": 0.09,
+    "nearest_valid_distance": 0.12,
+    "turn_size_weight": -1.0,
+    "rear_fold_weight": -1.0,
+    "same_tread_event_weight": -1.0,
+    "same_tread_dwell_weight": -1.0,
+    "turn_status_weight": 1.0,
+    "turn_symmetry_weight": 2.0,
+    "ascent_direction_weight": -2.0,
+    "direction_lateral_tolerance": 0.1,
+    "direction_lateral_scale": 0.25,
+    "direction_speed_tolerance": 0.05,
+    "direction_speed_scale": 0.2,
+    "direction_heading_tolerance": 0.08726646259971647,
+    "direction_heading_scale": 0.2617993877991494,
+    "direction_velocity_mix": 0.5,
+    "direction_heading_mix": 0.5,
+    "direction_command_change": 0.2617993877991494,
+    "direction_exit_inset": 0.06,
+    "direction_exit_height_tolerance": 0.05,
+    "direction_exit_contact_time": 0.06
+  },
+  "canonical_source_sha256": "41891e2606993a573da0da9f32c0cad4edf75f2741722b8b6e38df9e2b3d1004"
+}

@@ -1,0 +1,16 @@
+{
+  "baseline": {
+    "source": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-06_22-06-56_stair_resume/model_196600.pt",
+    "copy": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/latest_gait_20261008/baseline.pt",
+    "sha256": "765228e6499dd8af9fd3eb7d41d8289072b4478ad20e19ce95b23ab8f7862fe8",
+    "bytes": 7251465,
+    "iteration": 196600
+  },
+  "latest": {
+    "source": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-07_23-47-00_gait_safety_v2/model_22000.pt",
+    "copy": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/latest_gait_20261008/latest.pt",
+    "sha256": "8f4c98797361f37c1d596209d6033c3aabacf5c8d5f82b45ea1ab1cc85b6bc81",
+    "bytes": 7251391,
+    "iteration": 22000
+  }
+}

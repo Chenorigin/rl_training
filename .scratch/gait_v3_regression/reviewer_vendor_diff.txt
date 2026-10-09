@@ -1,0 +1,13 @@
+--- official_PPO.update
++++ guard_vendored.update
+@@ -57,6 +57,10 @@
+         else:
+             value_loss = (batch.returns - values).pow(2).mean()
+         loss = surrogate_loss + self.value_loss_coef * value_loss - self.entropy_coef * entropy.mean()
++        if self.reference_actor is not None and self.guard_updates >= self.critic_warmup_iterations:
++            anchor_loss = self._anchor_loss(batch.observations)
++            loss = loss + self.anchor_coefficient * anchor_loss
++            self._anchor_losses.append(float(anchor_loss.detach()))
+         if self.symmetry:
+             if not self.symmetry['use_data_augmentation']:
+                 data_augmentation_func = self.symmetry['data_augmentation_func']

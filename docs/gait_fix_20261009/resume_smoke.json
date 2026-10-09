@@ -1,0 +1,11 @@
+{
+  "log_dir": "logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-09_01-02-39_gait_fix_oct09_smoke",
+  "iteration": 199999,
+  "guard_updates": 2,
+  "optimizer_lr": [
+    1e-05
+  ],
+  "reference_matches": true,
+  "actor_unchanged_during_critic_warmup": true,
+  "all_model_tensors_finite": true
+}

@@ -1,0 +1,51 @@
+{
+  "identical_prefix_frames": 368,
+  "all_fields_identical": {
+    "body_gap": true,
+    "command": true,
+    "yaw_velocity": true,
+    "wheel_clearance": true,
+    "time": true,
+    "qpos": true,
+    "qvel": true,
+    "root_pos": true,
+    "wheel_pos": true,
+    "hip_pos": true,
+    "ground": true,
+    "forces": true,
+    "knee": true,
+    "extension": true,
+    "support": true,
+    "contact_time": true,
+    "tilt_body_deg": true,
+    "tilt_yaw_deg": true,
+    "leg_forward_body": true,
+    "pitch_deg": true,
+    "phase": true
+  },
+  "production_sources_unchanged": {
+    "deploy/deploy_mujoco/deploy_mujoco.py": true,
+    "deploy/deploy_mujoco/gait_metrics.py": true,
+    "deploy/deploy_mujoco/terrain_loader.py": true,
+    "deploy/deploy_mujoco/terrains/stairs_ascent.xml": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_teacher.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_teacher_env_cfg.py": true
+  },
+  "all_ten_static_force_checks_passed": true,
+  "sequence_positive_negative_controls_passed": true,
+  "supplementary_result": {
+    "steps_executed": 966,
+    "final_x": 2.0795838103740514,
+    "final_z": 1.993941368723326,
+    "max_x": 3.199691363337358,
+    "fell_in_policy": true,
+    "cleared_stairs": false
+  },
+  "global_performance_limit": "10 single runs plus 1 same-case continuation, not a success-rate estimate",
+  "skipped": [
+    "25cm risers",
+    "full mixed terrain",
+    "stochastic multi-seed success rate",
+    "real robot"
+  ]
+}

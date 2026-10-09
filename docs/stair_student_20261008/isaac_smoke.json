@@ -1,0 +1,34 @@
+{
+  "observation_shapes": {
+    "policy": [
+      4,
+      618
+    ],
+    "critic": [
+      4,
+      618
+    ],
+    "teacher": [
+      4,
+      244
+    ]
+  },
+  "critic_terms": [
+    "base_ang_vel",
+    "projected_gravity",
+    "velocity_commands",
+    "joint_pos",
+    "joint_vel",
+    "actions",
+    "height_scan",
+    "height_validity",
+    "height_confidence"
+  ],
+  "actor_only_warm_start_max_error": 0.0,
+  "finite": true,
+  "steps": 8,
+  "num_envs": 4,
+  "trained": false,
+  "valid_fraction": 0.75,
+  "confidence_mean": 0.6391078233718872
+}

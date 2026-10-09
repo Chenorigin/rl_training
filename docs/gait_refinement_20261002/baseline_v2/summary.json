@@ -1,0 +1,948 @@
+{
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/gait_refinement_20261002/baseline/model_31800.pt",
+  "checkpoint_sha256": "b1b8fd57d2f49a126e4cef04f3277853c73875fea9d643650db36e628ced99a9",
+  "cases": {
+    "ascent": {
+      "terrain": "ascent",
+      "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml",
+      "terrain_parameters": {
+        "width": [
+          4.0
+        ],
+        "friction": [
+          1.0,
+          0.01,
+          0.01
+        ],
+        "spawn_xy": [
+          -1.0,
+          0.0
+        ],
+        "spawn_yaw_deg": [
+          0.0
+        ],
+        "start_x": [
+          0.25
+        ],
+        "step_height": [
+          0.15
+        ],
+        "tread_depth": [
+          0.3
+        ],
+        "step_count": [
+          5.0
+        ],
+        "platform_length": [
+          10.0
+        ]
+      },
+      "goal_x": 1.75,
+      "course_width": 4.0,
+      "sample_count": 750,
+      "metrics_valid": true,
+      "scope": "+X ascent alternation uses XML step labels; top platform excluded; no route-bypass proof",
+      "rear_extension_min_m": 0.3651327092020903,
+      "rear_supported_extension_p05_m": 0.49053169939902697,
+      "rear_supported_knee_abs_p95_rad": 0.7496268372336746,
+      "rear_compressed_support_fraction": 0.0,
+      "compression_threshold_m": 0.35,
+      "turn_clearance_p95_m": null,
+      "turn_reach_p95_m": null,
+      "turn_steps": 0,
+      "front_same_tread_events": 0,
+      "turn_yaw_error_mean_rad_s": null,
+      "translation_velocity_error_mean_m_s": 0.1279037852894705,
+      "rear_same_tread_events": 3,
+      "front_alternation_rate": 0.75,
+      "rear_alternation_rate": 0.75,
+      "alternation_checks": [
+        4,
+        4
+      ],
+      "mean_absolute_mechanical_power_w": 121.61441393246588,
+      "absolute_mechanical_energy_j": 1824.2162089869882,
+      "vertical_support_impulse_ns": [
+        1210.5903762566065,
+        1087.9888766059503,
+        1354.6563014420235,
+        1362.9529521784505
+      ],
+      "crossed_finish": true,
+      "inside_course": true,
+      "cleared_terrain": true,
+      "cleared_stairs": true,
+      "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked",
+      "fell": false,
+      "physics_enabled": true,
+      "final_xyz": [
+        5.5469347942723015,
+        0.369376258878321,
+        1.319297021030288
+      ],
+      "landings": [
+        {
+          "time": 0.10000000000000002,
+          "leg": "fl",
+          "level": 0,
+          "xyz": [
+            -0.6906618086402252,
+            0.22232603299796894,
+            0.08964435169554077
+          ],
+          "supporting_force": 80.31817350963944
+        },
+        {
+          "time": 0.10000000000000002,
+          "leg": "fr",
+          "level": 0,
+          "xyz": [
+            -0.6913548423875435,
+            -0.22642887561813832,
+            0.08954217189616326
+          ],
+          "supporting_force": 52.96437263550593
+        },
+        {
+          "time": 0.10000000000000002,
+          "leg": "hl",
+          "level": 0,
+          "xyz": [
+            -1.2797916627829715,
+            0.2305609466193358,
+            0.08971055547538498
+          ],
+          "supporting_force": 94.14352740928854
+        },
+        {
+          "time": 0.10000000000000002,
+          "leg": "hr",
+          "level": 0,
+          "xyz": [
+            -1.2872258058875556,
+            -0.22418121513502387,
+            0.08961764533857691
+          ],
+          "supporting_force": 101.55330522932607
+        },
+        {
+          "time": 1.3999999999999921,
+          "leg": "hr",
+          "level": 0,
+          "xyz": [
+            -0.824373909338825,
+            -0.22401408081730534,
+            0.08980636334934528
+          ],
+          "supporting_force": 53.68749531287705
+        },
+        {
+          "time": 2.1399999999999766,
+          "leg": "hr",
+          "level": 0,
+          "xyz": [
+            -0.31135408785206675,
+            -0.36966884565785096,
+            0.092570870890367
+          ],
+          "supporting_force": 310.67891232675265
+        },
+        {
+          "time": 2.159999999999976,
+          "leg": "fl",
+          "level": 1,
+          "xyz": [
+            0.43574240332971026,
+            0.20526109590547106,
+            0.24180405544900035
+          ],
+          "supporting_force": 85.3222983694301
+        },
+        {
+          "time": 2.219999999999975,
+          "leg": "hl",
+          "level": 0,
+          "xyz": [
+            -0.48659507613769626,
+            0.1843644674306685,
+            0.0904769713131669
+          ],
+          "supporting_force": 190.12836621221106
+        },
+        {
+          "time": 2.2799999999999736,
+          "leg": "fl",
+          "level": 1,
+          "xyz": [
+            0.36467430883427365,
+            0.2083012822645547,
+            0.2419269098939456
+          ],
+          "supporting_force": 114.23531208964815
+        },
+        {
+          "time": 2.3799999999999715,
+          "leg": "hl",
+          "level": 0,
+          "xyz": [
+            -0.2674550796614931,
+            0.13473728776758606,
+            0.08976801350171748
+          ],
+          "supporting_force": 67.64388882680595
+        },
+        {
+          "time": 2.4599999999999698,
+          "leg": "fr",
+          "level": 2,
+          "xyz": [
+            0.6833498517635765,
+            -0.2136338751392588,
+            0.39009054739857973
+          ],
+          "supporting_force": 44.69008707336661
+        },
+        {
+          "time": 2.6199999999999664,
+          "leg": "fr",
+          "level": 2,
+          "xyz": [
+            0.7570012953766196,
+            -0.20994571539245882,
+            0.38952976708887316
+          ],
+          "supporting_force": 137.32656335793482
+        },
+        {
+          "time": 2.639999999999966,
+          "leg": "hl",
+          "level": 0,
+          "xyz": [
+            -0.05879773931022035,
+            0.09985840804730763,
+            0.08947151609918255
+          ],
+          "supporting_force": 258.7048878787807
+        },
+        {
+          "time": 2.7199999999999642,
+          "leg": "hr",
+          "level": 0,
+          "xyz": [
+            0.05593870503768003,
+            -0.3115987741351026,
+            0.09085457040119974
+          ],
+          "supporting_force": 211.8371167809887
+        },
+        {
+          "time": 2.8999999999999604,
+          "leg": "hl",
+          "level": 0,
+          "xyz": [
+            0.037018062924881134,
+            0.08401615448288646,
+            0.09101839158060016
+          ],
+          "supporting_force": 90.95378977315578
+        },
+        {
+          "time": 2.9799999999999587,
+          "leg": "fl",
+          "level": 3,
+          "xyz": [
+            0.8964288089551005,
+            0.3182765526525618,
+            0.5428575319658328
+          ],
+          "supporting_force": 149.54997286377952
+        },
+        {
+          "time": 3.199999999999954,
+          "leg": "hl",
+          "level": 1,
+          "xyz": [
+            0.31479201856280203,
+            0.1983639631399295,
+            0.2403314186302233
+          ],
+          "supporting_force": 360.66823885313875
+        },
+        {
+          "time": 3.37999999999995,
+          "leg": "hr",
+          "level": 1,
+          "xyz": [
+            0.3392974134615214,
+            -0.19814960649968083,
+            0.24221215175592267
+          ],
+          "supporting_force": 132.2635838563176
+        },
+        {
+          "time": 3.4199999999999493,
+          "leg": "fr",
+          "level": 4,
+          "xyz": [
+            1.1798774459713712,
+            -0.11739274878542388,
+            0.6908214688344513
+          ],
+          "supporting_force": 34.18775081353495
+        },
+        {
+          "time": 3.579999999999946,
+          "leg": "fl",
+          "level": 3,
+          "xyz": [
+            1.0572385860132212,
+            0.37443440579923265,
+            0.541015351081366
+          ],
+          "supporting_force": 144.9287661931081
+        },
+        {
+          "time": 3.579999999999946,
+          "leg": "hl",
+          "level": 1,
+          "xyz": [
+            0.3772999948272384,
+            0.20025264658252845,
+            0.24118708866514507
+          ],
+          "supporting_force": 40.877258839812114
+        },
+        {
+          "time": 3.7799999999999416,
+          "leg": "fl",
+          "level": 3,
+          "xyz": [
+            1.0569752199600715,
+            0.37720493366393304,
+            0.5402588317482057
+          ],
+          "supporting_force": 222.18906998092376
+        },
+        {
+          "time": 3.85999999999994,
+          "leg": "fl",
+          "level": 3,
+          "xyz": [
+            1.0590298020426576,
+            0.38359009066174926,
+            0.540438797581883
+          ],
+          "supporting_force": 227.09236484320172
+        },
+        {
+          "time": 3.8799999999999395,
+          "leg": "hr",
+          "level": 1,
+          "xyz": [
+            0.45459935484568254,
+            -0.19794434319365298,
+            0.237708830679491
+          ],
+          "supporting_force": 429.15724246750233
+        },
+        {
+          "time": 4.0199999999999365,
+          "leg": "hl",
+          "level": 2,
+          "xyz": [
+            0.5756457832152273,
+            0.2541434355458886,
+            0.3894606798541006
+          ],
+          "supporting_force": 348.1552681307478
+        },
+        {
+          "time": 4.059999999999936,
+          "leg": "fr",
+          "level": 4,
+          "xyz": [
+            1.3468219680586093,
+            -0.04592416564139376,
+            0.6895633105955574
+          ],
+          "supporting_force": 70.97341165645688
+        },
+        {
+          "time": 4.259999999999931,
+          "leg": "hr",
+          "level": 2,
+          "xyz": [
+            0.5981198936486747,
+            -0.14731296963389445,
+            0.39334632097457334
+          ],
+          "supporting_force": 151.74958183034434
+        },
+        {
+          "time": 4.33999999999993,
+          "leg": "fl",
+          "level": 4,
+          "xyz": [
+            1.3255597674036528,
+            0.35279041506869446,
+            0.6898212551287664
+          ],
+          "supporting_force": 137.26462800601666
+        },
+        {
+          "time": 4.459999999999927,
+          "leg": "hl",
+          "level": 2,
+          "xyz": [
+            0.6567637959273797,
+            0.18576878155473472,
+            0.39065211874297057
+          ],
+          "supporting_force": 61.78791523578464
+        },
+        {
+          "time": 4.519999999999926,
+          "leg": "fr",
+          "level": 5,
+          "xyz": [
+            1.5202945124661655,
+            -0.12498186890468377,
+            0.8426900631291925
+          ],
+          "supporting_force": 103.9366400976563
+        },
+        {
+          "time": 4.8199999999999195,
+          "leg": "fl",
+          "level": 5,
+          "xyz": [
+            1.5832292695947259,
+            0.3322277474528136,
+            0.8409085203880484
+          ],
+          "supporting_force": 188.40308560896233
+        },
+        {
+          "time": 4.839999999999919,
+          "leg": "hr",
+          "level": 3,
+          "xyz": [
+            0.8857039578904122,
+            -0.22861018813094072,
+            0.5407426917346159
+          ],
+          "supporting_force": 295.0144828152489
+        },
+        {
+          "time": 5.059999999999914,
+          "leg": "fl",
+          "level": 5,
+          "xyz": [
+            1.747634822307002,
+            0.3553478387284681,
+            0.8412800805712839
+          ],
+          "supporting_force": 72.86467587958867
+        },
+        {
+          "time": 5.139999999999913,
+          "leg": "hl",
+          "level": 3,
+          "xyz": [
+            1.0618642885695437,
+            0.22503668393147058,
+            0.5411985769795432
+          ],
+          "supporting_force": 334.2736477894156
+        },
+        {
+          "time": 5.159999999999912,
+          "leg": "fr",
+          "level": 5,
+          "xyz": [
+            1.8532746838000318,
+            -0.14315929394607102,
+            0.8410662044661623
+          ],
+          "supporting_force": 109.93870865322168
+        },
+        {
+          "time": 5.25999999999991,
+          "leg": "fl",
+          "level": 5,
+          "xyz": [
+            1.8424096558532381,
+            0.35498586241871555,
+            0.8406126373040719
+          ],
+          "supporting_force": 160.62363429810873
+        },
+        {
+          "time": 5.479999999999905,
+          "leg": "fr",
+          "level": 5,
+          "xyz": [
+            1.935814762714908,
+            -0.1332614983531468,
+            0.8396906656025748
+          ],
+          "supporting_force": 187.71958684439073
+        },
+        {
+          "time": 5.479999999999905,
+          "leg": "hl",
+          "level": 4,
+          "xyz": [
+            1.2615754538679025,
+            0.28539360589289375,
+            0.6894502976880041
+          ],
+          "supporting_force": 313.1212088722528
+        },
+        {
+          "time": 5.6599999999999016,
+          "leg": "hr",
+          "level": 4,
+          "xyz": [
+            1.290809508666356,
+            -0.13314757926731435,
+            0.6921791762826808
+          ],
+          "supporting_force": 198.2132630117638
+        },
+        {
+          "time": 5.759999999999899,
+          "leg": "fl",
+          "level": 5,
+          "xyz": [
+            1.9556332636153098,
+            0.31719582789672074,
+            0.8406033460970912
+          ],
+          "supporting_force": 44.584135054209526
+        },
+        {
+          "time": 5.819999999999898,
+          "leg": "hl",
+          "level": 4,
+          "xyz": [
+            1.3592784079300106,
+            0.2539700889993195,
+            0.6910396434903244
+          ],
+          "supporting_force": 37.943573315241075
+        },
+        {
+          "time": 5.839999999999898,
+          "leg": "hr",
+          "level": 4,
+          "xyz": [
+            1.3587356663436467,
+            -0.12625894377359026,
+            0.6921583529386259
+          ],
+          "supporting_force": 158.21317751277465
+        },
+        {
+          "time": 6.059999999999893,
+          "leg": "fr",
+          "level": 5,
+          "xyz": [
+            2.073586315622019,
+            -0.14235736156424797,
+            0.8397810385957336
+          ],
+          "supporting_force": 99.03597393247883
+        },
+        {
+          "time": 6.079999999999893,
+          "leg": "hr",
+          "level": 4,
+          "xyz": [
+            1.3591063155279846,
+            -0.12427622360077425,
+            0.6957571504172997
+          ],
+          "supporting_force": 114.07687909794751
+        },
+        {
+          "time": 6.119999999999892,
+          "leg": "fl",
+          "level": 5,
+          "xyz": [
+            2.1539939563344324,
+            0.3274538318795486,
+            0.8399856160134197
+          ],
+          "supporting_force": 147.12399259402875
+        },
+        {
+          "time": 6.159999999999891,
+          "leg": "hr",
+          "level": 4,
+          "xyz": [
+            1.3596261632779667,
+            -0.12233376567057443,
+            0.6907534480086608
+          ],
+          "supporting_force": 218.67204408240912
+        },
+        {
+          "time": 6.339999999999887,
+          "leg": "fr",
+          "level": 5,
+          "xyz": [
+            2.1394857071595825,
+            -0.14075086624989477,
+            0.8416813695156893
+          ],
+          "supporting_force": 213.93916678339622
+        },
+        {
+          "time": 6.479999999999884,
+          "leg": "fl",
+          "level": 5,
+          "xyz": [
+            2.1525636295931556,
+            0.42786835186244754,
+            0.8426481022176493
+          ],
+          "supporting_force": 101.49868279257359
+        },
+        {
+          "time": 6.499999999999884,
+          "leg": "hr",
+          "level": 5,
+          "xyz": [
+            1.4805385669825517,
+            -0.08700563904641724,
+            0.8417217388528349
+          ],
+          "supporting_force": 159.29645713845844
+        },
+        {
+          "time": 6.67999999999988,
+          "leg": "fr",
+          "level": 5,
+          "xyz": [
+            2.189683135339397,
+            -0.10683555452289131,
+            0.8411868515795178
+          ],
+          "supporting_force": 115.30782217811695
+        },
+        {
+          "time": 6.67999999999988,
+          "leg": "hl",
+          "level": 5,
+          "xyz": [
+            1.6061481919091996,
+            0.34128563499313913,
+            0.8397317324563744
+          ],
+          "supporting_force": 169.71487730930107
+        },
+        {
+          "time": 6.759999999999878,
+          "leg": "fl",
+          "level": 5,
+          "xyz": [
+            2.1707260189906896,
+            0.40741402554516293,
+            0.8412682798200221
+          ],
+          "supporting_force": 56.29873255586136
+        }
+      ],
+      "reference_clip_status": "unreviewed; not an AMP expert dataset"
+    },
+    "descent": {
+      "terrain": "descent",
+      "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_descent.xml",
+      "terrain_parameters": {
+        "width": [
+          4.0
+        ],
+        "friction": [
+          1.0,
+          0.01,
+          0.01
+        ],
+        "spawn_xy": [
+          -1.0,
+          0.0
+        ],
+        "spawn_yaw_deg": [
+          0.0
+        ],
+        "start_x": [
+          0.5
+        ],
+        "step_height": [
+          0.15
+        ],
+        "tread_depth": [
+          0.3
+        ],
+        "step_count": [
+          5.0
+        ],
+        "platform_length": [
+          10.0
+        ]
+      },
+      "goal_x": 2.0,
+      "course_width": 4.0,
+      "sample_count": 750,
+      "metrics_valid": true,
+      "scope": "+X ascent alternation uses XML step labels; top platform excluded; no route-bypass proof",
+      "rear_extension_min_m": 0.3064240073120393,
+      "rear_supported_extension_p05_m": 0.4229201093582126,
+      "rear_supported_knee_abs_p95_rad": 1.3397809378669712,
+      "rear_compressed_support_fraction": 0.012955465587044534,
+      "compression_threshold_m": 0.35,
+      "turn_clearance_p95_m": null,
+      "turn_reach_p95_m": null,
+      "turn_steps": 0,
+      "front_same_tread_events": 0,
+      "turn_yaw_error_mean_rad_s": null,
+      "translation_velocity_error_mean_m_s": 0.10031728740076903,
+      "rear_same_tread_events": 0,
+      "front_alternation_rate": null,
+      "rear_alternation_rate": null,
+      "alternation_checks": [
+        0,
+        0
+      ],
+      "mean_absolute_mechanical_power_w": 63.06456360903153,
+      "absolute_mechanical_energy_j": 945.9684541354729,
+      "vertical_support_impulse_ns": [
+        1338.2404114870938,
+        1195.843875578745,
+        1233.1929611514483,
+        1423.1440703394132
+      ],
+      "crossed_finish": true,
+      "inside_course": true,
+      "cleared_terrain": true,
+      "cleared_stairs": true,
+      "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked",
+      "fell": false,
+      "physics_enabled": true,
+      "final_xyz": [
+        5.578131197955894,
+        1.6573709352419872,
+        0.5675188947236282
+      ],
+      "landings": [],
+      "reference_clip_status": "unreviewed; not an AMP expert dataset"
+    },
+    "turn_left": {
+      "terrain": "flat",
+      "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/flat.xml",
+      "terrain_parameters": {
+        "width": [
+          4.0
+        ],
+        "friction": [
+          1.0,
+          0.01,
+          0.01
+        ],
+        "spawn_xy": [
+          -1.0,
+          0.0
+        ],
+        "spawn_yaw_deg": [
+          0.0
+        ],
+        "goal_x": [
+          5.0
+        ]
+      },
+      "goal_x": 5.0,
+      "course_width": 4.0,
+      "sample_count": 750,
+      "metrics_valid": true,
+      "scope": "+X ascent alternation uses XML step labels; top platform excluded; no route-bypass proof",
+      "rear_extension_min_m": 0.42377490428516784,
+      "rear_supported_extension_p05_m": 0.5108081464430843,
+      "rear_supported_knee_abs_p95_rad": 0.4620376333132785,
+      "rear_compressed_support_fraction": 0.0,
+      "compression_threshold_m": 0.35,
+      "turn_clearance_p95_m": 0.11334089019412424,
+      "turn_reach_p95_m": 0.2366568354687435,
+      "turn_steps": 750,
+      "front_same_tread_events": 0,
+      "turn_yaw_error_mean_rad_s": 0.5949117304504135,
+      "translation_velocity_error_mean_m_s": 0.1660670145027236,
+      "rear_same_tread_events": 0,
+      "front_alternation_rate": null,
+      "rear_alternation_rate": null,
+      "alternation_checks": [
+        0,
+        0
+      ],
+      "mean_absolute_mechanical_power_w": 214.47249856163936,
+      "absolute_mechanical_energy_j": 3217.0874784245902,
+      "vertical_support_impulse_ns": [
+        1143.8026315616662,
+        1662.0465825082056,
+        1512.3347950909613,
+        929.4753014569507
+      ],
+      "crossed_finish": false,
+      "inside_course": true,
+      "cleared_terrain": false,
+      "cleared_stairs": false,
+      "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked",
+      "fell": false,
+      "physics_enabled": true,
+      "final_xyz": [
+        -1.1988287141746963,
+        0.02485031861522857,
+        0.5717617891968527
+      ],
+      "landings": [],
+      "reference_clip_status": "unreviewed; not an AMP expert dataset"
+    },
+    "turn_right": {
+      "terrain": "flat",
+      "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/flat.xml",
+      "terrain_parameters": {
+        "width": [
+          4.0
+        ],
+        "friction": [
+          1.0,
+          0.01,
+          0.01
+        ],
+        "spawn_xy": [
+          -1.0,
+          0.0
+        ],
+        "spawn_yaw_deg": [
+          0.0
+        ],
+        "goal_x": [
+          5.0
+        ]
+      },
+      "goal_x": 5.0,
+      "course_width": 4.0,
+      "sample_count": 750,
+      "metrics_valid": true,
+      "scope": "+X ascent alternation uses XML step labels; top platform excluded; no route-bypass proof",
+      "rear_extension_min_m": 0.4350333206814264,
+      "rear_supported_extension_p05_m": 0.49620299708587773,
+      "rear_supported_knee_abs_p95_rad": 0.6892273378873646,
+      "rear_compressed_support_fraction": 0.0,
+      "compression_threshold_m": 0.35,
+      "turn_clearance_p95_m": 0.16565785325464516,
+      "turn_reach_p95_m": 0.2695044973157278,
+      "turn_steps": 750,
+      "front_same_tread_events": 0,
+      "turn_yaw_error_mean_rad_s": 0.6092677164557504,
+      "translation_velocity_error_mean_m_s": 0.2541552109089716,
+      "rear_same_tread_events": 0,
+      "front_alternation_rate": null,
+      "rear_alternation_rate": null,
+      "alternation_checks": [
+        0,
+        0
+      ],
+      "mean_absolute_mechanical_power_w": 324.29681229066665,
+      "absolute_mechanical_energy_j": 4864.45218436,
+      "vertical_support_impulse_ns": [
+        1612.5030048116344,
+        1027.3661181017285,
+        1045.9527661989075,
+        1423.7483592434905
+      ],
+      "crossed_finish": false,
+      "inside_course": true,
+      "cleared_terrain": false,
+      "cleared_stairs": false,
+      "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked",
+      "fell": false,
+      "physics_enabled": true,
+      "final_xyz": [
+        -1.3274860246867386,
+        0.06376199946398743,
+        0.5786797143958794
+      ],
+      "landings": [],
+      "reference_clip_status": "unreviewed; not an AMP expert dataset"
+    },
+    "flat": {
+      "terrain": "flat",
+      "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/flat.xml",
+      "terrain_parameters": {
+        "width": [
+          4.0
+        ],
+        "friction": [
+          1.0,
+          0.01,
+          0.01
+        ],
+        "spawn_xy": [
+          -1.0,
+          0.0
+        ],
+        "spawn_yaw_deg": [
+          0.0
+        ],
+        "goal_x": [
+          5.0
+        ]
+      },
+      "goal_x": 5.0,
+      "course_width": 4.0,
+      "sample_count": 750,
+      "metrics_valid": true,
+      "scope": "+X ascent alternation uses XML step labels; top platform excluded; no route-bypass proof",
+      "rear_extension_min_m": 0.5023600500402546,
+      "rear_supported_extension_p05_m": 0.5023723016751375,
+      "rear_supported_knee_abs_p95_rad": 0.6109218494550182,
+      "rear_compressed_support_fraction": 0.0,
+      "compression_threshold_m": 0.35,
+      "turn_clearance_p95_m": null,
+      "turn_reach_p95_m": null,
+      "turn_steps": 0,
+      "front_same_tread_events": 0,
+      "turn_yaw_error_mean_rad_s": null,
+      "translation_velocity_error_mean_m_s": 0.08515627440259592,
+      "rear_same_tread_events": 0,
+      "front_alternation_rate": null,
+      "rear_alternation_rate": null,
+      "alternation_checks": [
+        0,
+        0
+      ],
+      "mean_absolute_mechanical_power_w": 21.839874580297785,
+      "absolute_mechanical_energy_j": 327.5981187044668,
+      "vertical_support_impulse_ns": [
+        1459.5595389856364,
+        1053.3937520216152,
+        1070.1329116030988,
+        1490.853740304169
+      ],
+      "crossed_finish": false,
+      "inside_course": true,
+      "cleared_terrain": false,
+      "cleared_stairs": false,
+      "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked",
+      "fell": false,
+      "physics_enabled": true,
+      "final_xyz": [
+        5.219414204373175,
+        -0.011867769470626104,
+        0.567742458071258
+      ],
+      "landings": [],
+      "reference_clip_status": "unreviewed; not an AMP expert dataset"
+    }
+  }
+}

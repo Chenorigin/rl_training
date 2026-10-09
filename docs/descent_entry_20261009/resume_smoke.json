@@ -1,0 +1,11 @@
+{
+  "log_dir": "logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-09_01-52-16_descent_entry_final_smoke",
+  "iter": 199999,
+  "updates": 2,
+  "lr": [
+    1e-05
+  ],
+  "source_sha256": "d9f9ef07d53693cfa72b8ae736e292cef372a0de4bb2155ec1cbf20db7c751dd",
+  "reference_matches": true,
+  "finite": true
+}

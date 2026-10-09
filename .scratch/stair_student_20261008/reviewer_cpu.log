@@ -1,0 +1,59 @@
+{
+  "clean_height_teacher_parity": true,
+  "height_shape": [
+    4,
+    187
+  ],
+  "nan_inf_student_channels_finite": true,
+  "teacher_raw_height_nan_survives_clip": true,
+  "full_dropout_zero_placeholders": true,
+  "atomic_reuse_clone_and_step_refresh": true,
+  "same_step_zero_episode_reset_without_event": {
+    "cache_return": 0.06999999284744263,
+    "correct_fresh_height": -0.030000001192092896,
+    "max_error": 0.09999999403953552,
+    "stale": true
+  },
+  "same_step_zero_episode_reset_with_event": {
+    "cache_return": -0.030000001192092896,
+    "correct_fresh_height": -0.030000001192092896,
+    "max_error": 0.0
+  },
+  "reset_event_wiring_static": true,
+  "real_rsl_mlp_actor_expansion": {
+    "max_action_error": 0.0,
+    "extra_columns_zero": true,
+    "source_unchanged": true,
+    "actor_keys": [
+      "distribution.log_std_param",
+      "mlp.0.weight",
+      "mlp.0.bias",
+      "mlp.2.weight",
+      "mlp.2.bias",
+      "mlp.4.weight",
+      "mlp.4.bias",
+      "mlp.6.weight",
+      "mlp.6.bias"
+    ],
+    "action_shape": [
+      8,
+      16
+    ]
+  },
+  "distillation_teacher_grad_detached": true,
+  "registration_entry": {
+    "id": "Rough-Deeprobotics-M20-StairStudent-v0",
+    "entry_point": "isaaclab.envs:ManagerBasedRLEnv",
+    "disable_env_checker": true,
+    "kwargs": {
+      "env_cfg_entry_point": "rl_training.tasks.manager_based.locomotion.velocity.config.wheeled.deeprobotics_m20.stair_student_env_cfg:DeeproboticsM20StairStudentEnvCfg",
+      "rsl_rl_cfg_entry_point": "rl_training.tasks.manager_based.locomotion.velocity.config.wheeled.deeprobotics_m20.agents.stair_student_ppo_cfg:DeeproboticsM20StairStudentPPORunnerCfg"
+    }
+  },
+  "source_sha256": {
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_student.py": "d04249808dc91c0657f1540f956f523d6f901fc768cc3efaf5d21c48429a8bf6",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_student_env_cfg.py": "933cbd480204cab0094b6df8f47526a9d0d325078badfa165d49a2a39e573d83",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/stair_student_ppo_cfg.py": "e7e5f38b60c34f2a41f8f684cbe152492d7e5304859608b89bd7ad2e6eba1687",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/__init__.py": "f85f2bc64fdda387e05bb6046a3c5b2c05a1cfbd9df2ed3985b07058a5e0d793"
+  }
+}

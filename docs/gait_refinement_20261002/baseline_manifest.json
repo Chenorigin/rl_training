@@ -1,0 +1,12 @@
+{
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-02_00-12-17/model_31800.pt",
+  "sha256": "b1b8fd57d2f49a126e4cef04f3277853c73875fea9d643650db36e628ced99a9",
+  "files": {
+    "/home/ubuntu/cyq_shixi_projects/rl_training/source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_teacher.py": "701f2b96dac4ba7d37769ef8d142792552da51e03af170ffd3eedb08d2b43d70",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_ascent.py": "ad86ff9444f8842565bd9fa4fcaf3697f042969b730862e0d0ce5cb5f93269d3",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_teacher_env_cfg.py": "7f8a77c86bbefaa6e207ffe186cec7f01d1761f836737bc80fd0da28642f88e4",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/pre_teacher_env_cfg.py": "6b86f54c7562ba75c51947bb8dc1e5d0bcce5a474a55d174419b7c185f44266a",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/deploy_mujoco.py": "c2e70f3de9142306c888445020cc6849f9c8284af6b2c0c87390271f391dbda0",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-02_00-12-17/params/env.yaml": "5b620ef4ee9ff2c2809d583d9c35ebb375e5efbbfc412990564a4b160e7ba1fa"
+  }
+}

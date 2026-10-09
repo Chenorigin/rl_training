@@ -1,0 +1,87 @@
+{
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-08_18-23-11_gait_preserve/model_9999.pt",
+  "checkpoint_sha256": "c119c93ce7f9387d7b6e14d0be4932469be8b534523bcc9a2f31a47374adbc7c",
+  "cases": {
+    "descent": {
+      "terrain": "descent",
+      "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_descent.xml",
+      "terrain_parameters": {
+        "width": [
+          4.0
+        ],
+        "friction": [
+          1.0,
+          0.01,
+          0.01
+        ],
+        "spawn_xy": [
+          -1.0,
+          0.0
+        ],
+        "spawn_yaw_deg": [
+          0.0
+        ],
+        "start_x": [
+          0.5
+        ],
+        "step_height": [
+          0.15
+        ],
+        "tread_depth": [
+          0.3
+        ],
+        "step_count": [
+          5.0
+        ],
+        "platform_length": [
+          10.0
+        ]
+      },
+      "goal_x": 2.0,
+      "course_width": 4.0,
+      "sample_count": 2000,
+      "metrics_valid": true,
+      "scope": "+X ascent alternation uses XML step labels; top platform excluded; no route-bypass proof",
+      "rear_extension_min_m": 0.3468041193070029,
+      "rear_supported_extension_p05_m": 0.5023779566933702,
+      "rear_supported_knee_abs_p95_rad": 0.6106423622739291,
+      "rear_compressed_support_fraction": 0.0,
+      "compression_threshold_m": 0.3,
+      "turn_clearance_p95_m": null,
+      "turn_reach_p95_m": null,
+      "turn_steps": 0,
+      "front_same_tread_events": 0,
+      "turn_yaw_error_mean_rad_s": null,
+      "translation_velocity_error_mean_m_s": 0.07527365571978734,
+      "rear_same_tread_events": 0,
+      "front_alternation_rate": null,
+      "rear_alternation_rate": null,
+      "alternation_checks": [
+        0,
+        0
+      ],
+      "mean_absolute_mechanical_power_w": 19.107512313327582,
+      "absolute_mechanical_energy_j": 764.3004925331032,
+      "vertical_support_impulse_ns": [
+        2734.459452982926,
+        4268.037989602039,
+        4107.579310282248,
+        2434.428032626724
+      ],
+      "crossed_finish": true,
+      "inside_course": false,
+      "cleared_terrain": false,
+      "cleared_stairs": false,
+      "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked",
+      "fell": false,
+      "physics_enabled": true,
+      "final_xyz": [
+        16.853900898110783,
+        -2.550397845295706,
+        0.5656030364641537
+      ],
+      "landings": [],
+      "reference_clip_status": "unreviewed; not an AMP expert dataset"
+    }
+  }
+}

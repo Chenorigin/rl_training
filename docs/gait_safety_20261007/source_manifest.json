@@ -1,0 +1,19 @@
+{
+  "frozen_files_unchanged": {
+    "deploy/deploy_mujoco/deploy_mujoco.py": true,
+    "deploy/deploy_mujoco/terrain_loader.py": true,
+    "deploy/deploy_mujoco/gait_metrics.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/pre_teacher_env_cfg.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/stair_teacher_ppo_cfg.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/pre_teacher_ppo_cfg.py": true,
+    "deploy/deploy_mujoco/terrains/stairs_ascent.xml": true
+  },
+  "changed_file_sha256": {
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_teacher.py": "ded9f4261f9476641beccb6139e26fc2cafc1aa796a174d49a19c19c4459b7d9",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_teacher_env_cfg.py": "a7ee2f16d42841e9e2034883d47069b524eda88cd4f13fb3e9612162df502c3a",
+    "scripts/tools/check_gait_safety.py": "e327310771aae53dbeb7b8782910d42b1644b84d796574cfef7f3b69b49c6d2d",
+    "scripts/tools/check_gait_refinement.py": "b32975457e9cb12921c1b277df11b79ddca87923b3e73ce5490f7176acb1256f",
+    "scripts/tools/check_stair_rewards.py": "9595696380200aec50f6f06da49abf7cf5933a371403dc627b4b453370ac3a88",
+    "scripts/tools/smoke_stair_rewards.py": "82cea4140f7a705a0efa037cf8e71ddf91ea153b2e7ae6f4f6d1c17776f5dac6"
+  }
+}

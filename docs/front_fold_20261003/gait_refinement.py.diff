@@ -1,0 +1,131 @@
+--- /home/ubuntu/cyq_shixi_projects/rl_training/.scratch/front_fold_20261003/baseline/gait_refinement.py	2026-10-03 14:28:15.077887979 +0800
++++ /home/ubuntu/cyq_shixi_projects/rl_training/source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/gait_refinement.py	2026-10-03 14:35:25.235180595 +0800
+@@ -16,6 +16,10 @@
+     "height_scale": 0.08, "reach_scale": 0.10,
+     "rear_min_extension": 0.35, "extension_scale": 0.10,
+     "rear_max_knee": 1.90, "knee_scale": 0.50,
++    "front_min_extension": 0.35, "front_max_knee": 2.0,
++    "front_support_grace": 0.20, "front_fold_weight": -0.5,
++    "front_swing_min_extension": 0.22, "front_swing_max_knee": 2.50,
++    "front_swing_scale": 0.50,
+     "support_grace": 0.12, "same_tread_grace": 0.12,
+     "wheel_radius": 0.09, "nearest_valid_distance": 0.12,
+     "turn_size_weight": -1.0, "rear_fold_weight": -1.0,
+@@ -42,10 +46,12 @@
+                          ((high - air) / (high - target) * peak).clamp_min(0))
+ 
+ 
+-def fold_excess(extension, knee):
+-    length = ((TUNING["rear_min_extension"] - extension).clamp_min(0)
++def fold_excess(extension, knee, min_extension=None, max_knee=None):
++    min_extension = TUNING["rear_min_extension"] if min_extension is None else min_extension
++    max_knee = TUNING["rear_max_knee"] if max_knee is None else max_knee
++    length = ((min_extension - extension).clamp_min(0)
+               / TUNING["extension_scale"]).square()
+-    angle = ((knee.abs() - TUNING["rear_max_knee"]).clamp_min(0)
++    angle = ((knee.abs() - max_knee).clamp_min(0)
+              / TUNING["knee_scale"]).square()
+     return torch.maximum(length, angle).clamp_max(1)
+ 
+@@ -93,6 +99,14 @@
+     if descent is not None:
+         down |= descent["active"] & ~descent["up"] & (env.episode_length_buf > 1)
+     down &= command[:, 0] > TUNING["translation_threshold"]
++    # All visible upward edges include the one recently passed by the trunk.
++    # An active target also keeps the gate through a temporary scan transition.
++    rising_edges = scan.get("ascending_edges_valid")
++    up = (scan["up_gate"] > 0) if rising_edges is None else rising_edges.any(dim=1)
++    ascent = getattr(env, "_m20_ascent_state", None)
++    if ascent is not None:
++        up |= ascent["active"] & (env.episode_length_buf > 1)
++    up &= (command[:, 0] > TUNING["translation_threshold"]) & ~down
+     extension = torch.linalg.vector_norm(wheels - hips, dim=-1)
+     reach = torch.linalg.vector_norm((wheels - hips)[..., :2], dim=-1)
+     knee = robot.data.joint_pos[:, knee_cfg.joint_ids]
+@@ -100,10 +114,23 @@
+     size = turn_size_excess(clearance, reach, scan["terrain_gate"])
+     size = torch.where(ground_valid & airborne, size, 0.0)
+     fold = torch.where(support[:, 2:] & down[:, None], fold_excess(extension[:, 2:], knee[:, 2:]), 0.0)
++    front_support = (support[:, :2]
++                     & (contact.data.current_contact_time[:, contact_sensor_cfg.body_ids][:, :2]
++                        >= TUNING["front_support_grace"]) & up[:, None])
++    front_fold = torch.where(front_support, fold_excess(
++        extension[:, :2], knee[:, :2], TUNING["front_min_extension"], TUNING["front_max_knee"]), 0.0)
++    front_swing = airborne[:, :2] & ground_valid[:, :2] & up[:, None]
++    # Swing needs substantial flexion to clear a riser. Only the wider severe
++    # envelope is charged, at a weaker rate than settled support.
++    front_swing_fold = torch.where(front_swing, fold_excess(
++        extension[:, :2], knee[:, :2], TUNING["front_swing_min_extension"],
++        TUNING["front_swing_max_knee"]), 0.0)
+     tracking = turn_tracking_quality(robot.data.root_ang_vel_b[:, 2], command[:, 2])
+     cached = dict(step=step, turn=turn, tracking=tracking, support=support, airborne=airborne, clearance=clearance,
+                   ground_valid=ground_valid, extension=extension, knee=knee, reach=reach,
+-                  size=size, fold=fold, down=down)
++                  size=size, fold=fold, down=down, up=up,
++                  front_fold=front_fold, front_support=front_support,
++                  front_swing=front_swing, front_swing_fold=front_swing_fold)
+     env._m20_gait_context = cached
+     # Once per control step, independently of how many reward terms use it.
+     stats = getattr(env, "_m20_gait_stats", None)
+@@ -111,7 +138,9 @@
+         stats = {name: torch.zeros(env.num_envs, device=env.device) for name in
+                  ("turn_steps", "turn_clearance_sum", "turn_reach_sum", "turn_size_sum",
+                   "rear_support_samples", "rear_extension_sum", "rear_fold_samples",
+-                  "down_steps", "turn_yaw_error_sum")}
++                  "down_steps", "turn_yaw_error_sum", "up_steps", "front_support_samples",
++                  "front_extension_sum", "front_knee_abs_sum", "front_fold_samples",
++                  "front_swing_samples", "front_swing_fold_samples")}
+         env._m20_gait_stats = stats
+     reset = env.episode_length_buf <= 1
+     for value in stats.values():
+@@ -127,6 +156,13 @@
+     stats["rear_extension_sum"] += (extension[:, 2:] * rear_samples.float()).sum(dim=1)
+     stats["rear_fold_samples"] += ((fold > 0) & rear_samples).sum(dim=1)
+     stats["down_steps"] += down.float()
++    stats["up_steps"] += up.float()
++    stats["front_support_samples"] += front_support.sum(dim=1)
++    stats["front_extension_sum"] += (extension[:, :2] * front_support.float()).sum(dim=1)
++    stats["front_knee_abs_sum"] += (knee[:, :2].abs() * front_support.float()).sum(dim=1)
++    stats["front_fold_samples"] += ((front_fold > 0) & front_support).sum(dim=1)
++    stats["front_swing_samples"] += front_swing.sum(dim=1)
++    stats["front_swing_fold_samples"] += ((front_swing_fold > 0) & front_swing).sum(dim=1)
+     return cached
+ 
+ 
+@@ -139,6 +175,16 @@
+     return _context(env, asset_cfg, hip_cfg, knee_cfg, sensor_cfg, contact_sensor_cfg)["fold"].mean(dim=1)
+ 
+ 
++def ascent_front_fold_cost(env, asset_cfg, hip_cfg, knee_cfg, sensor_cfg, contact_sensor_cfg):
++    """Bounded cost for excessive front flexion with separate support/swing envelopes.
++
++    Normal swing and initial touchdown compliance are free; only severe swing
++    flexion is charged. Commands and missing local ground close the gates.
++    """
++    c = _context(env, asset_cfg, hip_cfg, knee_cfg, sensor_cfg, contact_sensor_cfg)
++    return (c["front_fold"] + TUNING["front_swing_scale"] * c["front_swing_fold"]).mean(dim=1)
++
++
+ def compact_turn_air_time(env, command_name, sensor_cfg, asset_cfg, threshold,
+                           stair_sensor_cfg, cmd_threshold=0.1, foot_height_threshold=0.05):
+     """Bound airtime at touchdown; moving forward cannot activate this term.
+@@ -178,10 +224,18 @@
+     s = {key: value[env_ids].sum() for key, value in stats.items()}
+     turns = s["turn_steps"].clamp_min(1)
+     rear = s["rear_support_samples"].clamp_min(1)
++    front = s["front_support_samples"].clamp_min(1)
++    swing = s["front_swing_samples"].clamp_min(1)
+     return {"turn_samples": s["turn_steps"], "descent_samples": s["down_steps"],
+             "rear_support_samples": s["rear_support_samples"],
+             "turn_clearance_mean_m": s["turn_clearance_sum"] / turns,
+             "turn_reach_mean_m": s["turn_reach_sum"] / turns,
+             "turn_yaw_error_mean": s["turn_yaw_error_sum"] / turns,
+             "rear_extension_mean_m": s["rear_extension_sum"] / rear,
+-            "rear_fold_support_fraction": s["rear_fold_samples"] / rear}
++            "rear_fold_support_fraction": s["rear_fold_samples"] / rear,
++            "ascent_samples": s["up_steps"], "front_support_samples": s["front_support_samples"],
++            "front_extension_mean_m": s["front_extension_sum"] / front,
++            "front_knee_abs_mean_rad": s["front_knee_abs_sum"] / front,
++            "front_fold_support_fraction": s["front_fold_samples"] / front,
++            "front_swing_samples": s["front_swing_samples"],
++            "front_extreme_swing_fold_fraction": s["front_swing_fold_samples"] / swing}

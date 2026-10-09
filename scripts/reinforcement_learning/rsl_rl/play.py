@@ -16,6 +16,11 @@
 import argparse
 import os
 import sys
+from pathlib import Path
+
+# Use this checkout even when m20_wzh also has an older rl_training installation.
+_LOCAL_SOURCE = Path(__file__).resolve().parents[3] / "source" / "rl_training"
+sys.path.insert(0, str(_LOCAL_SOURCE))
 
 from isaaclab.app import AppLauncher
 
@@ -110,7 +115,6 @@ from isaaclab_tasks.utils import get_checkpoint_path
 from isaaclab_tasks.utils.hydra import hydra_task_config
 
 import rl_training.tasks  # noqa: F401
-from rl_training.envs.amp_locomotion_env import AmpLocomotionEnv, AmpRslRlVecEnvWrapper
 
 
 def _phase_traj_body(
@@ -247,11 +251,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         env = gym.wrappers.RecordVideo(env, **video_kwargs)
 
     # wrap around environment for rsl-rl
-    # Use custom wrapper for AMP env to preserve obs_history in get_observations()
-    if isinstance(env.unwrapped, AmpLocomotionEnv):
-        env = AmpRslRlVecEnvWrapper(env, clip_actions=agent_cfg.clip_actions)
-    else:
-        env = RslRlVecEnvWrapper(env, clip_actions=agent_cfg.clip_actions)
+    # Wrap the M20 environment for RSL-RL.
+    env = RslRlVecEnvWrapper(env, clip_actions=agent_cfg.clip_actions)
 
     print(f"[INFO]: Loading model checkpoint from: {resume_path}")
     # load previously trained model
@@ -347,7 +348,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     if VIS_ENABLED:
         robot = env.unwrapped.scene["robot"]
         # Resolve foot/wheel bodies. Prefer the env_cfg.foot_link_name regex
-        # (Lite3: ".*_FOOT", M20: ".*_wheel"); otherwise fall back to a
+        # (M20: ".*_wheel"); otherwise fall back to a
         # name-substring heuristic so this script works on robots that don't
         # expose foot_link_name.
         foot_pattern = getattr(env_cfg, "foot_link_name", None)

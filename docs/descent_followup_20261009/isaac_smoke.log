@@ -1,0 +1,672 @@
+Loading user config located at: '/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20261009_112217.log
+2026-10-09T03:22:17Z [28ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/kit/extscore/omni.kit.async_engine/omni/kit/async_engine/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [28ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/kit/extscore/omni.kit.async_engine/omni/kit/main_event_loop_wrapper`: errno=28/No space left on device
+2026-10-09T03:22:17Z [29ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/kit/extscore/omni.kit.async_engine/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [36ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.stats-1.0.1+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [36ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.stats-1.0.1+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [36ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.stats-1.0.1+69cbf6ad.lx64.r.cp311/omni/stats`: errno=28/No space left on device
+2026-10-09T03:22:17Z [36ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.stats-1.0.1+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [45ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.hsscclient-1.1.2+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [45ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.hsscclient-1.1.2+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [45ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.hsscclient-1.1.2+69cbf6ad.lx64.r.cp311/omni/hsscclient`: errno=28/No space left on device
+2026-10-09T03:22:17Z [45ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.hsscclient-1.1.2+69cbf6ad.lx64.r.cp311/omni/hsscclient/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [45ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.hsscclient-1.1.2+69cbf6ad.lx64.r.cp311/omni/hsscclient/tests/data`: errno=28/No space left on device
+2026-10-09T03:22:17Z [45ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.hsscclient-1.1.2+69cbf6ad.lx64.r.cp311/omni/hsscclient/tests/data/testtex`: errno=28/No space left on device
+2026-10-09T03:22:17Z [45ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.hsscclient-1.1.2+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [48ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.ujitso.default-1.0.0+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [48ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.ujitso.default-1.0.0+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [48ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.ujitso.default-1.0.0+69cbf6ad.lx64.r.cp311/omni/ujitso`: errno=28/No space left on device
+2026-10-09T03:22:17Z [48ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.ujitso.default-1.0.0+69cbf6ad.lx64.r.cp311/omni/ujitso/default`: errno=28/No space left on device
+2026-10-09T03:22:17Z [48ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.ujitso.default-1.0.0+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [56ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2026-10-09T03:22:17Z [57ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.config-1.0.6+69cbf6ad`: errno=28/No space left on device
+2026-10-09T03:22:17Z [57ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.config-1.0.6+69cbf6ad/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [57ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.config-1.0.6+69cbf6ad/omni/usd_config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [57ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.config-1.0.6+69cbf6ad/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [139ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl-56.0.3+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [140ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl-56.0.3+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [140ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl-56.0.3+69cbf6ad.lx64.r.cp311/omni/mdl`: errno=28/No space left on device
+2026-10-09T03:22:17Z [140ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl-56.0.3+69cbf6ad.lx64.r.cp311/omni/mdl/pymdlsdk`: errno=28/No space left on device
+2026-10-09T03:22:17Z [140ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl-56.0.3+69cbf6ad.lx64.r.cp311/omni/mdl/pymdlsdk/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [140ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl-56.0.3+69cbf6ad.lx64.r.cp311/omni/mdl/pymdlsdk/tests/mdlsdk`: errno=28/No space left on device
+2026-10-09T03:22:17Z [140ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl-56.0.3+69cbf6ad.lx64.r.cp311/omni/mdl/extensions`: errno=28/No space left on device
+2026-10-09T03:22:17Z [140ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl-56.0.3+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [145ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl.neuraylib-0.2.12+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [145ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl.neuraylib-0.2.12+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [145ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl.neuraylib-0.2.12+69cbf6ad.lx64.r.cp311/omni/mdl`: errno=28/No space left on device
+2026-10-09T03:22:17Z [145ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl.neuraylib-0.2.12+69cbf6ad.lx64.r.cp311/omni/mdl/neuraylib`: errno=28/No space left on device
+2026-10-09T03:22:17Z [145ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl.neuraylib-0.2.12+69cbf6ad.lx64.r.cp311/omni/mdl/neuraylib/scripts`: errno=28/No space left on device
+2026-10-09T03:22:17Z [145ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl.neuraylib-0.2.12+69cbf6ad.lx64.r.cp311/omni/mdl/neuraylib/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [145ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl.neuraylib-0.2.12+69cbf6ad.lx64.r.cp311/omni/mdl/neuraylib/utils`: errno=28/No space left on device
+2026-10-09T03:22:17Z [145ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.mdl.neuraylib-0.2.12+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 1 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 2 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 3 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 4 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 5 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 6 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 7 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 8 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 9 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 10 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 11 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 12 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 13 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 14 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 15 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 16 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 17 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 18 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 19 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 20 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 21 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 22 belongs to.
+2026-10-09T03:22:17Z [217ms] [Error] [omni.platforminfo.plugin] failed to find the package that core 23 belongs to.
+2026-10-09T03:22:17Z [236ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.telemetry-0.5.2+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [236ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.telemetry-0.5.2+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [236ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.telemetry-0.5.2+69cbf6ad.lx64.r.cp311/omni/kit`: errno=28/No space left on device
+2026-10-09T03:22:17Z [236ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.telemetry-0.5.2+69cbf6ad.lx64.r.cp311/omni/kit/telemetry`: errno=28/No space left on device
+2026-10-09T03:22:17Z [237ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.telemetry-0.5.2+69cbf6ad.lx64.r.cp311/omni/kit/telemetry/impl`: errno=28/No space left on device
+2026-10-09T03:22:17Z [237ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.telemetry-0.5.2+69cbf6ad.lx64.r.cp311/omni/kit/telemetry/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [237ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.telemetry-0.5.2+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [269ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.activity.core-1.0.3+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [270ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.activity.core-1.0.3+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [270ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.activity.core-1.0.3+69cbf6ad.lx64.r.cp311/omni/activity`: errno=28/No space left on device
+2026-10-09T03:22:17Z [270ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.activity.core-1.0.3+69cbf6ad.lx64.r.cp311/omni/activity/core`: errno=28/No space left on device
+2026-10-09T03:22:17Z [270ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.activity.core-1.0.3+69cbf6ad.lx64.r.cp311/omni/activity/core/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [270ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.activity.core-1.0.3+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [273ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.resourcemonitor-107.0.1+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [273ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.resourcemonitor-107.0.1+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [273ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.resourcemonitor-107.0.1+69cbf6ad.lx64.r.cp311/omni/resourcemonitor`: errno=28/No space left on device
+2026-10-09T03:22:17Z [273ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.resourcemonitor-107.0.1+69cbf6ad.lx64.r.cp311/omni/resourcemonitor/scripts`: errno=28/No space left on device
+2026-10-09T03:22:17Z [273ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.resourcemonitor-107.0.1+69cbf6ad.lx64.r.cp311/omni/resourcemonitor/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [273ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.resourcemonitor-107.0.1+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [274ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/carb.audio-0.1.0+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [275ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/carb.audio-0.1.0+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [278ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.foundation-107.3.26+107.3.3.lx64.r.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:17Z [278ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.foundation-107.3.26+107.3.3.lx64.r.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [278ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.foundation-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxfoundation`: errno=28/No space left on device
+2026-10-09T03:22:17Z [278ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.foundation-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxfoundation/scripts`: errno=28/No space left on device
+2026-10-09T03:22:17Z [278ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.foundation-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxfoundation/bindings`: errno=28/No space left on device
+2026-10-09T03:22:17Z [278ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.foundation-107.3.26+107.3.3.lx64.r.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [301ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.hydra.usdrt_delegate-7.5.1+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [301ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.hydra.usdrt_delegate-7.5.1+69cbf6ad.lx64.r.cp311/usdrt`: errno=28/No space left on device
+2026-10-09T03:22:17Z [301ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.hydra.usdrt_delegate-7.5.1+69cbf6ad.lx64.r.cp311/usdrt/population`: errno=28/No space left on device
+2026-10-09T03:22:17Z [301ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.hydra.usdrt_delegate-7.5.1+69cbf6ad.lx64.r.cp311/usdrt/hierarchy`: errno=28/No space left on device
+2026-10-09T03:22:17Z [301ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.hydra.usdrt_delegate-7.5.1+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [301ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.audiodeviceenum-1.0.2+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [301ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.audiodeviceenum-1.0.2+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [301ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.audiodeviceenum-1.0.2+69cbf6ad.lx64.r.cp311/omni/kit`: errno=28/No space left on device
+2026-10-09T03:22:17Z [301ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.audiodeviceenum-1.0.2+69cbf6ad.lx64.r.cp311/omni/kit/audiodeviceenum`: errno=28/No space left on device
+2026-10-09T03:22:17Z [301ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.audiodeviceenum-1.0.2+69cbf6ad.lx64.r.cp311/omni/kit/audiodeviceenum/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [301ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.audiodeviceenum-1.0.2+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [302ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.numpy.common-0.1.3+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [302ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.numpy.common-0.1.3+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [302ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.numpy.common-0.1.3+69cbf6ad.lx64.r.cp311/omni/kit`: errno=28/No space left on device
+2026-10-09T03:22:17Z [302ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.numpy.common-0.1.3+69cbf6ad.lx64.r.cp311/omni/kit/numpy`: errno=28/No space left on device
+2026-10-09T03:22:17Z [302ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.numpy.common-0.1.3+69cbf6ad.lx64.r.cp311/omni/kit/numpy/common`: errno=28/No space left on device
+2026-10-09T03:22:17Z [302ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.numpy.common-0.1.3+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [304ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.actions.core-1.0.0+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [304ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.actions.core-1.0.0+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [304ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.actions.core-1.0.0+69cbf6ad.lx64.r.cp311/omni/kit`: errno=28/No space left on device
+2026-10-09T03:22:17Z [304ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.actions.core-1.0.0+69cbf6ad.lx64.r.cp311/omni/kit/actions`: errno=28/No space left on device
+2026-10-09T03:22:17Z [304ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.actions.core-1.0.0+69cbf6ad.lx64.r.cp311/omni/kit/actions/core`: errno=28/No space left on device
+2026-10-09T03:22:17Z [304ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.actions.core-1.0.0+69cbf6ad.lx64.r.cp311/omni/kit/actions/core/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [304ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd_undo-0.1.8+69cbf6ad`: errno=28/No space left on device
+2026-10-09T03:22:17Z [304ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.actions.core-1.0.0+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [304ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd_undo-0.1.8+69cbf6ad/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [304ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd_undo-0.1.8+69cbf6ad/omni/kit`: errno=28/No space left on device
+2026-10-09T03:22:17Z [304ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd_undo-0.1.8+69cbf6ad/omni/kit/usd_undo`: errno=28/No space left on device
+2026-10-09T03:22:17Z [305ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd_undo-0.1.8+69cbf6ad/omni/kit/usd_undo/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [305ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd_undo-0.1.8+69cbf6ad/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [305ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kvdb-107.3.26+107.3.3.lx64.r.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:17Z [305ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kvdb-107.3.26+107.3.3.lx64.r.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [305ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kvdb-107.3.26+107.3.3.lx64.r.cp311.u353/omni/kvdb`: errno=28/No space left on device
+2026-10-09T03:22:17Z [305ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kvdb-107.3.26+107.3.3.lx64.r.cp311.u353/omni/kvdb/scripts`: errno=28/No space left on device
+2026-10-09T03:22:17Z [305ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kvdb-107.3.26+107.3.3.lx64.r.cp311.u353/omni/kvdb/bindings`: errno=28/No space left on device
+2026-10-09T03:22:17Z [306ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kvdb-107.3.26+107.3.3.lx64.r.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [308ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.commands-1.4.10+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [309ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.commands-1.4.10+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [309ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usdphysics-107.3.26+107.3.3.lx64.r.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:17Z [309ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.timeline-1.0.14+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [309ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usdphysics-107.3.26+107.3.3.lx64.r.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [309ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usdphysics-107.3.26+107.3.3.lx64.r.cp311.u353/omni/usdphysics`: errno=28/No space left on device
+2026-10-09T03:22:17Z [309ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.timeline-1.0.14+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [309ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usdphysics-107.3.26+107.3.3.lx64.r.cp311.u353/omni/usdphysics/scripts`: errno=28/No space left on device
+2026-10-09T03:22:17Z [309ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.timeline-1.0.14+69cbf6ad.lx64.r.cp311/omni/timeline`: errno=28/No space left on device
+2026-10-09T03:22:17Z [309ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usdphysics-107.3.26+107.3.3.lx64.r.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [309ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.timeline-1.0.14+69cbf6ad.lx64.r.cp311/omni/timeline/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [309ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.timeline-1.0.14+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [309ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.commands-1.4.10+69cbf6ad.lx64.r.cp311/omni/kit`: errno=28/No space left on device
+2026-10-09T03:22:17Z [309ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.commands-1.4.10+69cbf6ad.lx64.r.cp311/omni/kit/commands`: errno=28/No space left on device
+2026-10-09T03:22:17Z [310ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.commands-1.4.10+69cbf6ad.lx64.r.cp311/omni/kit/commands/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [310ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.commands-1.4.10+69cbf6ad.lx64.r.cp311/omni/kit/commands/builtin`: errno=28/No space left on device
+2026-10-09T03:22:17Z [310ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.localcache-107.3.26+107.3.3.lx64.r.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:17Z [310ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.commands-1.4.10+69cbf6ad.lx64.r.cp311/omni/kit/undo`: errno=28/No space left on device
+2026-10-09T03:22:17Z [310ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.localcache-107.3.26+107.3.3.lx64.r.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [310ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.localcache-107.3.26+107.3.3.lx64.r.cp311.u353/omni/localcache`: errno=28/No space left on device
+2026-10-09T03:22:17Z [310ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.commands-1.4.10+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [310ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.localcache-107.3.26+107.3.3.lx64.r.cp311.u353/omni/localcache/scripts`: errno=28/No space left on device
+2026-10-09T03:22:17Z [310ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.localcache-107.3.26+107.3.3.lx64.r.cp311.u353/omni/localcache/bindings`: errno=28/No space left on device
+2026-10-09T03:22:17Z [310ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.localcache-107.3.26+107.3.3.lx64.r.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [311ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.convexdecomposition-107.3.26+107.3.3.lx64.r.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:17Z [311ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.convexdecomposition-107.3.26+107.3.3.lx64.r.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [311ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.convexdecomposition-107.3.26+107.3.3.lx64.r.cp311.u353/omni/convexdecomposition`: errno=28/No space left on device
+2026-10-09T03:22:17Z [311ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.convexdecomposition-107.3.26+107.3.3.lx64.r.cp311.u353/omni/convexdecomposition/scripts`: errno=28/No space left on device
+2026-10-09T03:22:17Z [311ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.convexdecomposition-107.3.26+107.3.3.lx64.r.cp311.u353/omni/convexdecomposition/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [311ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.convexdecomposition-107.3.26+107.3.3.lx64.r.cp311.u353/omni/convexdecomposition/bindings`: errno=28/No space left on device
+2026-10-09T03:22:17Z [311ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.convexdecomposition-107.3.26+107.3.3.lx64.r.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [338ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.cooking-107.3.26+107.3.3.lx64.r.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:17Z [338ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.cooking-107.3.26+107.3.3.lx64.r.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [338ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.cooking-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxcooking`: errno=28/No space left on device
+2026-10-09T03:22:17Z [338ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.cooking-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxcooking/scripts`: errno=28/No space left on device
+2026-10-09T03:22:17Z [338ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.cooking-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxcooking/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [338ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.cooking-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxcooking/bindings`: errno=28/No space left on device
+2026-10-09T03:22:17Z [338ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.cooking-107.3.26+107.3.3.lx64.r.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [342ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd.layers-2.2.11+69cbf6ad.lx64.r.cp311`: errno=28/No space left on device
+2026-10-09T03:22:17Z [342ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd.layers-2.2.11+69cbf6ad.lx64.r.cp311/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [342ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd.layers-2.2.11+69cbf6ad.lx64.r.cp311/omni/kit`: errno=28/No space left on device
+2026-10-09T03:22:17Z [342ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd.layers-2.2.11+69cbf6ad.lx64.r.cp311/omni/kit/usd`: errno=28/No space left on device
+2026-10-09T03:22:17Z [342ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd.layers-2.2.11+69cbf6ad.lx64.r.cp311/omni/kit/usd/layers`: errno=28/No space left on device
+2026-10-09T03:22:17Z [342ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd.layers-2.2.11+69cbf6ad.lx64.r.cp311/omni/kit/usd/layers/_impl`: errno=28/No space left on device
+2026-10-09T03:22:17Z [342ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd.layers-2.2.11+69cbf6ad.lx64.r.cp311/omni/kit/usd/layers/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [342ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.usd.layers-2.2.11+69cbf6ad.lx64.r.cp311/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [343ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics-107.3.26+107.3.3.lx64.r.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:17Z [343ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics-107.3.26+107.3.3.lx64.r.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [343ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics`: errno=28/No space left on device
+2026-10-09T03:22:17Z [343ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/core`: errno=28/No space left on device
+2026-10-09T03:22:17Z [343ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/core/scripts`: errno=28/No space left on device
+2026-10-09T03:22:17Z [343ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/core/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [343ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/core/bindings`: errno=28/No space left on device
+2026-10-09T03:22:17Z [343ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics-107.3.26+107.3.3.lx64.r.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [348ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx-107.3.26+107.3.3.lx64.r.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:17Z [348ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx-107.3.26+107.3.3.lx64.r.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [348ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physx`: errno=28/No space left on device
+2026-10-09T03:22:17Z [348ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physx/scripts`: errno=28/No space left on device
+2026-10-09T03:22:17Z [348ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physx/bindings`: errno=28/No space left on device
+2026-10-09T03:22:17Z [348ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx-107.3.26+107.3.3.lx64.r.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [349ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.stageupdate-107.3.26+107.3.3.lx64.r.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:17Z [349ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.stageupdate-107.3.26+107.3.3.lx64.r.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [349ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.stageupdate-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics`: errno=28/No space left on device
+2026-10-09T03:22:17Z [349ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.stageupdate-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/stageupdate`: errno=28/No space left on device
+2026-10-09T03:22:17Z [349ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.stageupdate-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/stageupdate/scripts`: errno=28/No space left on device
+2026-10-09T03:22:17Z [349ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.stageupdate-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/stageupdate/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [349ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.stageupdate-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/stageupdate/bindings`: errno=28/No space left on device
+2026-10-09T03:22:17Z [349ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.stageupdate-107.3.26+107.3.3.lx64.r.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [350ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-10-09T03:22:17Z [350ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.physx-107.3.26+107.3.3.lx64.r.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:17Z [350ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.physx-107.3.26+107.3.3.lx64.r.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [350ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.physx-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics`: errno=28/No space left on device
+2026-10-09T03:22:17Z [350ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.physx-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/physx`: errno=28/No space left on device
+2026-10-09T03:22:17Z [350ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.physx-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/physx/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [350ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.physx-107.3.26+107.3.3.lx64.r.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [353ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.tensors-107.3.26+107.3.3.lx64.r.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:17Z [353ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.tensors-107.3.26+107.3.3.lx64.r.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [353ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.tensors-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics`: errno=28/No space left on device
+2026-10-09T03:22:17Z [353ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.tensors-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/tensors`: errno=28/No space left on device
+2026-10-09T03:22:17Z [353ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.tensors-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/tensors/impl`: errno=28/No space left on device
+2026-10-09T03:22:17Z [353ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.tensors-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physics/tensors/bindings`: errno=28/No space left on device
+2026-10-09T03:22:17Z [353ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physics.tensors-107.3.26+107.3.3.lx64.r.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [355ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+2026-10-09T03:22:17Z [355ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extsDeprecated/omni.isaac.dynamic_control`: errno=28/No space left on device
+2026-10-09T03:22:17Z [355ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extsDeprecated/omni.isaac.dynamic_control/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [355ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extsDeprecated/omni.isaac.dynamic_control/omni/isaac`: errno=28/No space left on device
+2026-10-09T03:22:17Z [355ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extsDeprecated/omni.isaac.dynamic_control/omni/isaac/dynamic_control`: errno=28/No space left on device
+2026-10-09T03:22:17Z [355ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extsDeprecated/omni.isaac.dynamic_control/omni/isaac/dynamic_control/scripts`: errno=28/No space left on device
+2026-10-09T03:22:17Z [355ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extsDeprecated/omni.isaac.dynamic_control/omni/isaac/dynamic_control/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [355ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extsDeprecated/omni.isaac.dynamic_control/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [356ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.deprecation_manager`: errno=28/No space left on device
+2026-10-09T03:22:17Z [356ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.deprecation_manager/isaacsim`: errno=28/No space left on device
+2026-10-09T03:22:17Z [356ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.deprecation_manager/isaacsim/core`: errno=28/No space left on device
+2026-10-09T03:22:17Z [356ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.deprecation_manager/isaacsim/core/deprecation_manager`: errno=28/No space left on device
+2026-10-09T03:22:17Z [356ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.deprecation_manager/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [358ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler-107.3.1+107.3.0.lx64.r.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:17Z [358ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler-107.3.1+107.3.0.lx64.r.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:17Z [358ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler-107.3.1+107.3.0.lx64.r.cp311.u353/omni/metrics`: errno=28/No space left on device
+2026-10-09T03:22:17Z [358ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler-107.3.1+107.3.0.lx64.r.cp311.u353/omni/metrics/assembler`: errno=28/No space left on device
+2026-10-09T03:22:17Z [358ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler-107.3.1+107.3.0.lx64.r.cp311.u353/omni/metrics/assembler/core`: errno=28/No space left on device
+2026-10-09T03:22:17Z [358ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler-107.3.1+107.3.0.lx64.r.cp311.u353/omni/metrics/assembler/core/scripts`: errno=28/No space left on device
+2026-10-09T03:22:17Z [358ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler-107.3.1+107.3.0.lx64.r.cp311.u353/omni/metrics/assembler/core/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [358ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler-107.3.1+107.3.0.lx64.r.cp311.u353/omni/metrics/assembler/core/bindings`: errno=28/No space left on device
+2026-10-09T03:22:17Z [358ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.version`: errno=28/No space left on device
+2026-10-09T03:22:17Z [358ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler-107.3.1+107.3.0.lx64.r.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:17Z [358ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.version/isaacsim`: errno=28/No space left on device
+2026-10-09T03:22:17Z [359ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.version/isaacsim/core`: errno=28/No space left on device
+2026-10-09T03:22:17Z [359ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.version/isaacsim/core/version`: errno=28/No space left on device
+2026-10-09T03:22:17Z [359ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.version/isaacsim/core/version/tests`: errno=28/No space left on device
+2026-10-09T03:22:17Z [359ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.version/config`: errno=28/No space left on device
+2026-10-09T03:22:18Z [454ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64`: errno=28/No space left on device
+2026-10-09T03:22:18Z [454ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/omni`: errno=28/No space left on device
+2026-10-09T03:22:18Z [454ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/omni/warp`: errno=28/No space left on device
+2026-10-09T03:22:18Z [454ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/omni/warp/core`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/omni/warp/core/_impl`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/omni/warp/core/tests`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/thirdparty`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/native`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/native/nanovdb`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/native/nanovdb/util`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/native/nanovdb/util/cuda`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/native/nanovdb/tools`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/native/nanovdb/tools/cuda`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.physics-107.3.26+107.3.3.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/native/nanovdb/cuda`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/native/nanovdb/math`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.physics-107.3.26+107.3.3.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.physics-107.3.26+107.3.3.cp311.u353/omni/metrics`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/native/clang`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.physics-107.3.26+107.3.3.cp311.u353/omni/metrics/assembler`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/native/libdevice`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.physics-107.3.26+107.3.3.cp311.u353/omni/metrics/assembler/physics`: errno=28/No space left on device
+2026-10-09T03:22:18Z [455ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/render`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.physics-107.3.26+107.3.3.cp311.u353/omni/metrics/assembler/physics/tests`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/sim`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.physics-107.3.26+107.3.3.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/jax_experimental`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/tests`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/tests/geometry`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/tests/interop`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/tests/assets`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.storage.native`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/tests/sim`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.storage.native/isaacsim`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.storage.native/isaacsim/storage`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/tests/cuda`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.storage.native/isaacsim/storage/native`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.storage.native/isaacsim/storage/native/impl`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/tests/tile`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.storage.native/isaacsim/storage/native/tests`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.storage.native/config`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/examples`: errno=28/No space left on device
+2026-10-09T03:22:18Z [456ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/examples/core`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/examples/benchmarks`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/examples/interop`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/examples/assets`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/examples/sim`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/examples/distributed`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/examples/tile`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/examples/optim`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/examples/fem`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/optim`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/bin`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/fem`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/fem/geometry`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/fem/quadrature`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/fem/space`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/fem/space/shape`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/warp/fem/field`: errno=28/No space left on device
+2026-10-09T03:22:18Z [457ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.warp.core-1.8.2+lx64/config`: errno=28/No space left on device
+2026-10-09T03:22:18Z [458ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.utils`: errno=28/No space left on device
+2026-10-09T03:22:18Z [458ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.utils/isaacsim`: errno=28/No space left on device
+2026-10-09T03:22:18Z [458ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.utils/isaacsim/core`: errno=28/No space left on device
+2026-10-09T03:22:18Z [458ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.utils/isaacsim/core/utils`: errno=28/No space left on device
+2026-10-09T03:22:18Z [458ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.utils/isaacsim/core/utils/torch`: errno=28/No space left on device
+2026-10-09T03:22:18Z [458ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.utils/isaacsim/core/utils/numpy`: errno=28/No space left on device
+2026-10-09T03:22:18Z [458ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.utils/isaacsim/core/utils/tests`: errno=28/No space left on device
+2026-10-09T03:22:18Z [458ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_template.core-1.1.22+69cbf6ad`: errno=28/No space left on device
+2026-10-09T03:22:18Z [458ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_template.core-1.1.22+69cbf6ad/omni`: errno=28/No space left on device
+2026-10-09T03:22:18Z [458ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.utils/isaacsim/core/utils/warp`: errno=28/No space left on device
+2026-10-09T03:22:18Z [458ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.utils/config`: errno=28/No space left on device
+2026-10-09T03:22:18Z [458ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_template.core-1.1.22+69cbf6ad/omni/kit`: errno=28/No space left on device
+2026-10-09T03:22:18Z [459ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_template.core-1.1.22+69cbf6ad/omni/kit/stage_template`: errno=28/No space left on device
+2026-10-09T03:22:18Z [459ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_template.core-1.1.22+69cbf6ad/omni/kit/stage_template/core`: errno=28/No space left on device
+2026-10-09T03:22:18Z [459ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_template.core-1.1.22+69cbf6ad/omni/kit/stage_template/core/tests`: errno=28/No space left on device
+2026-10-09T03:22:18Z [459ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_template.core-1.1.22+69cbf6ad/config`: errno=28/No space left on device
+2026-10-09T03:22:19Z [1,705ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.primitive.mesh-1.0.17+69cbf6ad`: errno=28/No space left on device
+2026-10-09T03:22:19Z [1,706ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.primitive.mesh-1.0.17+69cbf6ad/omni`: errno=28/No space left on device
+2026-10-09T03:22:19Z [1,706ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.primitive.mesh-1.0.17+69cbf6ad/omni/kit`: errno=28/No space left on device
+2026-10-09T03:22:19Z [1,706ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.primitive.mesh-1.0.17+69cbf6ad/omni/kit/primitive`: errno=28/No space left on device
+2026-10-09T03:22:19Z [1,706ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.primitive.mesh-1.0.17+69cbf6ad/omni/kit/primitive/mesh`: errno=28/No space left on device
+2026-10-09T03:22:19Z [1,706ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.primitive.mesh-1.0.17+69cbf6ad/omni/kit/primitive/mesh/evaluators`: errno=28/No space left on device
+2026-10-09T03:22:19Z [1,706ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.primitive.mesh-1.0.17+69cbf6ad/omni/kit/primitive/mesh/tests`: errno=28/No space left on device
+2026-10-09T03:22:19Z [1,707ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.primitive.mesh-1.0.17+69cbf6ad/config`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,761ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.simulation_manager`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,761ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.simulation_manager/isaacsim`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,761ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.simulation_manager/isaacsim/core`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,761ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.simulation_manager/isaacsim/core/simulation_manager`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,761ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.simulation_manager/isaacsim/core/simulation_manager/impl`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,761ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.simulation_manager/isaacsim/core/simulation_manager/tests`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,761ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.simulation_manager/config`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,762ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_templates-2.0.0+69cbf6ad`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,762ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_templates-2.0.0+69cbf6ad/omni`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,762ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_templates-2.0.0+69cbf6ad/omni/kit`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,762ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_templates-2.0.0+69cbf6ad/omni/kit/stage_templates`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,762ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_templates-2.0.0+69cbf6ad/omni/kit/stage_templates/tests`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,762ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_templates-2.0.0+69cbf6ad/omni/kit/stage_templates/templates`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,762ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.kit.stage_templates-2.0.0+69cbf6ad/config`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,775ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.prims`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,775ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.prims/isaacsim`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,775ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.prims/isaacsim/core`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,775ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.prims/isaacsim/core/prims`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,775ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.prims/isaacsim/core/prims/impl`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,775ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.prims/isaacsim/core/prims/tests`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,775ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.prims/config`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,779ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,779ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,779ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,779ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,779ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/world`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,779ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/loggers`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,779ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/sensors`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/tasks`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/tests`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/tests/data`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/objects`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/controllers`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/robots`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/physics_context`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/scenes`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/materials`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/articulations`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/isaacsim/core/api/simulation_context`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.api/config`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.ui-107.3.1+107.3.0.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.ui-107.3.1+107.3.0.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.ui-107.3.1+107.3.0.cp311.u353/omni/metrics`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.ui-107.3.1+107.3.0.cp311.u353/omni/metrics/assembler`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.ui-107.3.1+107.3.0.cp311.u353/omni/metrics/assembler/ui`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.ui-107.3.1+107.3.0.cp311.u353/omni/metrics/assembler/ui/tests`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,780ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.usd.metrics.assembler.ui-107.3.1+107.3.0.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,782ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/omni.kit.loop-isaac`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,784ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/omni.kit.loop-isaac/omni`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,784ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.cloner`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,784ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/omni.kit.loop-isaac/omni/kit`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,784ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.fabric-107.3.26+107.3.3.lx64.r.cp311.u353`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,784ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/omni.kit.loop-isaac/omni/kit/loop`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,784ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.fabric-107.3.26+107.3.3.lx64.r.cp311.u353/omni`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,784ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.cloner/isaacsim`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,785ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.fabric-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxfabric`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,785ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/omni.kit.loop-isaac/omni/kit/loop/tests`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,785ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.fabric-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxfabric/scripts`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,785ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/omni.kit.loop-isaac/config`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,785ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.fabric-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxfabric/tests`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,785ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.cloner/isaacsim/core`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,785ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.fabric-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxfabric/bindings`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,785ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.cloner/isaacsim/core/cloner`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,785ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/extscache/omni.physx.fabric-107.3.26+107.3.3.lx64.r.cp311.u353/config`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,785ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.cloner/isaacsim/core/cloner/impl`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,785ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.cloner/isaacsim/core/cloner/tests`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,785ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.cloner/isaacsim/core/cloner/tests/data`: errno=28/No space left on device
+2026-10-09T03:22:20Z [2,785ms] [Error] [carb] Failed to create change watch for `/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/isaacsim/exts/isaacsim.core.cloner/config`: errno=28/No space left on device
+MESA: warning: Driver does not support the 0x7d67 PCI ID.
+MESA: warning: Driver does not support the 0x7d67 PCI ID.
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/ubuntu/xyproject/m20_wzh/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO]: Parsing configuration from: rl_training.tasks.manager_based.locomotion.velocity.config.wheeled.deeprobotics_m20.stair_teacher_env_cfg:DeeproboticsM20StairTeacherEnvCfg
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-10-09_11-22-23.log[0m
+[36m======================================================================================[0m
+
+[33m11:22:23 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 42
+	Physics step-size     : 0.005
+	Rendering step-size   : 0.02
+	Environment step-size : 0.02
+[INFO] Generating terrains based on curriculum took : 0.375041 seconds
+[INFO]: Time taken for scene creation : 0.549368 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 16
+	Environment spacing   : 2.5
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : ['/World/ground']
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+[INFO]: Time taken for simulation start : 0.455524 seconds
+[INFO] Command Manager:  <CommandManager> contains 1 active terms.
++-----------------------------------------------------+
+|                 Active Command Terms                |
++-------+---------------+-----------------------------+
+| Index | Name          |             Type            |
++-------+---------------+-----------------------------+
+|   0   | base_velocity | StairTeacherVelocityCommand |
++-------+---------------+-----------------------------+
+
+[INFO] Event Manager:  <EventManager> contains 3 active terms.
++----------------------------------------+
+| Active Event Terms in Mode: 'startup'  |
++-------+--------------------------------+
+| Index | Name                           |
++-------+--------------------------------+
+|   0   | randomize_rigid_body_material  |
+|   1   | randomize_rigid_body_mass      |
+|   2   | randomize_rigid_body_mass_base |
+|   3   | randomize_rigid_body_inertia   |
+|   4   | randomize_com_positions        |
++-------+--------------------------------+
++-----------------------------------------------+
+|      Active Event Terms in Mode: 'reset'      |
++-------+---------------------------------------+
+| Index | Name                                  |
++-------+---------------------------------------+
+|   0   | randomize_apply_external_force_torque |
+|   1   | randomize_reset_joints                |
+|   2   | randomize_actuator_gains              |
+|   3   | randomize_reset_base                  |
++-------+---------------------------------------+
++--------------------------------------------------------+
+|         Active Event Terms in Mode: 'interval'         |
++-------+----------------------+-------------------------+
+| Index | Name                 | Interval time range (s) |
++-------+----------------------+-------------------------+
+|   0   | randomize_push_robot |       (10.0, 15.0)      |
++-------+----------------------+-------------------------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 2 active terms.
++------------------------------------+
+|  Active Action Terms (shape: 16)   |
++--------+-------------+-------------+
+| Index  | Name        |   Dimension |
++--------+-------------+-------------+
+|   0    | joint_pos   |          12 |
+|   1    | joint_vel   |           4 |
++--------+-------------+-------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 2 groups.
++----------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (244,)) |
++-----------+--------------------------------+-------------+
+|   Index   | Name                           |    Shape    |
++-----------+--------------------------------+-------------+
+|     0     | base_ang_vel                   |     (3,)    |
+|     1     | projected_gravity              |     (3,)    |
+|     2     | velocity_commands              |     (3,)    |
+|     3     | joint_pos                      |    (16,)    |
+|     4     | joint_vel                      |    (16,)    |
+|     5     | actions                        |    (16,)    |
+|     6     | height_scan                    |    (187,)   |
++-----------+--------------------------------+-------------+
++--------------------------------------------------------------+
+| Active Observation Terms in Group: 'critic' (shape: (285,))  |
++---------+-----------------------------------------+----------+
+|  Index  | Name                                    |  Shape   |
++---------+-----------------------------------------+----------+
+|    0    | base_lin_vel                            |   (3,)   |
+|    1    | base_ang_vel                            |   (3,)   |
+|    2    | projected_gravity                       |   (3,)   |
+|    3    | velocity_commands                       |   (3,)   |
+|    4    | joint_pos                               |  (16,)   |
+|    5    | joint_vel                               |  (16,)   |
+|    6    | actions                                 |  (16,)   |
+|    7    | height_scan                             |  (187,)  |
+|    8    | joint_acceleration                      |  (16,)   |
+|    9    | applied_torque                          |  (16,)   |
+|    10   | wheel_contact_force_magnitude           |   (4,)   |
+|    11   | material_friction                       |   (2,)   |
++---------+-----------------------------------------+----------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 3 active terms.
++------------------------------------------+
+|         Active Termination Terms         |
++-------+-----------------------+----------+
+| Index | Name                  | Time Out |
++-------+-----------------------+----------+
+|   0   | time_out              |   True   |
+|   1   | terrain_out_of_bounds |   True   |
+|   2   | bad_orientation_2     |  False   |
++-------+-----------------------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 55 active terms.
++-----------------------------------------------------------+
+|                    Active Reward Terms                    |
++-------+----------------------------------------+----------+
+| Index | Name                                   |   Weight |
++-------+----------------------------------------+----------+
+|   0   | lin_vel_z_l2                           |     -2.0 |
+|   1   | ang_vel_xy_l2                          |    -0.02 |
+|   2   | joint_torques_l2                       | -2.5e-05 |
+|   3   | joint_acc_l2                           |   -2e-07 |
+|   4   | hipx_joint_pos_penalty                 |     -3.0 |
+|   5   | hipy_joint_pos_penalty                 |     -1.5 |
+|   6   | knee_joint_pos_penalty                 |    -0.75 |
+|   7   | joint_mirror                           |    -0.03 |
+|   8   | action_rate_l2                         |    -0.01 |
+|   9   | action_smooth_l2                       |   -0.025 |
+|   10  | undesired_contacts                     |     -1.0 |
+|   11  | contact_forces                         | -0.00015 |
+|   12  | track_lin_vel_xy_exp                   |      5.0 |
+|   13  | track_ang_vel_z_exp                    |      3.0 |
+|   14  | feet_air_time_ang_z_M20                |     50.0 |
+|   15  | feet_slide_ang_z_cmd                   |     -2.0 |
+|   16  | stand_still                            |     -1.0 |
+|   17  | rotation_gait_status                   |      1.0 |
+|   18  | rotation_gait_symmetry                 |      2.0 |
+|   19  | bad_orientation_penalty                |  -1000.0 |
+|   20  | joint_acc_wheel_l2                     |   -1e-07 |
+|   21  | stair_orientation_cost                 |     -1.0 |
+|   22  | stair_forward_progress                 |      1.0 |
+|   23  | stair_front_wheel_lift                 |      0.5 |
+|   24  | stair_forward_motion_cost              |     -2.0 |
+|   25  | stair_ascent_direction_cost            |     -1.0 |
+|   26  | stair_front_wheel_touchdown            |     0.25 |
+|   27  | stair_front_single_support             |      0.1 |
+|   28  | stair_diagonal_support_symmetry        |     0.05 |
+|   29  | stair_front_alternation                |     0.25 |
+|   30  | stair_up_step_completion               |      3.0 |
+|   31  | stair_up_task_crossing                 |      2.0 |
+|   32  | stair_up_rear_step_completion          |      3.0 |
+|   33  | stair_rear_wheel_lift                  |      0.5 |
+|   34  | stair_rear_transition_recovery         |      1.0 |
+|   35  | stair_rear_style_refund                |     -1.0 |
+|   36  | stair_descent_rear_forward_cost        |     -2.0 |
+|   37  | stair_descent_entry_retract            |     0.75 |
+|   38  | stair_descent_entry_position_cost      |     -1.0 |
+|   39  | stair_ascent_front_body_clearance_cost |     -1.0 |
+|   40  | stair_up_order_violation_cost          |     -0.5 |
+|   41  | stair_up_same_tread_cost               |     -1.5 |
+|   42  | stair_up_same_tread_dwell_cost         |     -0.2 |
+|   43  | stair_descent_rear_fold_cost           |     -1.0 |
+|   44  | stair_ascent_front_fold_cost           |     -1.0 |
+|   45  | turn_swing_size_cost                   |     -1.0 |
+|   46  | stair_down_step_completion             |      3.0 |
+|   47  | stair_front_riser_face_cost            |     -0.5 |
+|   48  | stair_descent_rear_support             |     0.35 |
+|   49  | stair_impact_cost                      |     -0.2 |
+|   50  | stair_non_wheel_contact_cost           |     -0.2 |
+|   51  | stair_non_wheel_scrape_cost            |     -0.1 |
+|   52  | stair_joint_effort_cost                |     -0.1 |
+|   53  | stair_joint_acceleration_cost          |    -0.02 |
+|   54  | stair_mechanical_power_cost            |     -0.1 |
++-------+----------------------------------------+----------+
+/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/rsl_rl/utils/utils.py:220: UserWarning: The observation configuration dictionary 'obs_groups' is empty and thus likely not configured. Consider configuring the 'obs_groups' dictionary explicitly
+  warnings.warn(
+/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/rsl_rl/utils/utils.py:251: UserWarning: The observation configuration dictionary 'obs_groups' does not contain the 'actor' key. As an observation group with the name 'policy' was found, this is assumed to be the appropriate observation. Consider adding the 'actor' key to the 'obs_groups' dictionary for clarity. This behavior will be removed in a future version.
+  warnings.warn(
+/home/ubuntu/miniconda3/envs/m20_wzh/lib/python3.11/site-packages/rsl_rl/utils/utils.py:243: UserWarning: The observation configuration dictionary 'obs_groups' does not contain the 'critic' key. As an observation group with the name 'critic' was found, this is assumed to be the appropriate observation. Consider adding the 'critic' key to the 'obs_groups' dictionary for clarity. This behavior will be removed in a future version.
+  warnings.warn(
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 13 active terms.
++--------------------------------------------+
+|          Active Curriculum Terms           |
++-------+------------------------------------+
+| Index | Name                               |
++-------+------------------------------------+
+|   0   | terrain_levels                     |
+|   1   | gait_level                         |
+|   2   | step_completion                    |
+|   3   | gait_quality                       |
+|   4   | ascent_direction                   |
+|   5   | terrain_level_overall              |
+|   6   | terrain_level_pyramid_stairs       |
+|   7   | terrain_level_pyramid_stairs_inv   |
+|   8   | terrain_level_boxes                |
+|   9   | terrain_level_random_rough         |
+|   10  | terrain_level_hf_pyramid_slope     |
+|   11  | terrain_level_hf_pyramid_slope_inv |
+|   12  | terrain_level_flat                 |
++-------+------------------------------------+
+
+[INFO]: Completed setting up the environment...
+[INFO]: Parsing configuration from: rl_training.tasks.manager_based.locomotion.velocity.config.wheeled.deeprobotics_m20.agents.stair_teacher_ppo_cfg:DeeproboticsM20StairTeacherPPORunnerCfg
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ['policy']
+	 critic :  ['critic']
+--------------------------------------------------------------------------------
+Actor Model: MLPModel(
+  (obs_normalizer): Identity()
+  (distribution): GaussianDistribution()
+  (mlp): MLP(
+    (0): Linear(in_features=244, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=16, bias=True)
+  )
+)
+Critic Model: MLPModel(
+  (obs_normalizer): Identity()
+  (mlp): MLP(
+    (0): Linear(in_features=285, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=1, bias=True)
+  )
+)
+STAIR_SMOKE_RUNNER_OK
+STAIR_SMOKE_ACTOR_LOADED
+STAIR_SMOKE_RESET_OK
+STAIR_SMOKE_PROGRESS=25/100
+STAIR_SMOKE_PROGRESS=50/100
+STAIR_SMOKE_PROGRESS=75/100
+STAIR_SMOKE_PROGRESS=100/100
+STAIR_SMOKE_RESULT={"steps": 100, "num_envs": 16, "trained": false, "actor_checkpoint": "logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-09_01-55-35_gait_fix_descent_entry/model_214400.pt", "observation_shapes": {"policy": [16, 244], "critic": [16, 285]}, "finite": true, "mean_return": 14.639474302530289, "targets_started": 2.0, "front_lift_credit": 1.0098564624786377, "observed_risers": 2, "nominal_radius_finite_fraction": 1.0, "calibrated_wheel_fraction": 1.0, "unified_reward_modules": {"stair_up_step_completion": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_up_rear_step_completion": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_descent_rear_fold_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_ascent_front_fold_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_ascent_direction_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_rear_wheel_lift": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_descent_rear_forward_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "stair_ascent_front_body_clearance_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "turn_swing_size_cost": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "rotation_gait_status": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher", "feet_air_time_ang_z_M20": "rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_teacher"}, "legacy_aliases_identical": true, "active_reward_weights": {"lin_vel_z_l2": -2.0, "ang_vel_xy_l2": -0.02, "joint_torques_l2": -2.5e-05, "joint_acc_l2": -2e-07, "hipx_joint_pos_penalty": -3.0, "hipy_joint_pos_penalty": -1.5, "knee_joint_pos_penalty": -0.75, "joint_mirror": -0.03, "action_rate_l2": -0.01, "action_smooth_l2": -0.025, "undesired_contacts": -1.0, "contact_forces": -0.00015, "track_lin_vel_xy_exp": 5.0, "track_ang_vel_z_exp": 3.0, "feet_air_time_ang_z_M20": 50.0, "feet_slide_ang_z_cmd": -2.0, "stand_still": -1.0, "rotation_gait_status": 1.0, "rotation_gait_symmetry": 2.0, "bad_orientation_penalty": -1000.0, "joint_acc_wheel_l2": -1e-07, "stair_orientation_cost": -1.0, "stair_forward_progress": 1.0, "stair_front_wheel_lift": 0.5, "stair_forward_motion_cost": -2.0, "stair_ascent_direction_cost": -1.0, "stair_front_wheel_touchdown": 0.25, "stair_front_single_support": 0.1, "stair_diagonal_support_symmetry": 0.05, "stair_front_alternation": 0.25, "stair_up_step_completion": 3.0, "stair_up_task_crossing": 2.0, "stair_up_rear_step_completion": 3.0, "stair_rear_wheel_lift": 0.5, "stair_rear_transition_recovery": 1.0, "stair_rear_style_refund": -1.0, "stair_descent_rear_forward_cost": -2.0, "stair_descent_entry_retract": 0.75, "stair_descent_entry_position_cost": -1.0, "stair_ascent_front_body_clearance_cost": -1.0, "stair_up_order_violation_cost": -0.5, "stair_up_same_tread_cost": -1.5, "stair_up_same_tread_dwell_cost": -0.2, "stair_descent_rear_fold_cost": -1.0, "stair_ascent_front_fold_cost": -1.0, "turn_swing_size_cost": -1.0, "stair_down_step_completion": 3.0, "stair_front_riser_face_cost": -0.5, "stair_descent_rear_support": 0.35, "stair_impact_cost": -0.2, "stair_non_wheel_contact_cost": -0.2, "stair_non_wheel_scrape_cost": -0.1, "stair_joint_effort_cost": -0.1, "stair_joint_acceleration_cost": -0.02, "stair_mechanical_power_cost": -0.1}, "resolved_gait_entities": {"stair_descent_rear_fold_cost": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "stair_ascent_front_fold_cost": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "stair_ascent_direction_cost": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "stair_rear_wheel_lift": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "stair_descent_rear_forward_cost": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "stair_ascent_front_body_clearance_cost": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "turn_swing_size_cost": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "rotation_gait_status": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}, "track_lin_vel_xy_exp": {"asset_cfg": {"bodies": [13, 14, 15, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}, "hip_cfg": {"bodies": [5, 6, 7, 8], "joints": null, "resolved_body_names": ["fl_hipy", "fr_hipy", "hl_hipy", "hr_hipy"], "resolved_joint_names": null}, "knee_cfg": {"bodies": null, "joints": [8, 9, 10, 11], "resolved_body_names": null, "resolved_joint_names": ["fl_knee_joint", "fr_knee_joint", "hl_knee_joint", "hr_knee_joint"]}, "sensor_cfg": {"bodies": null, "joints": null, "resolved_body_names": null, "resolved_joint_names": null}, "contact_sensor_cfg": {"bodies": [4, 8, 12, 16], "joints": null, "resolved_body_names": ["fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel"], "resolved_joint_names": null}}}, "reward_abs_peaks": {"lin_vel_z_l2": 0.21837572753429413, "ang_vel_xy_l2": 0.06312374025583267, "joint_torques_l2": 0.0, "joint_acc_l2": 1.233697533607483, "hipx_joint_pos_penalty": 0.3744082748889923, "hipy_joint_pos_penalty": 0.2566630244255066, "knee_joint_pos_penalty": 0.539395272731781, "joint_mirror": 0.0, "action_rate_l2": 0.0, "action_smooth_l2": 0.0, "undesired_contacts": 0.0, "contact_forces": 0.0, "track_lin_vel_xy_exp": 4.999997615814209, "track_ang_vel_z_exp": 3.0, "feet_air_time_ang_z_M20": 0.0, "feet_slide_ang_z_cmd": 0.0, "stand_still": 0.7854042649269104, "rotation_gait_status": 0.0, "rotation_gait_symmetry": 0.0, "bad_orientation_penalty": 0.0, "joint_acc_wheel_l2": 2.795452833175659, "stair_orientation_cost": 0.20613963901996613, "stair_forward_progress": 0.681307315826416, "stair_front_wheel_lift": 18.486337661743164, "stair_forward_motion_cost": 0.04847359657287598, "stair_ascent_direction_cost": 0.03962518647313118, "stair_front_wheel_touchdown": 0.0, "stair_front_single_support": 0.0681307315826416, "stair_diagonal_support_symmetry": 0.0340653657913208, "stair_front_alternation": 0.0, "stair_up_step_completion": 0.0, "stair_up_task_crossing": 0.0, "stair_up_rear_step_completion": 0.0, "stair_rear_wheel_lift": 0.0, "stair_rear_transition_recovery": 0.0, "stair_rear_style_refund": 0.0, "stair_descent_rear_forward_cost": 0.0, "stair_descent_entry_retract": 0.0, "stair_descent_entry_position_cost": 0.0, "stair_ascent_front_body_clearance_cost": 0.0, "stair_up_order_violation_cost": 0.0, "stair_up_same_tread_cost": 0.0, "stair_up_same_tread_dwell_cost": 0.0, "stair_descent_rear_fold_cost": 0.0, "stair_ascent_front_fold_cost": 0.0, "turn_swing_size_cost": 0.0, "stair_down_step_completion": 0.0, "stair_front_riser_face_cost": 0.0, "stair_descent_rear_support": 0.0, "stair_impact_cost": 0.0, "stair_non_wheel_contact_cost": 0.0, "stair_non_wheel_scrape_cost": 0.0, "stair_joint_effort_cost": 0.007110842037945986, "stair_joint_acceleration_cost": 0.019999999552965164, "stair_mechanical_power_cost": 0.0012921885354444385}, "gait_metrics": {"turn_samples": 800.0, "descent_samples": 0.0, "rear_support_samples": 0.0, "turn_clearance_mean_m": 0.003923037555068731, "turn_reach_mean_m": 0.15908282995224, "turn_yaw_error_mean": 0.1205701157450676, "rear_extension_mean_m": 0.0, "rear_fold_support_fraction": 0.0, "ascent_samples": 15.0, "front_support_samples": 14.0, "front_extension_mean_m": 0.4962596893310547, "front_knee_abs_mean_rad": 0.6689977049827576, "front_fold_support_fraction": 0.0, "front_swing_samples": 16.0, "front_extreme_swing_fold_fraction": 0.0, "front_loaded_a_mean_deg": 141.6692657470703, "front_loaded_a_low_fraction": 0.0, "front_loaded_a_min_deg": 128.67735290527344, "fl_loaded_samples": 4.0, "fl_loaded_a_mean_deg": 129.54222106933594, "fl_loaded_a_low_fraction": 0.0, "fr_loaded_samples": 10.0, "fr_loaded_a_mean_deg": 146.52008056640625, "fr_loaded_a_low_fraction": 0.0, "front_swing_a_mean_deg": 112.06138610839844, "front_swing_a_low_fraction": 0.0, "front_swing_a_min_deg": 91.01300811767578, "fl_swing_samples": 11.0, "fl_swing_a_mean_deg": 102.41715240478516, "fl_swing_a_low_fraction": 0.0, "fr_swing_samples": 5.0, "fr_swing_a_mean_deg": 133.2786865234375, "fr_swing_a_low_fraction": 0.0, "rear_forward_samples": 0.0, "rear_forward_excess_fraction": 0.0, "rear_body_b_mean_deg": 0.0, "rear_gravity_g_mean_deg": 0.0, "rear_b_max_deg": 0.0, "rear_g_max_deg": 0.0, "hl_loaded_samples": 0.0, "hl_body_b_mean_deg": 0.0, "hl_gravity_g_mean_deg": 0.0, "hl_forward_excess_fraction": 0.0, "hr_loaded_samples": 0.0, "hr_body_b_mean_deg": 0.0, "hr_gravity_g_mean_deg": 0.0, "hr_forward_excess_fraction": 0.0, "rear_entry_samples": 0.0, "rear_entry_b_mean_deg": 0.0, "rear_entry_g_mean_deg": 0.0, "front_body_gap_samples": 15.0, "front_body_gap_mean_m": 0.49724164605140686, "front_body_gap_low_fraction": 0.0, "loaded_without_local_map_samples": 0.0, "rear_swing_samples": 0.0, "rear_swing_excess_fraction": 0.0, "rear_swing_b_positive_mean_deg": 0.0, "rear_swing_b_max_deg": 0.0, "rear_swing_g_positive_mean_deg": 0.0, "rear_swing_g_max_deg": 0.0, "hl_swing_excess_fraction": 0.0, "hr_swing_excess_fraction": 0.0, "hl_loaded_b_p95_upper_deg": 0.0, "hr_loaded_b_p95_upper_deg": 0.0, "hl_loaded_g_p95_upper_deg": 0.0, "hr_loaded_g_p95_upper_deg": 0.0, "hl_swing_b_p95_upper_deg": 0.0, "hr_swing_b_p95_upper_deg": 0.0, "hl_swing_g_p95_upper_deg": 0.0, "hr_swing_g_p95_upper_deg": 0.0, "descent_entry_started": 0.0, "hl_entry_samples": 0.0, "hl_entry_x_mean_m": 0.0, "hl_entry_in_band_fraction": 0.0, "hl_entry_too_forward_fraction": 0.0, "hl_entry_too_rearward_fraction": 0.0, "hl_entry_retract_credit": 0.0, "hl_entry_blocked_fraction": 0.0, "hl_entry_transfer_samples": 0.0, "hl_entry_transfer_excess_fraction": 0.0, "hl_entry_transfer_swing_fraction": 0.0, "hl_entry_transfer_cost_mean": 0.0, "hl_entry_transfer_compact_fraction": 0.0, "hr_entry_samples": 0.0, "hr_entry_x_mean_m": 0.0, "hr_entry_in_band_fraction": 0.0, "hr_entry_too_forward_fraction": 0.0, "hr_entry_too_rearward_fraction": 0.0, "hr_entry_retract_credit": 0.0, "hr_entry_blocked_fraction": 0.0, "hr_entry_transfer_samples": 0.0, "hr_entry_transfer_excess_fraction": 0.0, "hr_entry_transfer_swing_fraction": 0.0, "hr_entry_transfer_cost_mean": 0.0, "hr_entry_transfer_compact_fraction": 0.0}, "ascent_direction_metrics": {"samples": 15.0, "lateral_error_mean_m": 0.007260071579366922, "lateral_error_max_m": 0.011233002878725529, "lateral_speed_mean_m_s": 0.045389335602521896, "heading_error_mean_deg": 0.662775456905365, "outside_tolerance_fraction": 0.0, "cost_mean": 0.008531528525054455, "activation_fraction": 0.01875000074505806, "large_error_fraction": 0.0}, "step_metrics": {"up_attempts": 0.0625, "up_successes": 0.0625, "up_success_rate": 1.0, "up_rear_successes": 0.0, "up_front_violations": 0.0, "up_rear_violations": 0.0, "up_front_same_tread_events": 0.0, "up_front_same_tread_dwell_s": 0.0, "up_rear_same_tread_events": 0.0, "up_rear_same_tread_dwell_s": 0.0, "up_targets_started": 0.125, "up_lift_credit": 0.06311602890491486, "up_retries": 0.0, "up_abandoned_targets": 0.0, "up_retreat_fraction": 0.0, "up_stationary_fraction": 0.0, "down_attempts": 0.0, "down_successes": 0.0, "down_success_rate": 0.0, "forward_gate_fraction": 0.00937500037252903, "nearby_gate_fraction": 0.00937500037252903, "registered_risers": 0.125, "up_whole_body_crossings": 0.0, "up_whole_body_crossing_coverage": 0.0, "up_front_registered_intermediate_risers": 0.0, "up_front_landing_coverage": 0.5, "up_front_strict_coverage": 0.0, "up_front_physical_landings": 0.0625, "up_front_transition_successes": 0.0, "up_front_transition_per_landing": 0.0, "up_front_skipped_riser_events": 0.0, "up_front_unsafe_events": 0.0, "up_front_skip_fraction": 0.0, "up_front_visited_intermediate_risers": 0.0, "up_front_same_tread_fraction": 0.0, "up_front_longest_strict_run": 0.0, "up_front_six_step_strict_fraction": 0.0, "fl_stable_treads": 0.0625, "fr_stable_treads": 0.0, "up_rear_registered_intermediate_risers": 0.0, "up_rear_landing_coverage": 0.0, "up_rear_strict_coverage": 0.0, "up_rear_physical_landings": 0.0, "up_rear_transition_successes": 0.0, "up_rear_transition_per_landing": 0.0, "up_rear_skipped_riser_events": 0.0, "up_rear_unsafe_events": 0.0, "up_rear_skip_fraction": 0.0, "up_rear_visited_intermediate_risers": 0.0, "up_rear_same_tread_fraction": 0.0, "up_rear_longest_strict_run": 0.0, "up_rear_six_step_strict_fraction": 0.0, "hl_stable_treads": 0.0, "hr_stable_treads": 0.0, "up_rear_lift_credit": 0.0, "up_rear_prep_blocked_gain": 7.816140714567155e-05, "up_rear_recovery_events": 0.0, "up_rear_style_refund": 0.0, "up_rear_recovery_per_landing": 0.0}, "gait_tuning": {"translation_threshold": 0.1, "yaw_threshold": 0.1, "turn_posture_scale": 0.2, "air_min": 0.1, "air_target": 0.2, "air_max": 0.35, "turn_height_flat": 0.08, "turn_height_terrain": 0.16, "turn_reach_flat": 0.22, "turn_reach_terrain": 0.3, "height_scale": 0.08, "reach_scale": 0.1, "rear_min_extension": 0.35, "extension_scale": 0.1, "rear_max_knee": 1.9, "knee_scale": 0.5, "front_min_extension": 0.35, "front_max_knee": 2.0, "front_support_grace": 0.0, "front_fold_weight": -1.0, "front_swing_min_extension": 0.22, "front_swing_max_knee": 2.5, "front_swing_scale": 0.5, "support_grace": 0.12, "same_tread_grace": 0.12, "wheel_radius": 0.09, "nearest_valid_distance": 0.12, "turn_size_weight": -1.0, "rear_fold_weight": -1.0, "same_tread_event_weight": -1.5, "same_tread_dwell_weight": -0.2, "task_crossing_weight": 2.0, "turn_status_weight": 1.0, "turn_symmetry_weight": 2.0, "ascent_direction_weight": -1.0, "direction_lateral_tolerance": 0.1, "direction_lateral_scale": 0.25, "direction_speed_tolerance": 0.05, "direction_speed_scale": 0.2, "direction_heading_tolerance": 0.08726646259971647, "direction_heading_scale": 0.2617993877991494, "direction_velocity_mix": 1.0, "direction_heading_mix": 1.0, "direction_soft_cap": 4.0, "direction_command_change": 0.2617993877991494, "direction_exit_inset": 0.06, "direction_exit_height_tolerance": 0.05, "direction_exit_contact_time": 0.06, "riser_identity_distance": 0.12, "riser_height_tolerance": 0.04, "riser_lateral_corridor": 0.45, "riser_min_spacing": 0.15, "riser_observation_half_width": 0.35, "tread_observation_corridor": 0.8, "riser_max_spacing": 0.5, "riser_cross_clearance": 0.01, "riser_default_half_width": 0.05, "tread_inset": 0.025, "tread_height_tolerance": 0.04, "landing_time": 0.04, "prep_distance": 0.6, "prep_weight": 0.5, "rear_completion_weight": 3.0, "front_touchdown_weight": 0.25, "front_a_support_low_deg": 90.0, "front_a_support_high_deg": 80.0, "front_a_swing_low_deg": 75.0, "front_a_swing_high_deg": 55.0, "pose_low_rise": 0.15, "pose_high_rise": 0.25, "pose_angle_scale": 0.3490658503988659, "pose_length_scale": 0.1, "pose_load_force_scale": 60.0, "rear_b_limit": 0.4363323129985824, "rear_g_limit": 0.3490658503988659, "rear_swing_b_limit": 0.6108652381980153, "rear_swing_g_limit": 0.4363323129985824, "rear_swing_mix": 0.75, "rear_load_floor": 0.5, "rear_target_x_scale": 0.3, "rear_target_z_scale": 0.2, "rear_swing_clearance": 0.04, "rear_swing_target_ceiling": 0.15, "rear_recovery_weight": 1.0, "rear_forward_relax": 0.08726646259971647, "rear_forward_weight": -2.0, "front_swing_min_extension_v3": 0.3, "front_swing_length_high": 0.26, "front_support_length_high": 0.33, "body_gap_target": 0.22, "body_gap_scale": 0.1, "body_bottom_z": -0.07, "body_gap_weight": -1.0, "pose_tracking_discount": 0.0, "pose_phase_radius": 1.5, "entry_x_lower": -0.05, "entry_x_upper": 0.15, "entry_x_high_rise_relax": 0.02, "entry_angle_upper": 0.3490658503988659, "entry_x_scale": 0.1, "entry_start_distance": 0.6, "entry_ground_tolerance": 0.04, "entry_contact_time": 0.06, "entry_forward_speed": 0.05, "entry_wheel_reverse_tolerance": 0.05, "entry_rearm_time": 0.5, "entry_retract_weight": 0.75, "entry_range_cost_weight": -1.0, "entry_swing_x_lower": -0.1, "entry_swing_x_upper": 0.22, "entry_swing_min_extension": 0.3, "entry_swing_min_extension_high": 0.26, "descent_cost_soft_cap": 4.0}, "canonical_source_sha256": "8ce61820368355126ce33ee9ac6b29f4b3cc80c8bd3eca0c73a78f72ef1ae05c"}
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.173.02    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 4090          | Yes: 0 |     | 81898   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2684      | cd550f3e.. |
+|     |                                  |        |     |            | 1         |            |
+|=============================================================================================|
+| OS: 22.04.5 LTS (Jammy Jellyfish) ubuntu, Version: 22.04.5, Kernel: 6.8.0-138-generic
+| XServer Vendor: The X.Org Foundation, XServer Version: 12101004 (1.21.1.4)
+| Processor: Intel(R) Core(TM) Ultra 9 285K
+| Cores: 1 | Logical Cores: 1
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 128145 | Free Memory: 100866
+| Total Page/Swap (MB): 2047 | Free Page/Swap: 2012
+|---------------------------------------------------------------------------------------------|
+2026-10-09T03:22:22Z [4,599ms] [Warning] [gpu.foundation.plugin] Different types of CPU governors are being used accross cores.
+2026-10-09T03:22:22Z [4,600ms] [Warning] [gpu.foundation.plugin] CPU performance profile is set to powersave. This profile sets the CPU to the lowest frequency reducing performance.
+2026-10-09T03:22:22Z [4,650ms] [Warning] [omni.kvdb.plugin] Disabling key-value database because another kit process is locking it

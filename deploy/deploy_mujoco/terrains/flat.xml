@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 平地：默认 z=0，适合基线、轮式行走和自由操控。
+     本文件供 deploy_mujoco.py 的 terrain-xml 参数使用。
+     参数化模板由 terrain_loader.py 在加载时生成碰撞体，不含机器人。
+     编辑 data 后重新启动部署；无需再改 Python，命令行覆盖值会打印在运行摘要中。 -->
+<mujoco model="flat_terrain">
+  <compiler angle="radian"/>
+  <custom>
+    <text name="terrain_kind" data="flat"/>
+    <!-- 公共参数：长度单位 m；世界 +X 为路线前进方向，+Y 为左，+Z 为上。 -->
+    <!-- width：路线宽度；生成障碍之外保留 z=0 无限平面，方便自由操控。 -->
+    <numeric name="width" data="4.0"/>
+    <!-- friction：滑动 / 扭转 / 滚动摩擦；应用于生成的地面和障碍。 -->
+    <numeric name="friction" data="1.0 0.01 0.01"/>
+    <!-- spawn_xy：机器人出生世界坐标 x y；z 自动射线查询 + 站立/趴下偏置。 -->
+    <numeric name="spawn_xy" data="-1.0 0.0"/>
+    <!-- spawn_yaw_deg：出生偏航角，单位度；0 表示朝 +X。 -->
+    <numeric name="spawn_yaw_deg" data="0"/>
+    <!-- goal_x：仅用于记录沿 +X 的穿越范围，不是终止条件。 -->
+    <numeric name="goal_x" data="5.0"/>
+  </custom>
+</mujoco>

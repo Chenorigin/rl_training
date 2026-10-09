@@ -1,0 +1,261 @@
+{
+  "model": "/home/ubuntu/\u684c\u9762/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-01_12-22-19/model_22400.pt",
+  "physics_steps_per_terrain": 200,
+  "terrains": {
+    "flat": {
+      "geoms": 45,
+      "spawn_z": 0.58,
+      "actor_input": 244,
+      "ray_samples": [
+        [
+          0.3,
+          0.0
+        ],
+        [
+          0.63,
+          0.0
+        ],
+        [
+          0.96,
+          0.0
+        ],
+        [
+          1.57,
+          0.0
+        ],
+        [
+          5.2,
+          0.0
+        ]
+      ],
+      "physics_time": 1.0000000000000007,
+      "contacts_at_end": 7,
+      "final_xyz": [
+        -0.6485323903720845,
+        -0.004474341927865138,
+        0.5657155923130076
+      ]
+    },
+    "ascent": {
+      "geoms": 51,
+      "spawn_z": 0.58,
+      "actor_input": 244,
+      "ray_samples": [
+        [
+          0.3,
+          0.0
+        ],
+        [
+          0.63,
+          0.14999999999999858
+        ],
+        [
+          0.96,
+          0.29999999999999716
+        ],
+        [
+          1.57,
+          0.6000000000000014
+        ],
+        [
+          2.2,
+          0.75
+        ]
+      ],
+      "physics_time": 1.0000000000000007,
+      "contacts_at_end": 7,
+      "final_xyz": [
+        -0.6485323903720845,
+        -0.004474341927865138,
+        0.5657155923130076
+      ]
+    },
+    "descent": {
+      "geoms": 50,
+      "spawn_z": 1.33,
+      "actor_input": 244,
+      "ray_samples": [
+        [
+          0.3,
+          0.75
+        ],
+        [
+          0.63,
+          0.6000000000000014
+        ],
+        [
+          0.96,
+          0.45000000000000284
+        ],
+        [
+          1.57,
+          0.14999999999999858
+        ],
+        [
+          2.2,
+          0.0
+        ]
+      ],
+      "physics_time": 1.0000000000000007,
+      "contacts_at_end": 14,
+      "final_xyz": [
+        -0.6454023905458239,
+        -0.004692482888024714,
+        1.3160826536322487
+      ]
+    },
+    "slope_up": {
+      "geoms": 47,
+      "spawn_z": 0.58,
+      "actor_input": 244,
+      "ray_samples": [
+        [
+          0.3,
+          0.0
+        ],
+        [
+          0.63,
+          0.027632353017104094
+        ],
+        [
+          0.96,
+          0.09777601836820793
+        ],
+        [
+          1.57,
+          0.22743552098691922
+        ],
+        [
+          3.7,
+          0.6376696850100672
+        ]
+      ],
+      "physics_time": 1.0000000000000007,
+      "contacts_at_end": 7,
+      "final_xyz": [
+        -0.6485323903720845,
+        -0.004474341927865138,
+        0.5657155923130076
+      ]
+    },
+    "slope_down": {
+      "geoms": 47,
+      "spawn_z": 1.2176696850100672,
+      "actor_input": 244,
+      "ray_samples": [
+        [
+          0.3,
+          0.6376696850100672
+        ],
+        [
+          0.63,
+          0.6100373319929631
+        ],
+        [
+          0.96,
+          0.5398936666418521
+        ],
+        [
+          1.57,
+          0.41023416402314083
+        ],
+        [
+          3.7,
+          0.0
+        ]
+      ],
+      "physics_time": 1.0000000000000007,
+      "contacts_at_end": 14,
+      "final_xyz": [
+        -0.6453843989132408,
+        -0.004689671138361163,
+        1.2037533938251228
+      ]
+    },
+    "rough": {
+      "geoms": 189,
+      "spawn_z": 0.58,
+      "actor_input": 244,
+      "ray_samples": [],
+      "physics_time": 1.0000000000000007,
+      "contacts_at_end": 7,
+      "final_xyz": [
+        -0.6485323903720845,
+        -0.004474341927865138,
+        0.5657155923130076
+      ]
+    },
+    "obstacles": {
+      "geoms": 49,
+      "spawn_z": 0.58,
+      "actor_input": 244,
+      "ray_samples": [],
+      "physics_time": 1.0000000000000007,
+      "contacts_at_end": 7,
+      "final_xyz": [
+        -0.6485323903720845,
+        -0.004474341927865138,
+        0.5657155923130076
+      ]
+    },
+    "hurdles": {
+      "geoms": 49,
+      "spawn_z": 0.58,
+      "actor_input": 244,
+      "ray_samples": [],
+      "physics_time": 1.0000000000000007,
+      "contacts_at_end": 7,
+      "final_xyz": [
+        -0.6485323903720845,
+        -0.004474341927865138,
+        0.5657155923130076
+      ]
+    },
+    "mixed": {
+      "geoms": 127,
+      "spawn_z": 0.58,
+      "actor_input": 244,
+      "ray_samples": [],
+      "physics_time": 1.0000000000000007,
+      "contacts_at_end": 7,
+      "final_xyz": [
+        -0.6485323903720845,
+        -0.004474341927865138,
+        0.5657155923130076
+      ]
+    },
+    "custom": {
+      "geoms": 46,
+      "spawn_z": 0.58,
+      "actor_input": 244,
+      "ray_samples": [],
+      "physics_time": 1.0000000000000007,
+      "contacts_at_end": 7,
+      "final_xyz": [
+        -0.6485323903720845,
+        -0.004474341927865138,
+        0.5657155923130076
+      ]
+    }
+  },
+  "parameter_edits": {
+    "ascent": {
+      "before": 0.15,
+      "after": 0.25
+    },
+    "slope_up": {
+      "before": 0.3188348425050332,
+      "after": 0.5459553513993001
+    }
+  },
+  "performance_evaluation": "not_run: this is a short contract smoke test",
+  "invalid_config_rejected": true,
+  "legacy_stair_overrides": "pass",
+  "negative_controls": [
+    "nonfinite_override_inf_rejected",
+    "nonfinite_override_nan_rejected",
+    "stairs_descent.xml_spawn_outside_platform_rejected",
+    "slope_down.xml_spawn_outside_platform_rejected"
+  ]
+}

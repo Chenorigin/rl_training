@@ -1,0 +1,356 @@
+{
+  "Episode_Reward/track_lin_vel_xy_exp": {
+    "early100": 3.6478152499720453,
+    "mid100": 4.5344898223876955,
+    "late100": 4.532016587257385,
+    "last_step": 9999
+  },
+  "Episode_Reward/stair_ascent_direction_cost": {
+    "early100": -0.284912937614572,
+    "mid100": -0.39138070076704023,
+    "late100": -0.3956679616868496,
+    "last_step": 9999
+  },
+  "Episode_Reward/stair_up_rear_step_completion": {
+    "early100": 0.008033221114892512,
+    "mid100": 0.012194298470858485,
+    "late100": 0.015665840209694578,
+    "last_step": 9999
+  },
+  "Episode_Reward/stair_descent_rear_forward_cost": {
+    "early100": -0.0005863401543820146,
+    "mid100": -0.0013383144070394338,
+    "late100": -0.001341002057888545,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_successes": {
+    "early100": 0.9906316677294672,
+    "mid100": 1.8673095470666885,
+    "late100": 2.0341974771022797,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_violations": {
+    "early100": 3.973050319161266,
+    "mid100": 4.67176019191742,
+    "late100": 4.765695965290069,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_violations": {
+    "early100": 4.491255424106494,
+    "mid100": 5.221554372310639,
+    "late100": 5.22947968006134,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_same_tread_events": {
+    "early100": 0.6450160110369325,
+    "mid100": 0.6490032079815865,
+    "late100": 0.6995970502495765,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_same_tread_dwell_s": {
+    "early100": 0.00013210318429628386,
+    "mid100": 7.472222379874438e-05,
+    "late100": 0.0001489582535577938,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_same_tread_events": {
+    "early100": 0.7443702366296202,
+    "mid100": 0.7711070829629898,
+    "late100": 0.7013412454724312,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_same_tread_dwell_s": {
+    "early100": 0.0017853206289873925,
+    "mid100": 0.0007736553194990847,
+    "late100": 0.0010369110110332257,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_whole_body_crossings": {
+    "early100": 2.6054515361227093,
+    "mid100": 3.9655356669425963,
+    "late100": 4.245144083499908,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_whole_body_crossing_coverage": {
+    "early100": 0.25451922226697204,
+    "mid100": 0.3574375256896019,
+    "late100": 0.38513830557465556,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_registered_intermediate_risers": {
+    "early100": 24.580417354106903,
+    "mid100": 27.423750858306885,
+    "late100": 26.607917385101317,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_landing_coverage": {
+    "early100": 0.4926944125816226,
+    "mid100": 0.5800732445716857,
+    "late100": 0.6121503213047981,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_strict_coverage": {
+    "early100": 0.08316056789830327,
+    "mid100": 0.12065617792308331,
+    "late100": 0.14222779639065267,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_physical_landings": {
+    "early100": 5.4328704399243,
+    "mid100": 6.763570969104767,
+    "late100": 7.077391858100891,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_transition_successes": {
+    "early100": 0.23448929394595325,
+    "mid100": 0.3898338261246681,
+    "late100": 0.4633139209449291,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_skipped_riser_events": {
+    "early100": 1.8778234448842703,
+    "mid100": 1.9946883928775787,
+    "late100": 1.939314752817154,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_unsafe_events": {
+    "early100": 3.1531399130821227,
+    "mid100": 3.525972949266434,
+    "late100": 3.664684541225433,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_skip_fraction": {
+    "early100": 0.23791563898324966,
+    "mid100": 0.2297455158829689,
+    "late100": 0.21732829332351686,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_visited_intermediate_risers": {
+    "early100": 13.070833753049374,
+    "mid100": 15.247500438690185,
+    "late100": 15.21208384513855,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_same_tread_fraction": {
+    "early100": 0.18397051157429814,
+    "mid100": 0.17059312283992767,
+    "late100": 0.19086793810129166,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_longest_strict_run": {
+    "early100": 0.33803698103874924,
+    "mid100": 0.4792880767583847,
+    "late100": 0.5230794829130173,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_front_six_step_strict_fraction": {
+    "early100": 0.0009391534980386496,
+    "mid100": 0.0007018849486485123,
+    "late100": 0.000520833358168602,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_registered_intermediate_risers": {
+    "early100": 24.580417354106903,
+    "mid100": 27.423750858306885,
+    "late100": 26.607917385101317,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_landing_coverage": {
+    "early100": 0.502474459335208,
+    "mid100": 0.6101466563344001,
+    "late100": 0.6315447065234184,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_strict_coverage": {
+    "early100": 0.0629276349209249,
+    "mid100": 0.10621741361916065,
+    "late100": 0.12179265484213829,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_physical_landings": {
+    "early100": 5.481887062340975,
+    "mid100": 7.088863987922668,
+    "late100": 7.263677163124084,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_transition_successes": {
+    "early100": 0.05355480651371181,
+    "mid100": 0.0812953222449869,
+    "late100": 0.10443893284536898,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_skipped_riser_events": {
+    "early100": 1.897799683958292,
+    "mid100": 2.1523376762866975,
+    "late100": 2.0939252734184266,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_unsafe_events": {
+    "early100": 3.4938519364595413,
+    "mid100": 3.403601508140564,
+    "late100": 3.2397638630867003,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_skip_fraction": {
+    "early100": 0.23126852080225946,
+    "mid100": 0.23595925584435462,
+    "late100": 0.2286576335132122,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_visited_intermediate_risers": {
+    "early100": 15.562083837240934,
+    "mid100": 18.275000553131104,
+    "late100": 17.655000553131103,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_same_tread_fraction": {
+    "early100": 0.16010030797682703,
+    "mid100": 0.16303734812885523,
+    "late100": 0.1563714960217476,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_longest_strict_run": {
+    "early100": 0.25209852738305927,
+    "mid100": 0.38146613150835035,
+    "late100": 0.40446942746639253,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_six_step_strict_fraction": {
+    "early100": 5.2083334885537625e-05,
+    "mid100": 0.00018452382180839778,
+    "late100": 0.00024305556900799274,
+    "last_step": 9999
+  },
+  "Curriculum/step_completion/up_rear_lift_credit": {
+    "early100": 1.0392982736474368,
+    "mid100": 1.6708022105693816,
+    "late100": 1.8250940585136413,
+    "last_step": 9999
+  },
+  "Curriculum/gait_quality/front_loaded_a_mean_deg": {
+    "early100": 86.08992492675782,
+    "mid100": 89.9837735748291,
+    "late100": 93.29475646972656,
+    "last_step": 9999
+  },
+  "Curriculum/gait_quality/front_loaded_a_low_fraction": {
+    "early100": 0.14185227548703552,
+    "mid100": 0.25897379219532013,
+    "late100": 0.2498776826262474,
+    "last_step": 9999
+  },
+  "Curriculum/gait_quality/front_loaded_a_min_deg": {
+    "early100": 54.94690651893616,
+    "mid100": 44.06097583770752,
+    "late100": 46.06465351104736,
+    "last_step": 9999
+  },
+  "Curriculum/gait_quality/rear_forward_samples": {
+    "early100": 366.2779266500473,
+    "mid100": 501.04667907714844,
+    "late100": 527.8945986938477,
+    "last_step": 9999
+  },
+  "Curriculum/gait_quality/rear_forward_excess_fraction": {
+    "early100": 0.03375043021515012,
+    "mid100": 0.04983235517516732,
+    "late100": 0.05016292972490191,
+    "last_step": 9999
+  },
+  "Curriculum/gait_quality/rear_entry_samples": {
+    "early100": 112.88875326476992,
+    "mid100": 150.2470877456665,
+    "late100": 161.12208824157716,
+    "last_step": 9999
+  },
+  "Curriculum/gait_quality/rear_entry_b_mean_deg": {
+    "early100": 4.6550373655557635,
+    "mid100": 8.44919132232666,
+    "late100": 8.547995927333831,
+    "last_step": 9999
+  },
+  "Curriculum/gait_quality/rear_entry_g_mean_deg": {
+    "early100": 0.3919390809163451,
+    "mid100": 1.5006096868216992,
+    "late100": 1.1961894143745304,
+    "last_step": 9999
+  },
+  "Curriculum/ascent_direction/samples": {
+    "early100": 580.9012645506859,
+    "mid100": 782.4546041870117,
+    "late100": 784.7537719726563,
+    "last_step": 9999
+  },
+  "Curriculum/ascent_direction/lateral_error_mean_m": {
+    "early100": 0.9271382941305637,
+    "mid100": 1.2187949287891389,
+    "late100": 1.1778229981660844,
+    "last_step": 9999
+  },
+  "Curriculum/ascent_direction/lateral_error_max_m": {
+    "early100": 3.3744295759545637,
+    "mid100": 4.580096879005432,
+    "late100": 4.3752567577362065,
+    "last_step": 9999
+  },
+  "Curriculum/ascent_direction/lateral_speed_mean_m_s": {
+    "early100": 0.3116946545056999,
+    "mid100": 0.39814687937498094,
+    "late100": 0.38602039009332656,
+    "last_step": 9999
+  },
+  "Curriculum/ascent_direction/heading_error_mean_deg": {
+    "early100": 14.361367783173918,
+    "mid100": 19.923355169296265,
+    "late100": 18.927358417510987,
+    "last_step": 9999
+  },
+  "Curriculum/ascent_direction/outside_tolerance_fraction": {
+    "early100": 0.5240338511089795,
+    "mid100": 0.6295004135370255,
+    "late100": 0.6434716632962227,
+    "last_step": 9999
+  },
+  "Curriculum/ascent_direction/cost_mean": {
+    "early100": 0.6631452742032706,
+    "mid100": 0.8348972743749619,
+    "late100": 0.8261106812953949,
+    "last_step": 9999
+  },
+  "Curriculum/terrain_level_pyramid_stairs": {
+    "early100": 0.34963564389305246,
+    "mid100": 5.869769177436829,
+    "late100": 5.921617693901062,
+    "last_step": 9999
+  },
+  "Curriculum/terrain_level_pyramid_stairs_inv": {
+    "early100": 0.33930382281920174,
+    "mid100": 5.982083220481872,
+    "late100": 5.864654378890991,
+    "last_step": 9999
+  },
+  "Metrics/base_velocity/error_vel_xy": {
+    "early100": 0.2704698452912271,
+    "mid100": 0.3724857819080353,
+    "late100": 0.3749955505132675,
+    "last_step": 9999
+  },
+  "Loss/anchor": {
+    "early100": 0.0010798362032073783,
+    "mid100": 0.025592609085142614,
+    "late100": 0.03148148383945227,
+    "last_step": 9999
+  },
+  "Train/mean_reward": {
+    "early100": 99.61663341879844,
+    "mid100": 110.6989427947998,
+    "late100": 114.02874053955078,
+    "last_step": 9999
+  },
+  "Train/mean_reward/time": {
+    "early100": 99.61663341879844,
+    "mid100": 110.6989427947998,
+    "late100": 114.02874053955078,
+    "last_step": 21203
+  }
+}

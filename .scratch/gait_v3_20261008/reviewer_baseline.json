@@ -1,0 +1,17 @@
+{
+  "front_missed_first_then_step2": {
+    "front_count": 0.0,
+    "front_successes": 0.0,
+    "active": 1.0,
+    "age": 2.079998731613159
+  },
+  "rear_skipped_first_then_step2": {
+    "front_count": 3.0,
+    "rear_count": 0.0,
+    "rear_successes": 0.0,
+    "rear_target_age": 2.2599985599517822
+  },
+  "front_fold_low_samples_False": 0.24999982118606567,
+  "front_fold_low_samples_True": 0.0,
+  "front_severe_new_contact_free": 0.0
+}

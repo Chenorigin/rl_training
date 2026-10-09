@@ -109,10 +109,21 @@ def convert_rsl_rl_cfg_dict(cfg_dict: dict) -> dict:
     Returns:
         The converted config dict compatible with rsl-rl v5+.
     """
-    if "actor" in cfg_dict and "critic" in cfg_dict:
-        # Already in new format
+    actor_cfg = cfg_dict.get("actor")
+    critic_cfg = cfg_dict.get("critic")
+    if (
+        isinstance(actor_cfg, dict)
+        and actor_cfg.get("class_name")
+        and isinstance(critic_cfg, dict)
+        and critic_cfg.get("class_name")
+    ):
+        # Both model configs are usable by RSL-RL v5.
         return cfg_dict
 
+    # Isaac Lab can serialize its MISSING actor/critic placeholders as empty
+    # dictionaries. Their presence alone does not make this a v5 config.
+    cfg_dict.pop("actor", None)
+    cfg_dict.pop("critic", None)
     policy = cfg_dict.pop("policy", {})
 
     # Build distribution config for actor from noise std settings

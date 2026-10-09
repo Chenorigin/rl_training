@@ -1,0 +1,10 @@
+{
+  "basis": "Same bounded 16-env/60-step probe already executed in docs/front_fold_20261003/isaac_smoke_final.json; scene retains two terrain rows. No optimizer update. Reserve conservative 12 GiB GPU / 16 GiB RAM for Isaac startup and scene; tiny 16*(244+285+16)*4 ~35 KiB per control tensor set plus <4 MiB inference MLP parameters.",
+  "available_gpu_mib": 47944,
+  "available_ram_mib": 105594,
+  "free_disk_gb": 70,
+  "cpu_load_1m": 0.61,
+  "allocation": "one process, one CPU Torch thread, cuda:0, 16 envs, 60 steps, timeout 180s",
+  "limit": "wall-clock timeout and fixed step count; no MemoryMax: short local verification process, no persistent service; no weights or video writes, log and JSON <1 MiB",
+  "remote_base": "origin/main is one new M20S commit ahead; it does not contain the three untracked stair reward modules. No global pull over existing dirty worktree."
+}

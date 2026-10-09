@@ -1,0 +1,29 @@
+{
+  "source_hashes": {
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_teacher.py": "c47c5e0823962f8343749967df6803ce262ee277e253d4dfff79a6e6e111381b",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_teacher_env_cfg.py": "aed4e702642395ee1598524685a3fff61244643a86a75f734c0ac4a7ceff570e",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/stair_teacher_ppo_cfg.py": "45eb4cbb0a240d6d9f256f5e2a60cba7e25dfab75c892d46bd79262e6af281b4",
+    "source/rl_training/rl_training/stair_guarded_ppo.py": "630870284cb7f6a5a5787f14116e39b8666886e9e29bcbf0503ff70f23c63e9e",
+    "scripts/reinforcement_learning/rsl_rl/train.py": "6b7fe859b90a5a4898f4d5a9948f92d9862869424875b59ab498fe71c4ed6719"
+  },
+  "final_reward_smoke_source_matches": true,
+  "training_smoke": {
+    "run": "2026-10-08_18-04-44_preservation_smoke",
+    "iterations": 55,
+    "critic_only": 50,
+    "actor_updates": 5,
+    "final_task_helper_changed_after_training": true
+  },
+  "original_training_not_stopped": true,
+  "long_training_not_started": true,
+  "heterogeneous_family": "unavailable; independent Codex same family review",
+  "post_training_algorithm_changes": "legacy load/fixed optimizer LR/reference counter reset; actual CPU and independent resume checks passed",
+  "student_sources_unchanged": {
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_student.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_student_env_cfg.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/stair_student_ppo_cfg.py": true
+  },
+  "shared_kb_fetch": "failed: corrupt loose object fabee48262ee49c5e328a344da94c08346f4a7d5; local note retained",
+  "independent_review": "PASS; actual CPU reproduction; legacy resume P1 fixed; same Codex/GPT family, heterogeneous unavailable",
+  "original_training_pid": 2377932
+}

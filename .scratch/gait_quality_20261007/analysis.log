@@ -1,0 +1,83 @@
+{
+  "comparisons": {
+    "up30": {
+      "initial": {
+        "comparable_completion": true,
+        "mean_n_change_pct": -10.503633485213193,
+        "p95_n_change_pct": -15.397650027062115,
+        "p99_n_change_pct": -23.391182314821503,
+        "max_n_change_pct": 5.8366314118097895,
+        "energy_per_m_change_pct": -9.389205598235451,
+        "power_change_pct": -18.447524696997743
+      },
+      "intermediate": {
+        "comparable_completion": true,
+        "mean_n_change_pct": -4.785869146769272,
+        "p95_n_change_pct": -7.919237022525827,
+        "p99_n_change_pct": -10.727029402632182,
+        "max_n_change_pct": -0.5612682462087792,
+        "energy_per_m_change_pct": 12.697636835356763,
+        "power_change_pct": -2.0607523054348653
+      }
+    },
+    "up20": {
+      "initial": {
+        "comparable_completion": true,
+        "mean_n_change_pct": 1.9897508699221467,
+        "p95_n_change_pct": -0.9661809714484493,
+        "p99_n_change_pct": 35.30223097403977,
+        "max_n_change_pct": 46.37242445641279,
+        "energy_per_m_change_pct": -21.57169575361556,
+        "power_change_pct": -3.0664322218207363
+      },
+      "intermediate": {
+        "comparable_completion": true,
+        "mean_n_change_pct": 8.835437710252393,
+        "p95_n_change_pct": -3.2740493226364187,
+        "p99_n_change_pct": 18.157683990310723,
+        "max_n_change_pct": 7.857361652134043,
+        "energy_per_m_change_pct": 39.45564489797211,
+        "power_change_pct": 0.8807279738341389
+      }
+    },
+    "down30": {
+      "initial": {
+        "comparable_completion": false,
+        "mean_n_change_pct": -19.16011694590417,
+        "p95_n_change_pct": -12.815736427701585,
+        "p99_n_change_pct": -27.098064880645378,
+        "max_n_change_pct": -24.44081300139407,
+        "energy_per_m_change_pct": -19.019229281971807,
+        "power_change_pct": -18.815332692405384
+      },
+      "intermediate": {
+        "comparable_completion": true,
+        "mean_n_change_pct": 4.434132555019854,
+        "p95_n_change_pct": 9.211817902457309,
+        "p99_n_change_pct": -24.850572992953936,
+        "max_n_change_pct": -27.713413284421584,
+        "energy_per_m_change_pct": 21.08503302432665,
+        "power_change_pct": 13.089356631846405
+      }
+    }
+  },
+  "descent_entry": {
+    "first_front_down_s": 8.539999999999935,
+    "first_rear_down_s": 9.240000000000045,
+    "stable_rear_samples": 65,
+    "rear_tilt_body_p95_deg": 35.355280614590164,
+    "rear_tilt_yaw_p95_deg": 22.958697681551303,
+    "rear_forward_body_max_m": 0.3176643718417307,
+    "pitch_min_deg": -0.2935773598297399,
+    "rear_fold": {
+      "samples": 65,
+      "extension_min_m": 0.4088088845810647,
+      "extension_p05_m": 0.44028474008144103,
+      "knee_abs_max_deg": 82.77071443775925,
+      "knee_abs_p95_deg": 69.32811433232894
+    },
+    "pitch_max_deg": 25.360571891014004,
+    "rear_load_fraction_mean": 0.3851132065050521,
+    "rear_load_fraction_max": 1.0
+  }
+}

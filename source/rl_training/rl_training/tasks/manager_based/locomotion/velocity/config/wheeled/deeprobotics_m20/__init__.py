@@ -19,7 +19,6 @@ gym.register(
     kwargs={
         "env_cfg_entry_point": f"{__name__}.flat_env_cfg:DeeproboticsM20FlatEnvCfg",
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:DeeproboticsM20FlatPPORunnerCfg",
-        "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:DeeproboticsM20FlatTrainerCfg",
     },
 )
 
@@ -30,6 +29,37 @@ gym.register(
     kwargs={
         "env_cfg_entry_point": f"{__name__}.rough_env_cfg:DeeproboticsM20RoughEnvCfg",
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:DeeproboticsM20RoughPPORunnerCfg",
-        "cusrl_cfg_entry_point": f"{agents.__name__}.cusrl_ppo_cfg:DeeproboticsM20RoughTrainerCfg",
+    },
+)
+
+
+gym.register(
+    id="Rough-Deeprobotics-M20-StairTeacher-v0",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.stair_teacher_env_cfg:DeeproboticsM20StairTeacherEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.stair_teacher_ppo_cfg:DeeproboticsM20StairTeacherPPORunnerCfg",
+    },
+)
+
+
+gym.register(
+    id="Rough-Deeprobotics-M20-PreTeacher-v0",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.pre_teacher_env_cfg:DeeproboticsM20PreTeacherEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.pre_teacher_ppo_cfg:DeeproboticsM20PreTeacherPPORunnerCfg",
+    },
+)
+
+gym.register(
+    id="Rough-Deeprobotics-M20-StairStudent-v0",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.stair_student_env_cfg:DeeproboticsM20StairStudentEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.stair_student_ppo_cfg:DeeproboticsM20StairStudentPPORunnerCfg",
     },
 )

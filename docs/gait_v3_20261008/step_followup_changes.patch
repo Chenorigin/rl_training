@@ -1,0 +1,48 @@
+--- previous/stair_teacher.py
++++ current/stair_teacher.py
+@@ -377,6 +377,7 @@
+         "radius_calibrated": flags(4), "rear_lift_gain": zeros(),
+         "rear_lift_credit": zeros(), "skip_total": zeros(2),
+         "physical_total": zeros(2), "unsafe_total": zeros(2),
++        "front_transition_successes": zeros(), "rear_transition_successes": zeros(),
+         "axis_run": zeros(2), "axis_max_run": zeros(2),
+         "duplicate_event_count": zeros(2),
+     })
+@@ -654,7 +655,20 @@
+         safe = state["map_safe"][row, candidate, sl].gather(1, side[:, None]).squeeze(-1)
+         correct = available & single & ordered & safe & ~skipped
+         violation = available & ~correct
+-        state[name+"_event"] = landed & correct[:, None]
++        previous = last.clamp_min(0)
++        previous_side = state["map_side"][row,previous,axle]
++        previous_pair = state["map_landed"][row,previous,sl]
++        previous_safe = state["map_safe"][row,previous,sl].gather(
++            1,previous_side.clamp_min(0)[:,None]).squeeze(-1)
++        # Pay the main style reward for a demonstrated alternating transition,
++        # rather than paying the first foot before its partner's plan is known.
++        # This prevents HL1,HR1,HL2,HR2 from collecting a completion per tread
++        # and only facing a temporally discounted same-tread penalty later.
++        transition = correct & (last >= 0) & (previous_side >= 0) & (
++            previous_pair.sum(-1)==1) & previous_safe & (side!=previous_side) & (
++            ~state["map_duplicate_paid"][row,previous,axle])
++        state[name+"_event"] = landed & transition[:, None]
++        state[name+"_transition_successes"] += transition.float()
+         state[name+"_violation_event"] = violation
+         state[name+"_successes"] += correct.float()
+         state[name+"_violations"] += violation.float()
+@@ -2057,8 +2071,15 @@
+         result[f"up_{name}_landing_coverage"] = paid.sum().float()/known.sum().clamp_min(1)
+         result[f"up_{name}_strict_coverage"] = strict.sum().float()/intermediate.sum().clamp_min(1)
+         result[f"up_{name}_physical_landings"] = state["physical_total"][ids,axle].float().mean()
++        result[f"up_{name}_transition_successes"] = state[name+"_transition_successes"][ids].mean()
+         result[f"up_{name}_skipped_riser_events"] = state["skip_total"][ids,axle].float().mean()
+         result[f"up_{name}_unsafe_events"] = state["unsafe_total"][ids,axle].float().mean()
++        result[f"up_{name}_skip_fraction"] = (
++            state["skip_total"][ids,axle].sum()/state["physical_total"][ids,axle].sum().clamp_min(1))
++        visited = paid & intermediate
++        result[f"up_{name}_visited_intermediate_risers"] = visited.sum().float()
++        result[f"up_{name}_same_tread_fraction"] = (
++            (state["map_duplicate_paid"][ids,:,axle]&visited).sum().float()/visited.sum().clamp_min(1))
+         # Longest surviving strict run. A later duplicate invalidates an earlier
+         # tread; future detected-but-unlanded treads contribute no success.
+         order = (state["map_flight"][ids].float()*1e6+state["map_z"][ids]).argsort(dim=-1,stable=True)

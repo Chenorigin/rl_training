@@ -1,0 +1,20 @@
+{
+  "terrain": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/all_terrain.xml",
+  "model": "/home/ubuntu/\u684c\u9762/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+  "native_terrain_geoms": 107,
+  "robot_joint_order_unchanged": true,
+  "robot_mass_unchanged": true,
+  "height_scan_points": 187,
+  "scan_poses": 36,
+  "max_height_error_m": 1.201250654503383e-09,
+  "low_friction": [
+    0.5,
+    0.01,
+    0.01
+  ],
+  "floor_negative_control_rejected": true,
+  "effective_patch_sliding_friction": 0.5,
+  "patch_contact_count": 16,
+  "rendering": "static geometry preview, not policy motion",
+  "performance": "full course not evaluated"
+}

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 连续混合路线：上楼 → 平台 → 下楼 → 方块 → 上坡 → 坡顶 → 下坡 → 障碍条。
+     本文件供 deploy_mujoco.py 的 terrain-xml 参数使用。
+     参数化模板由 terrain_loader.py 在加载时生成碰撞体，不含机器人。
+     编辑 data 后重新启动部署；无需再改 Python，命令行覆盖值会打印在运行摘要中。 -->
+<mujoco model="mixed_terrain">
+  <compiler angle="radian"/>
+  <custom>
+    <text name="terrain_kind" data="mixed"/>
+    <!-- 公共参数：长度单位 m；世界 +X 为路线前进方向，+Y 为左，+Z 为上。 -->
+    <!-- width：路线宽度；生成障碍之外保留 z=0 无限平面，方便自由操控。 -->
+    <numeric name="width" data="4.0"/>
+    <!-- friction：滑动 / 扭转 / 滚动摩擦；应用于生成的地面和障碍。 -->
+    <numeric name="friction" data="1.0 0.01 0.01"/>
+    <!-- spawn_xy：机器人出生世界坐标 x y；z 自动射线查询 + 站立/趴下偏置。 -->
+    <numeric name="spawn_xy" data="-1.0 0.0"/>
+    <!-- spawn_yaw_deg：出生偏航角，单位度；0 表示朝 +X。 -->
+    <numeric name="spawn_yaw_deg" data="0"/>
+    <!-- start_x：第一段地形起点的世界 X 坐标。 -->
+    <numeric name="start_x" data="0.5"/>
+    <!-- 楼梯段：级高、踏面深度、级数、楼梯顶部平台长度。 -->
+    <numeric name="step_height" data="0.10"/>
+    <numeric name="tread_depth" data="0.30"/>
+    <numeric name="step_count" data="3"/>
+    <numeric name="plateau_length" data="1.20"/>
+    <!-- section_gap：独立地形段之间的平地缓冲距离。 -->
+    <numeric name="section_gap" data="1.0"/>
+    <!-- rough_length：方块段长度；其余方块参数见下方。 -->
+    <numeric name="rough_length" data="2.0"/>
+    <!-- cell_size：方块边长；gap：方块间距。块从 z=0 起，空隙为平地。 -->
+    <numeric name="cell_size" data="0.30"/>
+    <numeric name="gap" data="0.05"/>
+    <!-- height_min/max：均匀分布的块顶高度；seed 固定则每次地形相同。 -->
+    <numeric name="height_min" data="0.02"/>
+    <numeric name="height_max" data="0.12"/>
+    <numeric name="seed" data="42"/>
+    <!-- 坡段：倾角度数、每段水平长度、法向厚度、坡顶平台长度。 -->
+    <numeric name="slope_deg" data="10"/>
+    <numeric name="ramp_length" data="2.0"/>
+    <numeric name="ramp_thickness" data="0.15"/>
+    <numeric name="ramp_plateau_length" data="1.0"/>
+    <!-- 最后一个横向障碍条的高度与 X 厚度。 -->
+    <numeric name="obstacle_height" data="0.15"/>
+    <numeric name="obstacle_depth" data="0.20"/>
+  </custom>
+</mujoco>

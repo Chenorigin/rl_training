@@ -1,0 +1,48 @@
+{
+  "angle24_force0": 0.0,
+  "angle30_force0": 0.0,
+  "angle49_force0": 0.13154368102550507,
+  "angle70_force0": 0.30153846740722656,
+  "angle24_force6": 0.021153857931494713,
+  "angle30_force6": 0.10999990254640579,
+  "angle49_force6": 0.37272366881370544,
+  "angle70_force6": 0.47413793206214905,
+  "angle24_force100": 0.038461558520793915,
+  "angle30_force100": 0.1999998241662979,
+  "angle49_force100": 0.6776793599128723,
+  "angle70_force100": 0.8620689511299133,
+  "uphill_force0": 0.0,
+  "uphill_force6": 0.0,
+  "uphill_force100": 0.0,
+  "cached_swing_stats_once": true,
+  "vectorized_cost": [
+    0.13154368102550507,
+    0.13154368102550507
+  ],
+  "no_scan_latched_cost": [
+    0.13154368102550507,
+    0.13154368102550507
+  ],
+  "one_env_reset_cost": [
+    0.0,
+    0.13154368102550507
+  ],
+  "target_scores": [
+    1.0,
+    0.13533535599708557,
+    0.04393693432211876
+  ],
+  "rear_oscillation_gains": [
+    0.5230618715286255,
+    0.18693125247955322,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "rear_pause_restart_gain": 0.0,
+  "wrong_leg_target_gain": 0.0,
+  "historical_target_revisit_gain": 0.0,
+  "historical_target_preserved_max": 0.7099931240081787,
+  "turned_away_phase_cost": 0.0
+}

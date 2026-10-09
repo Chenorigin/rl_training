@@ -1,0 +1,19 @@
+{
+  "canonical_source_sha256": "5b089ff048e9847b9141423430ce43a9430d5ff2ae287eba6f4309f3c8d8d7b1",
+  "env_cfg_sha256": "a16d22f2bc2ad466aa51f555d5381ec40bcdd1a27268d640162c29ff1e71fd33",
+  "actor_checkpoint_sha256": "b500859bedc871db1a860298944e699d1aed7481142b35400267c12ce1f53f76",
+  "frozen_files_unchanged": {
+    "deploy/deploy_mujoco/deploy_mujoco.py": true,
+    "deploy/deploy_mujoco/terrain_loader.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/pre_teacher_env_cfg.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/commands.py": true,
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/stair_teacher_ppo_cfg.py": true
+  },
+  "cpu_checks": "passed",
+  "independent_review_family": "Codex/GPT: same family independent reviewer, heterogeneous family unavailable",
+  "isaac_smoke_steps": 200,
+  "isaac_smoke_finite": true,
+  "training_started": false,
+  "trained_behavior_verified": false,
+  "legacy_contract_assertions": "incompatible failures retained; see README_CN.md"
+}

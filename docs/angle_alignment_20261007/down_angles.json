@@ -1,0 +1,29 @@
+{
+  "case": "down",
+  "leg": "hr",
+  "time_s": 9.220000000000041,
+  "checkpoint": "model_196600.pt",
+  "physical_closed_loop": true,
+  "H_hip_joint_world": [
+    0.2038951419313778,
+    -0.0005122638125920065,
+    1.695683047631585
+  ],
+  "K_knee_joint_world": [
+    0.37828211787832877,
+    -0.08859595324338107,
+    1.5112568936394304
+  ],
+  "W_wheel_center_world": [
+    0.4984035917084521,
+    -0.1423888655795363,
+    1.2904891897439696
+  ],
+  "knee_q_signed_deg": -14.426990510765346,
+  "knee_inner_hinge_plane_deg": 165.57300948923466,
+  "knee_inner_3d_deg": 164.06689866097952,
+  "whole_leg_forward_tilt_body_deg": 49.0083390740919,
+  "whole_leg_forward_tilt_gravity_deg": 34.99162631861172,
+  "thigh_forward_tilt_body_deg": 56.3354504268126,
+  "body_pitch_positive_nose_down_deg": 13.884526726867641
+}

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 随机方块路面：固定种子，块高可调；可测试轮腿跨小障碍。
+     本文件供 deploy_mujoco.py 的 terrain-xml 参数使用。
+     参数化模板由 terrain_loader.py 在加载时生成碰撞体，不含机器人。
+     编辑 data 后重新启动部署；无需再改 Python，命令行覆盖值会打印在运行摘要中。 -->
+<mujoco model="rough_terrain">
+  <compiler angle="radian"/>
+  <custom>
+    <text name="terrain_kind" data="rough"/>
+    <!-- 公共参数：长度单位 m；世界 +X 为路线前进方向，+Y 为左，+Z 为上。 -->
+    <!-- width：路线宽度；生成障碍之外保留 z=0 无限平面，方便自由操控。 -->
+    <numeric name="width" data="4.0"/>
+    <!-- friction：滑动 / 扭转 / 滚动摩擦；应用于生成的地面和障碍。 -->
+    <numeric name="friction" data="1.0 0.01 0.01"/>
+    <!-- spawn_xy：机器人出生世界坐标 x y；z 自动射线查询 + 站立/趴下偏置。 -->
+    <numeric name="spawn_xy" data="-1.0 0.0"/>
+    <!-- spawn_yaw_deg：出生偏航角，单位度；0 表示朝 +X。 -->
+    <numeric name="spawn_yaw_deg" data="0"/>
+    <!-- start_x：第一段地形起点的世界 X 坐标。 -->
+    <numeric name="start_x" data="0.5"/>
+    <!-- length：随机方块区域水平长度。 -->
+    <numeric name="length" data="4.0"/>
+    <!-- cell_size：方块边长；gap：方块间距。块从 z=0 起，空隙为平地。 -->
+    <numeric name="cell_size" data="0.30"/>
+    <numeric name="gap" data="0.05"/>
+    <!-- height_min/max：均匀分布的块顶高度；seed 固定则每次地形相同。 -->
+    <numeric name="height_min" data="0.02"/>
+    <numeric name="height_max" data="0.12"/>
+    <numeric name="seed" data="42"/>
+  </custom>
+</mujoco>

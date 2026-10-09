@@ -1,0 +1,12 @@
+{
+  "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_teacher.py": "f2b3201558bf086acf6ad7ea5b504d00521160472f17d84e73663d45b2205b3f",
+  "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_ascent.py": "0ac91ded1bea3934b224fb8b2d5157ee01836f587ecf88f082104b54200868e2",
+  "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/gait_refinement.py": "f71bfcb772f6c7d5fb32760719fbf70593576794672ee7d0e7bb7810e36999fe",
+  "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/stair_teacher_env_cfg.py": "c2d3e2ec76c71c57b7f227e4eca65a3fb497866f3cbda06dc32a005c31ac3abc",
+  "scripts/tools/check_stair_rewards.py": "6f7b742467c289be0860f279a28b7cb9de8577c7ce379dee5e3b4892ed2d2734",
+  "scripts/tools/check_gait_refinement.py": "fa81d288d03dc484c5f871b0e89f683ad04895bc7136309f2f7b5ed1df3e80c0",
+  "scripts/tools/smoke_stair_rewards.py": "e7e7eef83133050e6f44a689c04e39e90aa55f5ca99da807d22570f186c0da4d",
+  "README_CN.md": "276940c43cca05366a604bdfcd5325f0f29a3457c4d531cce4487c6179aebd66",
+  "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/pre_teacher_env_cfg.py": "6b86f54c7562ba75c51947bb8dc1e5d0bcce5a474a55d174419b7c185f44266a",
+  "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/pre_teacher_ppo_cfg.py": "e73dcd52adba78628a360f20fbb56fc613824b12f616aea7bd40ec549e823ef8"
+}

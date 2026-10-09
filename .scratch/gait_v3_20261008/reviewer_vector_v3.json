@@ -1,0 +1,7 @@
+{
+  "envs": 8,
+  "ticks": 120,
+  "all_state_fields_batched_equal_individual": true,
+  "independent_resets": true,
+  "max_registered": 4
+}

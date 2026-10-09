@@ -1,0 +1,9 @@
+{
+  "scope": "all front frames and near-zero-force flight proxy; not teacher ray validity or reward gate",
+  "min_extension_all_m": 0.18503639331751945,
+  "max_knee_all_rad": 2.7559981009922447,
+  "flight_proxy_samples": 281,
+  "flight_extreme_fraction": 0.13523131672597866,
+  "min_flight_extension_m": 0.18503639331751945,
+  "max_flight_knee_rad": 2.7559981009922447
+}
