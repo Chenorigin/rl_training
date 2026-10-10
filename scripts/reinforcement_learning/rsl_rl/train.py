@@ -165,17 +165,25 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         log_dir += f"_{agent_cfg.run_name}"
     log_dir = os.path.join(log_root_path, log_dir)
 
+    # A file path permits full resume across experiment directories, while a
+    # filename/regex retains the original --load_run lookup behavior.
+    _algo_class_name = getattr(getattr(agent_cfg, "algorithm", None), "class_name", None)
+    if agent_cfg.resume or _algo_class_name == "Distillation":
+        checkpoint = Path(agent_cfg.load_checkpoint).expanduser()
+        if checkpoint.is_absolute() or os.sep in agent_cfg.load_checkpoint:
+            checkpoint = checkpoint.resolve()
+            if not checkpoint.is_file():
+                raise FileNotFoundError(f"Resume checkpoint does not exist: {checkpoint}")
+            resume_path = str(checkpoint)
+        else:
+            resume_path = get_checkpoint_path(log_root_path, agent_cfg.load_run, agent_cfg.load_checkpoint)
+
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
 
     # convert to single-agent instance if required by the RL algorithm
     if isinstance(env.unwrapped, DirectMARLEnv):
         env = multi_agent_to_single_agent(env)
-
-    # save resume path before creating a new log_dir
-    _algo_class_name = getattr(getattr(agent_cfg, "algorithm", None), "class_name", None)
-    if agent_cfg.resume or _algo_class_name == "Distillation":
-        resume_path = get_checkpoint_path(log_root_path, agent_cfg.load_run, agent_cfg.load_checkpoint)
 
     # wrap for video recording
     if args_cli.video:
@@ -233,16 +241,26 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # dump the configuration into log-directory
     dump_yaml(os.path.join(log_dir, "params", "env.yaml"), env_cfg)
     dump_yaml(os.path.join(log_dir, "params", "agent.yaml"), agent_cfg)
+    dump_yaml(os.path.join(log_dir, "params", "cli.yaml"), vars(args_cli))
     
     # run training
     runner.learn(num_learning_iterations=agent_cfg.max_iterations, init_at_random_ep_len=True)
+    print(f"[INFO]: Training completed: {log_dir}", flush=True)
 
     # close the simulator
     env.close()
 
 
 if __name__ == "__main__":
-    # run the main function
-    main()
-    # close sim app
-    simulation_app.close()
+    try:
+        main()
+    except BaseException:
+        # Kit fast shutdown can suppress an unwinding exception and exit 0.
+        # Emit it and return a real failure before simulator teardown.
+        import traceback
+        traceback.print_exc()
+        sys.stderr.flush()
+        sys.stdout.flush()
+        os._exit(1)
+    finally:
+        simulation_app.close()

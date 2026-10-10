@@ -46,3 +46,7 @@ python scripts/tools/compare_runs.py \
 ```
 
 The ONNX export tool records M20 joint and action metadata by default. Check observation and action contracts against the deployment project before using a policy outside simulation.
+
+## M20 Quiet Landing V1.5
+
+Independent quiet-landing task with continuous impact-peak penalties and gated support load balance. [Configuration, training and validation (中文)](docs/quiet_landing_v1_5_20261010/README_CN.md).

@@ -16,15 +16,21 @@ from rsl_rl.algorithms import PPO
 
 class StairGuardedPPO(PPO):
     def __init__(self, *args, anchor_coefficient=0.1, critic_warmup_iterations=50,
-                 reference_std_multiplier=1.05, **kwargs):
+                 reference_std_multiplier=1.05, anchor_uneven_weight=0.1,
+                 actor_update_mask_key=None, **kwargs):
         super().__init__(*args, **kwargs)
         if self.actor.is_recurrent or self.symmetry or self.rnd or self.is_multi_gpu:
             raise ValueError("StairGuardedPPO currently supports plain single-device MLP PPO only")
-        if anchor_coefficient < 0 or critic_warmup_iterations < 0 or reference_std_multiplier < 1:
+        if (anchor_coefficient < 0 or critic_warmup_iterations < 0 or reference_std_multiplier < 1
+                or not 0 <= anchor_uneven_weight <= 1):
             raise ValueError("Invalid preservation configuration")
         self.anchor_coefficient = anchor_coefficient
         self.critic_warmup_iterations = critic_warmup_iterations
         self.reference_std_multiplier = reference_std_multiplier
+        self.anchor_uneven_weight = anchor_uneven_weight
+        self.actor_update_mask_key = actor_update_mask_key
+        if actor_update_mask_key is not None and self.entropy_coef != 0:
+            raise ValueError("Entry-only task updates require zero entropy coefficient")
         self.reference_actor = None
         self.guard_updates = 0
         self._anchor_losses = []
@@ -48,10 +54,29 @@ class StairGuardedPPO(PPO):
             # changes on uneven terrain, including stairs in either direction.
             height = observations['policy'][:, 57:244]
             uneven = (height.amax(-1)-height.amin(-1)) > 0.07
-            weight = torch.where(uneven, 0.1, 1.0)
+            weight = torch.where(uneven, self.anchor_uneven_weight, 1.0)
+            if self.actor_update_mask_key is not None:
+                # Preserve all non-entry observations, including other stairs.
+                active = self._actor_update_mask(observations)
+                weight = torch.where(active, self.anchor_uneven_weight, 1.0)
         predicted = self.actor(observations)
         error = ((predicted-target)/std).square().mean(-1)
         return (weight*error).mean()
+
+    def _actor_update_mask(self, observations):
+        mask = observations[self.actor_update_mask_key]
+        if mask.shape != (observations.batch_size[0], 1) or not torch.isfinite(mask).all():
+            raise ValueError("Actor update mask must be a finite [batch, 1] binary tensor")
+        if not ((mask == 0) | (mask == 1)).all():
+            raise ValueError("Actor update mask must be binary")
+        return mask[:, 0].bool()
+
+    def _surrogate_mean(self, per_sample_loss, observations):
+        if self.actor_update_mask_key is None:
+            return per_sample_loss.mean()
+        active = self._actor_update_mask(observations)
+        # An empty entry batch contributes exactly zero policy-task gradient.
+        return (per_sample_loss * active).sum() / active.sum().clamp_min(1)
 
     def update(self):
         self._anchor_losses = []
@@ -194,7 +219,7 @@ class StairGuardedPPO(PPO):
             surrogate_clipped = -torch.squeeze(batch.advantages) * torch.clamp(  # type: ignore
                 ratio, 1.0 - self.clip_param, 1.0 + self.clip_param
             )
-            surrogate_loss = torch.max(surrogate, surrogate_clipped).mean()
+            surrogate_loss = self._surrogate_mean(torch.max(surrogate, surrogate_clipped), batch.observations)
 
             # Value function loss
             if self.use_clipped_value_loss:
