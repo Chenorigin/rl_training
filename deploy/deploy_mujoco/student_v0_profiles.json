@@ -1,0 +1,41 @@
+{
+  "clean": {"perception": {"level": 0.0}},
+  "train": {},
+  "lidar_fov": {
+    "perception": {"level": 0.0},
+    "lidar_visibility": true,
+    "lidar_horizontal_fov_deg": 135.0,
+    "sensor_offset_body_m": [0.10, 0.0, 0.15],
+    "rear_sensor_offset_body_m": [-0.10, 0.0, 0.15]
+  },
+  "realistic": {
+    "perception": {"level": 1.0},
+    "lidar_visibility": true,
+    "lidar_horizontal_fov_deg": 135.0,
+    "sensor_offset_body_m": [0.10, 0.0, 0.15],
+    "rear_sensor_offset_body_m": [-0.10, 0.0, 0.15],
+    "gyro_std_rad_s": 0.015,
+    "gravity_tilt_std_rad": 0.01,
+    "joint_position_std_rad": 0.002,
+    "joint_velocity_std_rad_s": 0.05,
+    "action_delay_steps": 1
+  },
+  "stress": {
+    "perception": {
+      "level": 1.0, "height_noise_std": 0.05, "height_bias_std": 0.03,
+      "xy_bias_std": 0.04, "yaw_bias_std": 0.04,
+      "point_dropout": 0.12, "packet_dropout": 0.15,
+      "map_update_period_s": 0.20, "max_delay_s": 0.12
+    },
+    "lidar_visibility": true,
+    "lidar_horizontal_fov_deg": 135.0,
+    "sensor_offset_body_m": [0.10, 0.0, 0.15],
+    "rear_sensor_offset_body_m": [-0.10, 0.0, 0.15],
+    "gyro_std_rad_s": 0.03,
+    "gravity_tilt_std_rad": 0.02,
+    "joint_position_std_rad": 0.004,
+    "joint_velocity_std_rad_s": 0.10,
+    "action_delay_steps": 2,
+    "blackout_start_s": 3.0, "blackout_period_s": 8.0, "blackout_duration_s": 0.60
+  }
+}

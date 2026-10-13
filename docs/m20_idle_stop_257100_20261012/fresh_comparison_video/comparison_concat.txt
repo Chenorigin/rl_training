@@ -1,0 +1,3 @@
+file '/home/ubuntu/cyq_shixi_projects/rl_training/docs/m20_idle_stop_257100_20261012/fresh_comparison_video/stationary_compare.mp4'
+file '/home/ubuntu/cyq_shixi_projects/rl_training/docs/m20_idle_stop_257100_20261012/fresh_comparison_video/move_stop_compare.mp4'
+file '/home/ubuntu/cyq_shixi_projects/rl_training/docs/m20_idle_stop_257100_20261012/fresh_comparison_video/stairs_compare.mp4'

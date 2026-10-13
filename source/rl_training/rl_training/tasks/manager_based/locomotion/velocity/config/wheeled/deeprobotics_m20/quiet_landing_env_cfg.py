@@ -17,8 +17,10 @@ from isaaclab.utils import configclass
 from rl_training.tasks.manager_based.locomotion.velocity.mdp import quiet_landing_traversal as traversal
 from rl_training.tasks.manager_based.locomotion.velocity.velocity_env_cfg import CurriculumCfg, ObservationsCfg
 
-from m20_quiet.signals import QuietLandingSettings, touchdown_cost
-from m20_quiet.extended import ExtendedQuietSettings, extended_cost, action_group_rate
+from rl_training.tasks.manager_based.locomotion.velocity.mdp.quiet_landing_signals import (
+    QuietLandingSettings, ExtendedQuietSettings, touchdown_cost,
+    extended_cost, action_group_rate, idle_stance_cost,
+)
 
 from .rough_env_cfg import DeeproboticsM20RewardsCfg, DeeproboticsM20RoughEnvCfg
 
@@ -614,9 +616,26 @@ class DeeproboticsM20QuietLandingEnvCfg(DeeproboticsM20RoughEnvCfg):
 
 @configclass
 class DeeproboticsM20QuietLandingV15EnvCfg(DeeproboticsM20QuietLandingEnvCfg):
-    """V1.5: combine unsaturated peak-force tail and stable support balance."""
+    """V1.5: quiet impact, stationary support, and world-frame straight routes."""
 
     quiet_extended: ExtendedQuietSettings = ExtendedQuietSettings(
         impact_peak_mode="quadratic_linear",
         weights={**ExtendedQuietSettings().weights, "load_balance": -0.05},
     )
+
+    def __post_init__(self):
+        super().__post_init__()
+        from rl_training.tasks.manager_based.locomotion.velocity.mdp import rewards
+        self.rewards.track_ang_vel_z_exp.func = rewards.track_ang_vel_z_world_exp
+        # Replace the ascent-only path cost; do not double-charge ascent.
+        self.rewards.stair_ascent_direction_cost.weight = 0.0
+        self.rewards.quiet_straight_route = RewTerm(
+            func=traversal.straight_route_cost, weight=-1.0,
+            params={"asset_cfg": SceneEntityCfg("robot"), "command_name": "base_velocity"})
+        # Flat idle has its own support objective. It does not depend on the
+        # rare low-motion gate used while traversing or permit drift to disable it.
+        for component, weight in (("motion", -1.0), ("pose", -0.5), ("load", -0.5)):
+            setattr(self.rewards, "quiet_idle_"+component, RewTerm(
+                func=idle_stance_cost, weight=weight, params={"component": component}))
+        self.commands.base_velocity.rel_zero_vel_envs = 0.10
+        self.commands.base_velocity.rel_only_lin_x_envs = 0.20

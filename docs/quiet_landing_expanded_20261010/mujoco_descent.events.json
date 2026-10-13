@@ -1,0 +1,156 @@
+[
+  {
+    "time": 2.7199999999999642,
+    "leg": "fl",
+    "pre_speed_m_s": 1.247118592262268,
+    "specific_energy_J_kg": 0.7776523915831106,
+    "map_valid": true
+  },
+  {
+    "time": 2.7199999999999642,
+    "leg": "fr",
+    "pre_speed_m_s": 1.123125672340393,
+    "specific_energy_J_kg": 0.63070563793503,
+    "map_valid": true
+  },
+  {
+    "time": 2.7549999999999635,
+    "leg": "fr",
+    "pre_speed_m_s": 1.4582507610321045,
+    "specific_energy_J_kg": 1.063247641025356,
+    "map_valid": true
+  },
+  {
+    "time": 2.769999999999963,
+    "leg": "fl",
+    "pre_speed_m_s": 1.7897443771362305,
+    "specific_energy_J_kg": 1.6015924677453768,
+    "map_valid": true
+  },
+  {
+    "time": 2.769999999999963,
+    "leg": "fr",
+    "pre_speed_m_s": 1.51641845703125,
+    "specific_energy_J_kg": 1.1497624684125185,
+    "map_valid": true
+  },
+  {
+    "time": 2.92499999999996,
+    "leg": "hl",
+    "pre_speed_m_s": 0.04257664456963539,
+    "specific_energy_J_kg": 0.0009063853314045314,
+    "map_valid": true
+  },
+  {
+    "time": 3.2799999999999523,
+    "leg": "hr",
+    "pre_speed_m_s": 0.5657049417495728,
+    "specific_energy_J_kg": 0.16001104055994375,
+    "map_valid": true
+  },
+  {
+    "time": 3.329999999999951,
+    "leg": "hr",
+    "pre_speed_m_s": 0.1651795208454132,
+    "specific_energy_J_kg": 0.013642137053360148,
+    "map_valid": true
+  },
+  {
+    "time": 3.3699999999999504,
+    "leg": "hr",
+    "pre_speed_m_s": 0.10943938046693802,
+    "specific_energy_J_kg": 0.005988488998493607,
+    "map_valid": true
+  },
+  {
+    "time": 3.5049999999999475,
+    "leg": "hr",
+    "pre_speed_m_s": 0.6005999445915222,
+    "specific_energy_J_kg": 0.18036014672166978,
+    "map_valid": true
+  },
+  {
+    "time": 3.529999999999947,
+    "leg": "hr",
+    "pre_speed_m_s": 0.4516180157661438,
+    "specific_energy_J_kg": 0.10197941608227445,
+    "map_valid": true
+  },
+  {
+    "time": 3.5499999999999465,
+    "leg": "hr",
+    "pre_speed_m_s": 0.40836387872695923,
+    "specific_energy_J_kg": 0.08338052872446333,
+    "map_valid": true
+  },
+  {
+    "time": 3.5549999999999464,
+    "leg": "hl",
+    "pre_speed_m_s": 1.1181707382202148,
+    "specific_energy_J_kg": 0.6251528999059701,
+    "map_valid": true
+  },
+  {
+    "time": 3.584999999999946,
+    "leg": "fl",
+    "pre_speed_m_s": 1.3525983095169067,
+    "specific_energy_J_kg": 0.9147610934539969,
+    "map_valid": true
+  },
+  {
+    "time": 3.6549999999999443,
+    "leg": "hr",
+    "pre_speed_m_s": 1.7314220666885376,
+    "specific_energy_J_kg": 1.4989111865080034,
+    "map_valid": true
+  },
+  {
+    "time": 3.664999999999944,
+    "leg": "fr",
+    "pre_speed_m_s": 1.2710810899734497,
+    "specific_energy_J_kg": 0.8078235686440465,
+    "map_valid": true
+  },
+  {
+    "time": 3.7349999999999426,
+    "leg": "fr",
+    "pre_speed_m_s": 0.17088712751865387,
+    "specific_energy_J_kg": 0.014601205175788334,
+    "map_valid": true
+  },
+  {
+    "time": 3.85999999999994,
+    "leg": "hr",
+    "pre_speed_m_s": 0.026461172848939896,
+    "specific_energy_J_kg": 0.00035009683427073696,
+    "map_valid": true
+  },
+  {
+    "time": 3.8799999999999395,
+    "leg": "hr",
+    "pre_speed_m_s": 0.04587147757411003,
+    "specific_energy_J_kg": 0.0010520962274160398,
+    "map_valid": true
+  },
+  {
+    "time": 3.899999999999939,
+    "leg": "hr",
+    "pre_speed_m_s": 0.11783653497695923,
+    "specific_energy_J_kg": 0.006942724487688068,
+    "map_valid": true
+  },
+  {
+    "time": 3.909999999999939,
+    "leg": "fr",
+    "pre_speed_m_s": 1.2216757535934448,
+    "specific_energy_J_kg": 0.7462458234590557,
+    "map_valid": true
+  },
+  {
+    "time": 3.9649999999999377,
+    "leg": "fr",
+    "pre_speed_m_s": 1.7130801677703857,
+    "specific_energy_J_kg": 1.4673218306041065,
+    "map_valid": true
+  }
+]

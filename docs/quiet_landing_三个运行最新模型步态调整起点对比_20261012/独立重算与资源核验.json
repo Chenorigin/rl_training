@@ -1,0 +1,74 @@
+{
+  "result": "PASS",
+  "checks": [
+    {
+      "model": "V1_257100",
+      "case": "零命令",
+      "sha256": "368fa6287d3fc5e999b4ad596ad9f84be23f25d72bbd861236ec535a66b51c1c",
+      "fell": false,
+      "samples": 7200,
+      "physics": true,
+      "external_correction": false,
+      "peak_RSS_KiB": 1103024
+    },
+    {
+      "model": "V1_257100",
+      "case": "仅w",
+      "sha256": "368fa6287d3fc5e999b4ad596ad9f84be23f25d72bbd861236ec535a66b51c1c",
+      "fell": false,
+      "samples": 7200,
+      "physics": true,
+      "external_correction": false,
+      "peak_RSS_KiB": 1104632
+    },
+    {
+      "model": "旧V1.5_236200",
+      "case": "零命令",
+      "sha256": "9b7d25e4af5d325e6206090035be8fc3b1e7578bb45c408dff70719eeeef31f0",
+      "fell": false,
+      "samples": 7200,
+      "physics": true,
+      "external_correction": false,
+      "peak_RSS_KiB": 1102400
+    },
+    {
+      "model": "旧V1.5_236200",
+      "case": "仅w",
+      "sha256": "9b7d25e4af5d325e6206090035be8fc3b1e7578bb45c408dff70719eeeef31f0",
+      "fell": false,
+      "samples": 7200,
+      "physics": true,
+      "external_correction": false,
+      "peak_RSS_KiB": 1106368
+    },
+    {
+      "model": "新V1.5_230900",
+      "case": "零命令",
+      "sha256": "6b36dd2f613be8fcc81482af85d74c6ca31367398cffff2269e599d0918a896c",
+      "fell": false,
+      "samples": 7200,
+      "physics": true,
+      "external_correction": false,
+      "peak_RSS_KiB": 1104600
+    },
+    {
+      "model": "新V1.5_230900",
+      "case": "仅w",
+      "sha256": "6b36dd2f613be8fcc81482af85d74c6ca31367398cffff2269e599d0918a896c",
+      "fell": false,
+      "samples": 7200,
+      "physics": true,
+      "external_correction": false,
+      "peak_RSS_KiB": 1105924
+    }
+  ],
+  "source_sha256_checked": {
+    "deploy/deploy_mujoco/deploy_mujoco.py": "dc619164c56aebd3e65b1fe192d3c1bbb767f85732820b284ed012af83120e15",
+    "deploy/deploy_mujoco/quiet_landing_metrics.py": "898157df1655055e36f6693845ea2a168825880e116f6232b2c87f2cd1a07a26",
+    "/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml": "98ac70602d930dac0f0b65124309c59c9c98cca9186f071262981e0e32bceb7a",
+    "deploy/deploy_mujoco/terrains/all_terrain.xml": "78e8cbb5a0eaeff9b08566f58fa7589a01a1115777053f76189b18bd7538af5a"
+  },
+  "six_fresh_physical_replays": true,
+  "all_no_fall": true,
+  "fall_exclusion": "Entire falling replay excluded; not selectively cutting around force peaks."
+}

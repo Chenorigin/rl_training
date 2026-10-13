@@ -1,0 +1,114 @@
+{
+  "candidate": "distilled_round5",
+  "passed": true,
+  "checks": {
+    "no_fall": true,
+    "full_duration": true,
+    "stationary_drift": true,
+    "stationary_yaw": true,
+    "stop_displacement": true,
+    "stop_yaw": true,
+    "prestop_moving": true,
+    "residual_speed": true,
+    "stairs_exit": true,
+    "quiet_peak": true,
+    "quiet_cumulative_energy": true
+  },
+  "result": {
+    "零命令": {
+      "fell": false,
+      "duration_s": 35.999999999999964,
+      "actor_action_dimension": 16,
+      "no_runtime_stop_clamp": true,
+      "drift_m": 0.021335733272148653,
+      "net_displacement_m": 0.021335733272148653,
+      "window_path_m": 0.021336287355046654,
+      "residual_last10_m_s": 0.0006319187128333084,
+      "yaw_excursion_deg": 0.34268733845386334,
+      "final_wheel_actions": [
+        0.004312962293624878,
+        0.004594773054122925,
+        -0.024126175791025162,
+        0.00962691567838192
+      ]
+    },
+    "平地启停": {
+      "fell": false,
+      "duration_s": 35.999999999999964,
+      "actor_action_dimension": 16,
+      "no_runtime_stop_clamp": true,
+      "drift_m": 0.0732306272341555,
+      "net_displacement_m": 0.06128799127597651,
+      "window_path_m": 0.10237530133979905,
+      "residual_last10_m_s": 0.0006092430576228916,
+      "yaw_excursion_deg": 0.6243377848634926,
+      "final_wheel_actions": [
+        0.004305928945541382,
+        0.004621595144271851,
+        -0.024143312126398087,
+        0.009638478979468346
+      ],
+      "prestop_forward_progress_m": 3.5953298101401874
+    },
+    "仅w": {
+      "fell": false,
+      "duration_s": 35.999999999999964,
+      "actor_action_dimension": 16,
+      "no_runtime_stop_clamp": true,
+      "stairs_exit_time_s": 18.680000000000568,
+      "stairs_events": 85,
+      "stairs_40ms_mean_peak_N": 444.5665227166075,
+      "stairs_specific_energy_per_forward_m": 9.193470391097078,
+      "stairs_max_abs_y_m": 0.2105193316881393
+    }
+  },
+  "baseline": {
+    "零命令": {
+      "fell": false,
+      "duration_s": 35.999999999999964,
+      "actor_action_dimension": 16,
+      "no_runtime_stop_clamp": true,
+      "drift_m": 0.8615137144913466,
+      "net_displacement_m": 0.8615137144913466,
+      "window_path_m": 0.8616214995946923,
+      "residual_last10_m_s": 0.03310529348379041,
+      "yaw_excursion_deg": 3.1378152711671277,
+      "final_wheel_actions": [
+        -0.22970865666866302,
+        -0.5536505579948425,
+        0.2235236018896103,
+        0.26447176933288574
+      ]
+    },
+    "平地启停": {
+      "fell": false,
+      "duration_s": 35.999999999999964,
+      "actor_action_dimension": 16,
+      "no_runtime_stop_clamp": true,
+      "drift_m": 0.7672898201697123,
+      "net_displacement_m": 0.7672898201697123,
+      "window_path_m": 0.7688891830352254,
+      "residual_last10_m_s": 0.03310799326159031,
+      "yaw_excursion_deg": 2.8615978223142102,
+      "final_wheel_actions": [
+        -0.22971211373806,
+        -0.5536518692970276,
+        0.22352446615695953,
+        0.26447421312332153
+      ],
+      "prestop_forward_progress_m": 3.6574533174242254
+    },
+    "仅w": {
+      "fell": false,
+      "duration_s": 35.999999999999964,
+      "actor_action_dimension": 16,
+      "no_runtime_stop_clamp": true,
+      "stairs_exit_time_s": 18.560000000000592,
+      "stairs_events": 97,
+      "stairs_40ms_mean_peak_N": 402.10734382985885,
+      "stairs_specific_energy_per_forward_m": 9.149163244798544,
+      "stairs_max_abs_y_m": 0.2495380323856255
+    }
+  },
+  "criteria": "/home/ubuntu/cyq_shixi_projects/rl_training/docs/m20_idle_stop_257100_20261012/criteria.json"
+}

@@ -1,0 +1,132 @@
+{
+  "policy_path": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_student_v0/2026-10-12_23-24-52_380795_student_v0_stage_a/model_21000.pt",
+  "policy_sha256": "e3c08b47f6aba6898a34add1aacd29f547679668da4a03e4ded5d4576fd754d9",
+  "policy_source_state_key": "student_state_dict",
+  "model_path": "/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+  "model_xml_sha256": "98ac70602d930dac0f0b65124309c59c9c98cca9186f071262981e0e32bceb7a",
+  "mujoco_version": "3.10.0",
+  "terrain": {
+    "terrain": "rough",
+    "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/student_v0_mujoco_20261013/code/deploy/deploy_mujoco/terrains/rough.xml",
+    "terrain_parameters": {
+      "width": [
+        4.0
+      ],
+      "friction": [
+        1.0,
+        0.01,
+        0.01
+      ],
+      "spawn_xy": [
+        -1.0,
+        0.0
+      ],
+      "spawn_yaw_deg": [
+        0.0
+      ],
+      "start_x": [
+        0.5
+      ],
+      "length": [
+        4.0
+      ],
+      "cell_size": [
+        0.3
+      ],
+      "gap": [
+        0.05
+      ],
+      "height_min": [
+        0.02
+      ],
+      "height_max": [
+        0.12
+      ],
+      "seed": [
+        42.0
+      ]
+    },
+    "goal_x": 4.5,
+    "course_width": 4.0
+  },
+  "noise_profile": "realistic",
+  "perception": {
+    "level": 1.0,
+    "height_noise_std": 0.02,
+    "height_bias_std": 0.015,
+    "xy_bias_std": 0.015,
+    "yaw_bias_std": 0.01,
+    "point_dropout": 0.03,
+    "occlusion_probability": 0.3,
+    "occlusion_width_m": 0.4,
+    "occlusion_height_m": 0.3,
+    "occlusion_hold_s": 0.5,
+    "map_update_period_s": 0.1,
+    "max_delay_s": 0.06,
+    "packet_dropout": 0.05,
+    "max_map_age_s": 0.3,
+    "variance_growth_per_s": 0.001,
+    "confidence_reference_std": 0.05,
+    "confidence_age_tau_s": 0.5
+  },
+  "sensor_extras": {
+    "lidar_visibility": true,
+    "sensor_offset_body_m": [
+      0.1,
+      0.0,
+      0.15
+    ],
+    "gyro_std_rad_s": 0.015,
+    "gravity_tilt_std_rad": 0.01,
+    "joint_position_std_rad": 0.002,
+    "joint_velocity_std_rad_s": 0.05,
+    "action_delay_steps": 1,
+    "blackout_start_s": 3.0,
+    "blackout_period_s": 8.0,
+    "blackout_duration_s": 0.0
+  },
+  "confidence_pose_covariance_included": false,
+  "map_model": "training synthetic delayed patches + optional geometric terrain visibility; no beam scan, self-shadow or multi-frame fusion",
+  "seed": 42,
+  "controller": "student_only",
+  "teacher_executed_fraction": 0.0,
+  "weights_updated": false,
+  "physics": "closed loop mj_step",
+  "physics_dt_s": 0.005,
+  "policy_dt_s": 0.02,
+  "friction_scale": 1.0,
+  "command": [
+    0.5,
+    0.0,
+    0.0
+  ],
+  "warmup_s": 0.0,
+  "duration_s": 20.000000000000306,
+  "control_steps": 1000,
+  "wall_time_s": 1.9913238971494138,
+  "fell": false,
+  "first_fall_time_s": null,
+  "ever_outside_course": false,
+  "end_base_position": [
+    8.531849747693682,
+    -0.369468200049131,
+    0.5662208265904759
+  ],
+  "net_xy_distance_m": 9.53900761942539,
+  "velocity_xy_rmse_m_s": 0.13178829132503952,
+  "velocity_yaw_rmse_rad_s": 0.13174644677570232,
+  "tilt_p95_deg": 6.201918581127262,
+  "valid_fraction_mean": 0.7707700534759359,
+  "all_unknown_frames": 0,
+  "confidence_valid_mean": 0.5830528736114502,
+  "lidar_visible_fraction_mean": 0.9416470588235294,
+  "blackout_frames": 0,
+  "action_abs_max": 6.047784805297852,
+  "action_clipped_fraction": 0.0,
+  "evaluation_limit": "single seed fixed-command episode; crossing does not prove obstacle traversal or real-world capability",
+  "crossed_finish": true,
+  "inside_course": true,
+  "cleared_terrain": true,
+  "cleared_stairs": false,
+  "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked"
+}

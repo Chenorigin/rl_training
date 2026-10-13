@@ -48,3 +48,37 @@ _build
 CLAUDE.md
 
 **/usd/*
+
+# Source-only publication: local/runtime files stay off GitHub
+.scratch/
+.aws/
+.codex/
+.agents/
+.claude/
+.env
+.env.*
+*.pem
+*.key
+*.onnx
+*.jit
+*.engine
+*.npz
+*.npy
+*.pkl
+*.pickle
+*.mp4
+*.avi
+*.mov
+*.webm
+*.zip
+*.tar
+*.gz
+*.7z
+*.bag
+*.db3
+*.mcap
+*.log
+*.diff
+*.patch
+MUJOCO_LOG.TXT
+**/source_snapshot/

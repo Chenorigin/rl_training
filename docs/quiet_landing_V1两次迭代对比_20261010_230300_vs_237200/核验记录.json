@@ -1,0 +1,9 @@
+{
+  "physics_sampling_s": 0.005,
+  "energy_identity": "PASS",
+  "force_identity": "PASS",
+  "all_samples_finite": "PASS",
+  "both_complete_no_fall": "PASS",
+  "230300_prior_rollout_reproduction": "PASS",
+  "new_checkpoint_frozen": 237200
+}

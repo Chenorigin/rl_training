@@ -1,0 +1,30 @@
+{
+  "inputs": [
+    "docs/m20_idle_stop_257100_20261012/inputs/distill_reference_\u96f6\u547d\u4ee4_inputs.npz",
+    "docs/m20_idle_stop_257100_20261012/inputs/distill_reference_\u5e73\u5730\u542f\u505c_inputs.npz",
+    "docs/m20_idle_stop_257100_20261012/inputs/distill_reference_\u4ec5w_inputs.npz",
+    "docs/m20_idle_stop_257100_20261012/inputs/wheel_feedback_\u96f6\u547d\u4ee4_inputs.npz",
+    "docs/m20_idle_stop_257100_20261012/inputs/wheel_feedback_\u5e73\u5730\u542f\u505c_inputs.npz",
+    "docs/m20_idle_stop_257100_20261012/inputs/wheel_feedback_\u4ec5w_inputs.npz",
+    "docs/m20_idle_stop_257100_20261012/inputs/wheel_head_round3_\u96f6\u547d\u4ee4_inputs.npz",
+    "docs/m20_idle_stop_257100_20261012/inputs/wheel_head_round3_\u5e73\u5730\u542f\u505c_inputs.npz",
+    "docs/m20_idle_stop_257100_20261012/inputs/wheel_head_round3_\u4ec5w_inputs.npz",
+    "docs/m20_idle_stop_257100_20261012/inputs/distilled_round4_\u96f6\u547d\u4ee4_inputs.npz",
+    "docs/m20_idle_stop_257100_20261012/inputs/distilled_round4_\u5e73\u5730\u542f\u505c_inputs.npz",
+    "docs/m20_idle_stop_257100_20261012/inputs/distilled_round4_\u4ec5w_inputs.npz"
+  ],
+  "input_sha256": {
+    "docs/m20_idle_stop_257100_20261012/inputs/distill_reference_\u96f6\u547d\u4ee4_inputs.npz": "1b781aefd613625f90b9ff1b15ecb81446de40eaa13172ffca508d0062f8a46e",
+    "docs/m20_idle_stop_257100_20261012/inputs/distill_reference_\u5e73\u5730\u542f\u505c_inputs.npz": "010015f40c61b180c5861f43d544defc9ab9c5eb49661f7a144460ca0d60aae3",
+    "docs/m20_idle_stop_257100_20261012/inputs/distill_reference_\u4ec5w_inputs.npz": "92ba23bb3b22312c64be73bb68db3ce47b5abf2fbb6ee4d6731769c503aa1b4d",
+    "docs/m20_idle_stop_257100_20261012/inputs/wheel_feedback_\u96f6\u547d\u4ee4_inputs.npz": "34af584f22a2c16e5c3dccd2eea79e75cafea39828971d60a4c75a8e8b2e0fff",
+    "docs/m20_idle_stop_257100_20261012/inputs/wheel_feedback_\u5e73\u5730\u542f\u505c_inputs.npz": "d609650ee906088586cb25216ecd405b3646e38da2a52814b283c35702fe7f6b",
+    "docs/m20_idle_stop_257100_20261012/inputs/wheel_feedback_\u4ec5w_inputs.npz": "27d00bf3ffed92067086f58518cb2de51a57e304230a0d49635678eed44e97f6",
+    "docs/m20_idle_stop_257100_20261012/inputs/wheel_head_round3_\u96f6\u547d\u4ee4_inputs.npz": "85251776072e904e67358b5b3a50f8cf3cc99df83fe3aef37b1046469287bccd",
+    "docs/m20_idle_stop_257100_20261012/inputs/wheel_head_round3_\u5e73\u5730\u542f\u505c_inputs.npz": "f361af668d15f3da40a8bef1edd5f94e7f8b28870d439e3ae37045b9bc254cdf",
+    "docs/m20_idle_stop_257100_20261012/inputs/wheel_head_round3_\u4ec5w_inputs.npz": "e2557861b9fd02974cf47386591a1ff935660a9028a0e3118512fafda7ebb85e",
+    "docs/m20_idle_stop_257100_20261012/inputs/distilled_round4_\u96f6\u547d\u4ee4_inputs.npz": "2fd2d273e7da94ff0cfb80b799dcf132c98df4c24d3404a0b4a675b712535b4f",
+    "docs/m20_idle_stop_257100_20261012/inputs/distilled_round4_\u5e73\u5730\u542f\u505c_inputs.npz": "bd8a4c054d6c6fce0187659c8d1b83df95be2cd92f229943af1c12ec4c69b0d1",
+    "docs/m20_idle_stop_257100_20261012/inputs/distilled_round4_\u4ec5w_inputs.npz": "ca946a8aa0b037fe01d831439b4e0bf172f26e7051bad3b96336522fdf5c6b17"
+  }
+}

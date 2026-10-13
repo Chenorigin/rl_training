@@ -1,0 +1,140 @@
+{
+  "paths": {
+    "baseline": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-09_01-55-35_gait_fix_descent_entry/model_214700.pt",
+    "quiet_v1": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-48-58_quiet_landing_v1/model_230300.pt",
+    "model": "/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+    "terrain": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/all_terrain.xml",
+    "sampler": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/quiet_landing_metrics.py",
+    "runner": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/deploy_mujoco.py"
+  },
+  "sha256": {
+    "baseline": "19743a46229a2ba138716adb7f02dafa318684a2500d13c8107661279c217dd5",
+    "quiet_v1": "7d79479e11715b0ae5bb7cd29f2bb2bccd357b16a6004eb56f03494a52a2fa67",
+    "model": "98ac70602d930dac0f0b65124309c59c9c98cca9186f071262981e0e32bceb7a",
+    "terrain": "78e8cbb5a0eaeff9b08566f58fa7589a01a1115777053f76189b18bd7538af5a",
+    "sampler": "898157df1655055e36f6693845ea2a168825880e116f6232b2c87f2cd1a07a26",
+    "runner": "9ef5851d0d16eeb87763d6e3f91206744e0b3ff15533bb7ec8a6e4d3c3974eaa"
+  },
+  "command": [
+    0.5,
+    0,
+    0
+  ],
+  "spawn": [
+    -1,
+    0,
+    0
+  ],
+  "maximum_seconds": 120,
+  "policy_dt": 0.02,
+  "physics_dt": 0.005,
+  "stop_on_first_fall": true,
+  "fall_thresholds": {
+    "base_height_above_ground": 0.22,
+    "projected_gravity_z_max": -0.35
+  },
+  "goal_x": 38,
+  "course_half_width": 2,
+  "event_definition": "production tracker: 5/2N hysteresis, >=10ms airborne, >=100ms reset grace, tread_force_ratio>=0.5; estimated scan normal",
+  "force_window_seconds": 0.04,
+  "energy_definition": "0.5*pre_normal_closing_speed^2 J/kg; wheel-mass normal kinetic proxy also reported",
+  "analysis_domain": "root x in [-1,38], t>=0.1s, before first fall; common-covered road segments for primary comparison",
+  "interpretation": "proxy reduction requires comparable task coverage/progress; report failure and uncovered segments; no real sound/dB conclusion",
+  "sections": [
+    [
+      -1,
+      1,
+      "起步平地"
+    ],
+    [
+      1,
+      2.8,
+      "上楼"
+    ],
+    [
+      2.8,
+      4.8,
+      "楼顶平台"
+    ],
+    [
+      4.8,
+      6.6,
+      "下楼"
+    ],
+    [
+      6.6,
+      8,
+      "缓冲1"
+    ],
+    [
+      8,
+      11,
+      "上坡"
+    ],
+    [
+      11,
+      12.5,
+      "坡顶"
+    ],
+    [
+      12.5,
+      15.5,
+      "下坡"
+    ],
+    [
+      15.5,
+      17,
+      "缓冲2"
+    ],
+    [
+      17,
+      20,
+      "粗糙路面"
+    ],
+    [
+      20,
+      21,
+      "缓冲3"
+    ],
+    [
+      21,
+      24,
+      "错位障碍"
+    ],
+    [
+      24,
+      25,
+      "缓冲4"
+    ],
+    [
+      25,
+      27.22,
+      "障碍条"
+    ],
+    [
+      27.22,
+      29,
+      "缓冲5"
+    ],
+    [
+      29,
+      32,
+      "横坡"
+    ],
+    [
+      32,
+      34,
+      "缓冲6"
+    ],
+    [
+      34,
+      36,
+      "低摩擦"
+    ],
+    [
+      36,
+      38,
+      "终点平地"
+    ]
+  ]
+}

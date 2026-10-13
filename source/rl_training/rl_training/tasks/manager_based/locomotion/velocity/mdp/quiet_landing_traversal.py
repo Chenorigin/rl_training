@@ -22,6 +22,11 @@ from isaaclab.utils.math import quat_apply, quat_apply_inverse, yaw_quat
 
 from .commands import UniformThresholdVelocityCommand
 from .rewards import joint_pos_penalty
+from isaaclab.envs import ManagerBasedRLEnv
+from .quiet_landing_signals import (
+    LEGS, TouchdownTracker, ExtendedQuietTracker, map_clearance,
+    surface_normals, idle_stance_context,
+)
 
 
 # =============================================================================
@@ -1190,6 +1195,71 @@ def stair_ascent_direction_cost(env, asset_cfg, sensor_cfg, contact_sensor_cfg,
                                 command_name="base_velocity"):
     """Bounded ascent cost for cross-track drift, lateral speed and unwanted yaw."""
     return _ascent_direction_context(env, asset_cfg, sensor_cfg, contact_sensor_cfg, command_name)["cost"]
+
+
+def straight_route_context(env, asset_cfg=SceneEntityCfg("robot"), command_name="base_velocity"):
+    """Persistent world reference for straight translation, on every terrain.
+
+    Body yaw cannot redefine the route. Explicit turns, command direction
+    changes, episode resets and stopping end a segment. Unlike the inherited
+    ascent-only objective, this covers descent and both platform transitions.
+    Reference errors are diagnostics/reward state, not actor observations.
+    """
+    step = int(env.common_step_counter)
+    cache = getattr(env, "_quiet_straight_route_cache", None)
+    if cache is not None and cache["step"] == step:
+        return cache
+    robot = env.scene[asset_cfg.name]
+    command = env.command_manager.get_command(command_name)
+    xy = robot.data.root_pos_w[:, :2]
+    forward = torch.zeros(env.num_envs, 3, device=env.device);forward[:, 0] = 1
+    heading = quat_apply(yaw_quat(robot.data.root_quat_w), forward)[:, :2]
+    yaw = torch.atan2(heading[:, 1], heading[:, 0])
+    moving = torch.linalg.vector_norm(command[:, :2], dim=-1) > TUNING["translation_threshold"]
+    straight = moving & (command[:, 2].abs() < 0.05)
+    state = getattr(env, "_quiet_straight_route_state", None)
+    if state is None:
+        state = dict(active=torch.zeros_like(straight), yaw=yaw.clone(),
+                     xy=xy.clone(), command=command.clone(), cross=torch.zeros_like(yaw))
+        env._quiet_straight_route_state = state
+    previous = state["command"]
+    old_norm = torch.linalg.vector_norm(previous[:, :2], dim=-1)
+    norm = torch.linalg.vector_norm(command[:, :2], dim=-1)
+    cosine = (previous[:, :2]*command[:, :2]).sum(-1)/(old_norm*norm).clamp_min(1e-6)
+    changed = (old_norm > .1) & moving & (cosine < np.cos(TUNING["direction_command_change"]))
+    reset = env.episode_length_buf <= 1
+    start = straight & (~state["active"] | changed | reset)
+    # A small intentional yaw command integrates into the reference; current
+    # measured yaw is used only when establishing a new segment.
+    reference = state["yaw"] + previous[:, 2]*env.step_dt
+    reference = torch.where(start | ~straight, yaw, reference)
+    previous_yaw = state["yaw"] + .5*previous[:, 2]*env.step_dt
+    tangent = torch.stack((torch.cos(previous_yaw)*previous[:, 0]-torch.sin(previous_yaw)*previous[:, 1],
+                           torch.sin(previous_yaw)*previous[:, 0]+torch.cos(previous_yaw)*previous[:, 1]), -1)
+    tangent /= old_norm.clamp_min(1e-6)[:, None]
+    normal = torch.stack((-tangent[:, 1], tangent[:, 0]), -1)
+    increment = ((xy-state["xy"])*normal).sum(-1)
+    state["cross"] = torch.where(start | ~straight, 0.0, state["cross"]+increment)
+    lateral_speed = (robot.data.root_lin_vel_w[:, :2]*normal).sum(-1)
+    lateral_speed = torch.where(start, 0.0, lateral_speed)
+    heading_error = torch.atan2(torch.sin(yaw-reference), torch.cos(yaw-reference))
+    def excess(value, tolerance, scale):
+        u = (value.abs()-tolerance).clamp_min(0)/scale
+        huber = 2*(torch.sqrt(1+u.square())-1)
+        return huber/(1+huber/TUNING["direction_soft_cap"])
+    cost = excess(state["cross"], TUNING["direction_lateral_tolerance"], TUNING["direction_lateral_scale"])
+    cost += excess(lateral_speed, TUNING["direction_speed_tolerance"], TUNING["direction_speed_scale"])
+    cost += excess(heading_error, TUNING["direction_heading_tolerance"], TUNING["direction_heading_scale"])
+    cost *= straight
+    state.update(active=straight.clone(), yaw=reference.clone(), xy=xy.clone(), command=command.clone())
+    cache = dict(step=step, active=straight, cross_track=state["cross"].clone(),
+                 lateral_speed=lateral_speed, heading_error=heading_error, cost=cost)
+    env._quiet_straight_route_cache = cache
+    return cache
+
+
+def straight_route_cost(env, asset_cfg=SceneEntityCfg("robot"), command_name="base_velocity"):
+    return straight_route_context(env, asset_cfg, command_name)["cost"]
 
 
 def ascent_direction_metrics(env, env_ids):
@@ -2705,3 +2775,183 @@ def stair_distance_terrain_levels(
 
     update_gait_level_from_terrain_mean(mean_level)
     return mean_level
+
+
+# =============================================================================
+# Physics substeps: pre-impact sampling and episode diagnostics.
+# =============================================================================
+
+class M20QuietLandingEnv(ManagerBasedRLEnv):
+    POLICY_OBSERVATION_DIM = 244
+
+    def __init__(self, cfg, render_mode=None, **kwargs):
+        super().__init__(cfg, render_mode=render_mode, **kwargs)
+        self.quiet_tracker = TouchdownTracker(self.num_envs, self.device, cfg.quiet_landing)
+        self.quiet_extended_tracker = ExtendedQuietTracker(self.num_envs, self.device, cfg.quiet_extended)
+        robot = self.scene["robot"]
+        sensor = self.scene.sensors["contact_forces"]
+        self._quiet_body_ids, names = robot.find_bodies([f"{leg}_wheel" for leg in LEGS], preserve_order=True)
+        self._quiet_contact_ids, contact_names = sensor.find_bodies([f"{leg}_wheel" for leg in LEGS], preserve_order=True)
+        if names != [f"{leg}_wheel" for leg in LEGS] or contact_names != names:
+            raise RuntimeError("Quiet landing wheel order does not match FL/FR/HL/HR")
+        self._quiet_wheel_joint_ids, _ = robot.find_joints([f"{leg}_wheel_joint" for leg in LEGS], preserve_order=True)
+        self._quiet_leg_joint_ids, _ = robot.find_joints("^(?!.*_wheel_joint$).*")
+        # Action order is 12 leg positions then 4 wheel velocities, independent
+        # of the articulation joint order.
+        if list(self.action_manager.action_term_dim) != [12, 4]:
+            raise RuntimeError("Quiet grouped action reward requires leg12 / wheel4 action order")
+        self._quiet_leg_action_ids = slice(0, 12)
+        self._quiet_wheel_action_ids = slice(12, 16)
+        if self.observation_manager.group_obs_dim["policy"] != (self.POLICY_OBSERVATION_DIM,) or self.action_manager.total_action_dim != 16:
+            raise RuntimeError(f"Expected {self.POLICY_OBSERVATION_DIM}D policy / 16D action contract")
+        self.quiet_stability = None
+        if getattr(cfg.rewards, "quiet_idle_motion", None) is not None:
+            from rl_training.tasks.manager_based.locomotion.velocity.mdp.quiet_landing_traversal import straight_route_context
+            self._quiet_route_context = straight_route_context
+            self.quiet_stability = {key: torch.zeros(self.num_envs, device=self.device) for key in
+                ("time", "idle", "loaded", "speed", "yaw", "diagonal", "route", "cross", "heading")}
+
+    def step(self, action):
+        self.extras.pop("log", None)
+        self.quiet_tracker.begin_step()
+        self.quiet_extended_tracker.begin_step()
+        self.action_manager.process_action(action.to(self.device))
+        self.recorder_manager.record_pre_step()
+        rendering = self.sim.has_gui() or self.sim.has_rtx_sensors()
+        robot = self.scene["robot"]
+        sensor = self.scene.sensors["contact_forces"]
+        # Original scanner only, at its original update frequency; no privileged rays.
+        hits = self.scene.sensors["height_scanner"].data.ray_hits_w
+        finite_hits = torch.isfinite(hits).all(-1)
+        high = torch.where(finite_hits, hits[..., 2], -torch.inf).amax(-1)
+        low = torch.where(finite_hits, hits[..., 2], torch.inf).amin(-1)
+        stair = (high-low > self.cfg.quiet_extended.stair_height_threshold) & finite_hits.any(-1)
+        command = self.command_manager.get_command("base_velocity")
+        translating = torch.linalg.vector_norm(command[:, :2], dim=-1) > 0.1
+        # Diagnostic/reward gate only; never appended to policy observations.
+        flat = finite_hits.all(-1) & (high-low <= self.cfg.quiet_extended.load_balance_flat_range)
+        start_xy = robot.data.root_pos_w[:, :2].clone()
+        for _ in range(self.cfg.decimation):
+            pre_velocity = robot.data.body_lin_vel_w[:, self._quiet_body_ids].clone()
+            wheels = robot.data.body_pos_w[:, self._quiet_body_ids]
+            clearance, valid = map_clearance(wheels, hits, self.cfg.quiet_landing)
+            normals, normal_valid = surface_normals(wheels, hits, self.cfg.quiet_extended)
+            self._sim_step_counter += 1
+            self.action_manager.apply_action()
+            self.scene.write_data_to_sim()
+            self.sim.step(render=False)
+            self.recorder_manager.record_post_physics_decimation_step()
+            if self._sim_step_counter % self.cfg.sim.render_interval == 0 and rendering:
+                self.sim.render()
+            self.scene.update(dt=self.physics_dt)
+            post_force = sensor.data.net_forces_w[:, self._quiet_contact_ids]
+            event, _ = self.quiet_tracker.update(pre_velocity, post_force, self.physics_dt, clearance, valid, normals)
+            swing_gate = (stair & translating)[:, None] & ((pre_velocity*normals).sum(-1) > 0.05)
+            self.quiet_extended_tracker.update(
+                event=event, contact=self.quiet_tracker.contact,
+                eligible=self.quiet_tracker.age >= self.cfg.quiet_landing.reset_grace_time,
+                force=post_force, normals=normals,
+                wheel_velocity=robot.data.body_lin_vel_w[:, self._quiet_body_ids],
+                wheel_omega=robot.data.body_ang_vel_w[:, self._quiet_body_ids],
+                radius=self.cfg.quiet_landing.wheel_radius,
+                wheel_acceleration=robot.data.joint_acc[:, self._quiet_wheel_joint_ids],
+                base_omega=robot.data.root_ang_vel_w, base_velocity=robot.data.root_lin_vel_w,
+                torque=robot.data.applied_torque, clearance=clearance, map_valid=valid,
+                swing_gate=swing_gate, dt=self.physics_dt,
+                balance_gate=flat & normal_valid.all(-1) & (command[:, 2].abs() < 0.1)
+                & (robot.data.projected_gravity_b[:, 2] < -0.98))
+            self.quiet_normal_valid_fraction = normal_valid.float().mean()
+        self.quiet_tracker.distance += torch.linalg.vector_norm(robot.data.root_pos_w[:, :2] - start_xy, dim=-1)
+        # Preserve this step's events for external probes even when an env resets
+        # below; episode tracker reset must not erase the returned step evidence.
+        self.quiet_step_events = self.quiet_tracker.step_events.clone()
+        self.episode_length_buf += 1
+        self.common_step_counter += 1
+        self.reset_buf = self.termination_manager.compute()
+        self.reset_terminated = self.termination_manager.terminated
+        self.reset_time_outs = self.termination_manager.time_outs
+        self.reward_buf = self.reward_manager.compute(dt=self.step_dt)
+        if self.quiet_stability is not None:
+            robot, idle, loaded, diagonal = idle_stance_context(self)
+            q = self.quiet_stability
+            q["time"] += self.step_dt
+            q["idle"] += idle*self.step_dt
+            q["loaded"] += loaded*self.step_dt
+            q["speed"] += torch.linalg.vector_norm(robot.data.root_lin_vel_w[:, :2], dim=-1)*idle*self.step_dt
+            q["yaw"] += robot.data.root_ang_vel_w[:, 2].abs()*idle*self.step_dt
+            q["diagonal"] += diagonal.abs()*loaded*self.step_dt
+            route_term = getattr(self.cfg.rewards, "quiet_straight_route", None)
+            if route_term is not None:
+                # Diagnostics must also work when its reward weight is zero
+                # for an ablation. The helper caches each step's integration.
+                route = self._quiet_route_context(self, **route_term.params)
+                q["route"] += route["active"]*self.step_dt
+                q["cross"] += route["cross_track"].abs()*route["active"]*self.step_dt
+                q["heading"] += route["heading_error"].abs()*route["active"]*self.step_dt
+        if len(self.recorder_manager.active_terms) > 0:
+            self.obs_buf = self.observation_manager.compute()
+            self.recorder_manager.record_post_step()
+        reset_ids = self.reset_buf.nonzero(as_tuple=False).squeeze(-1)
+        if len(reset_ids) > 0:
+            self.recorder_manager.record_pre_reset(reset_ids)
+            self._reset_idx(reset_ids)
+            rerenders = getattr(self.cfg, "num_rerenders_on_reset", int(getattr(self.cfg, "rerender_on_reset", False)))
+            if self.sim.has_rtx_sensors():
+                for _ in range(rerenders):
+                    self.sim.render()
+            self.recorder_manager.record_post_reset(reset_ids)
+        self.command_manager.compute(dt=self.step_dt)
+        if "interval" in self.event_manager.available_modes:
+            self.event_manager.apply(mode="interval", dt=self.step_dt)
+        self.obs_buf = self.observation_manager.compute(update_history=True)
+        return self.obs_buf, self.reward_buf, self.reset_terminated, self.reset_time_outs, self.extras
+
+    def _reset_idx(self, env_ids):
+        tracker = getattr(self, "quiet_tracker", None)
+        quiet = tracker.metrics(env_ids) if tracker is not None else {}
+        extended = getattr(self, "quiet_extended_tracker", None)
+        if extended is not None:
+            quiet.update(extended.metrics(env_ids))
+        stability = getattr(self, "quiet_stability", None)
+        if stability is not None:
+            q = {key: value[env_ids].sum() for key, value in stability.items()}
+            quiet["QuietStand/idle_flat_fraction"] = q["idle"]/q["time"].clamp_min(1e-6)
+            quiet["QuietRoute/straight_fraction"] = q["route"]/q["time"].clamp_min(1e-6)
+            if q["idle"] > 0:
+                quiet["QuietStand/loaded_fraction"] = q["loaded"]/q["idle"]
+                quiet["QuietStand/mean_xy_speed_m_s"] = q["speed"]/q["idle"]
+                quiet["QuietStand/mean_world_yaw_rate_rad_s"] = q["yaw"]/q["idle"]
+            if q["loaded"] > 0:
+                quiet["QuietStand/diagonal_abs_mean"] = q["diagonal"]/q["loaded"]
+            if q["route"] > 0:
+                quiet["QuietRoute/cross_track_abs_mean_m"] = q["cross"]/q["route"]
+                quiet["QuietRoute/heading_error_abs_mean_deg"] = torch.rad2deg(q["heading"]/q["route"])
+        super()._reset_idx(env_ids)
+        # Keep all traversal rewards active, but do not carry their debugging
+        # cards (gait_quality, angle/entry/leg pose, ascent_direction, etc.).
+        old = self.extras["log"]
+        kept = {key: value for key, value in old.items()
+                if key.startswith("Episode_Termination/") or key in (
+                    "Metrics/base_velocity/error_vel_xy", "Metrics/base_velocity/error_vel_yaw")}
+        reward_total = sum(value for key, value in old.items() if key.startswith("Episode_Reward/"))
+        kept["Task/episode_reward_rate"] = reward_total
+        names = ("quiet_touchdown", "joint_acc_l2", "joint_acc_wheel_l2", "stair_joint_acceleration_cost",
+                 "action_rate_l2", "action_smooth_l2", "quiet_action_leg_rate", "quiet_action_wheel_rate")
+        names += tuple("quiet_"+name for name in self.cfg.quiet_extended.weights)
+        names += ("quiet_idle_motion", "quiet_idle_pose", "quiet_idle_load", "quiet_straight_route")
+        for name in names:
+            key = "Episode_Reward/" + name
+            if key in old:
+                kept["QuietReward/" + name] = old[key]
+        kept.update(quiet)
+        if hasattr(self, "quiet_normal_valid_fraction"):
+            kept["QuietLanding/normal_fit_valid_fraction_last_substep"] = self.quiet_normal_valid_fraction
+        self.extras["log"] = kept
+        if tracker is not None:
+            tracker.reset(env_ids)
+        extended = getattr(self, "quiet_extended_tracker", None)
+        if extended is not None:
+            extended.reset(env_ids)
+        if stability is not None:
+            for value in stability.values():
+                value[env_ids] = 0.0

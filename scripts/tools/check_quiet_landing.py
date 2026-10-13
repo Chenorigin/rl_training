@@ -2,15 +2,15 @@
 """CPU behavioral checks of the actual shared touchdown production code."""
 from pathlib import Path
 import sys
-import importlib.util
+import ast
 from types import SimpleNamespace
 from unittest.mock import patch
 
 import torch
 
 ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "source/rl_training"))
-from m20_quiet.signals import QuietLandingSettings, TouchdownTracker, map_clearance
+sys.path.insert(0, str(ROOT / "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp"))
+from quiet_landing_signals import QuietLandingSettings, TouchdownTracker, map_clearance
 
 
 def main():
@@ -78,15 +78,20 @@ def main():
     except ValueError:
         pass
     # Discrete event contribution stays constant after RewardManager's dt factor.
-    from m20_quiet.signals import touchdown_cost
+    from quiet_landing_signals import touchdown_cost
     tracker.step_cost.fill_(4)
     for policy_dt in (.01, .02, .04):
         env = SimpleNamespace(quiet_tracker=tracker, step_dt=policy_dt)
         assert torch.allclose(touchdown_cost(env) * policy_dt, torch.full((2,), 4.))
     # Exercise the real sparse logger without importing the Isaac-only package.
-    spec = importlib.util.spec_from_file_location("quiet_logger_check", ROOT / "source/rl_training/rl_training/quiet_landing_runner.py")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    from rsl_rl.utils.logger import Logger
+    source = ROOT / "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/quiet_landing_ppo_cfg.py"
+    nodes = [node for node in ast.parse(source.read_text()).body
+             if isinstance(node, ast.ClassDef) and node.name == "QuietLandingLogger"]
+    assert len(nodes) == 1
+    scope = {"torch": torch, "Logger": Logger}
+    exec(compile(ast.Module(body=nodes, type_ignores=[]), str(source), "exec"), scope)
+    module = SimpleNamespace(Logger=Logger, QuietLandingLogger=scope["QuietLandingLogger"])
     logger = module.QuietLandingLogger.__new__(module.QuietLandingLogger)
     scalars = {}
     logger.writer = SimpleNamespace(add_scalar=lambda key, value, iteration: scalars.update({key: (float(value), iteration)}))

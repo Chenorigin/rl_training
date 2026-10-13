@@ -1,0 +1,227 @@
+{
+  "label": "v2",
+  "case": "descent",
+  "checkpoint": {
+    "path": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_gait_refinement_v2/2026-10-12_16-16-02_v2_idle_stop_stair_heading/model_2400.pt",
+    "frozen_copy": "/tmp/m20_three_model_20261012/v2.pt",
+    "sha256": "01df66926880c5cbe4d422640fe38ba1a65aea41e91e85bf24d45cf24e057ab1",
+    "bytes": 6420661
+  },
+  "source_sha256": {
+    "/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml": "98ac70602d930dac0f0b65124309c59c9c98cca9186f071262981e0e32bceb7a",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/deploy_mujoco.py": "dc619164c56aebd3e65b1fe192d3c1bbb767f85732820b284ed012af83120e15",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/quiet_landing_metrics.py": "d2afbb844119693dafa3e060a2dd83200f8679d789e7be0712797961880d369d",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrain_loader.py": "52fc8a6fb1f75a9d3f1e22f647f21898f1cf02d2bc7c03d5ff759b2f9afe56dc",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/keyboard_input.py": "6e4a90ea341e13a436ce96f0faa8dfef2eadf083cd7ca681bab0081b35e0efc6",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/quiet_landing_signals.py": "92c34024f9ac70075ce867375ca62c0538540211d77c7bc11946a72a16dd522c",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/flat.xml": "c666ac27dde7fb49ef016901beb952588d451fc4068c0b88db8836079c2a876c",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_ascent.xml": "4fd718ba3cbcd862be27908598926b81b5d9333a5610f49c24f7921f791a0c8b",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_descent.xml": "ea985fb4b770af6533f18e8347c483e62baba7317dd412df6794bd2ae51b3096",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/all_terrain.xml": "78e8cbb5a0eaeff9b08566f58fa7589a01a1115777053f76189b18bd7538af5a"
+  },
+  "compiled_model_sha256": "4c5c3b0d5c11e9c2663de60b001006592d1fef4fb3aad9b8237d870c049192f3",
+  "deployment_entry": "deploy_mujoco.interactive_rollout",
+  "policy_dt": 0.02,
+  "physics_dt": 0.005,
+  "deterministic_actor": true,
+  "course_correction": false,
+  "command_schedule": [
+    [
+      0,
+      [
+        0,
+        0,
+        0
+      ]
+    ],
+    [
+      8,
+      [
+        0.7,
+        0,
+        0
+      ]
+    ]
+  ],
+  "mj_step1_calls": 7200,
+  "mj_step2_calls": 7200,
+  "frames": 700,
+  "fps": 25,
+  "live_capture": true,
+  "clip_start_s": 8,
+  "clip_end_s": 36,
+  "early_termination_before_video_window": false,
+  "video_sha256": "92df66afa6e6c0e5bc48c305a64b5b5b1359e4059cb79cad6a7cb9a8d069e052",
+  "result": {
+    "checkpoint": "/tmp/m20_three_model_20261012/v2.pt",
+    "model": "/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+    "terrain": "descent",
+    "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/stairs_descent.xml",
+    "terrain_parameters": {
+      "width": [
+        4.0
+      ],
+      "friction": [
+        1.0,
+        0.01,
+        0.01
+      ],
+      "spawn_xy": [
+        -1.0,
+        0.0
+      ],
+      "spawn_yaw_deg": [
+        0.0
+      ],
+      "start_x": [
+        0.5
+      ],
+      "step_height": [
+        0.15
+      ],
+      "tread_depth": [
+        0.3
+      ],
+      "step_count": [
+        20.0
+      ],
+      "platform_length": [
+        10.0
+      ]
+    },
+    "goal_x": 6.5,
+    "course_width": 4.0,
+    "crossed_finish": true,
+    "inside_course": true,
+    "cleared_terrain": true,
+    "cleared_stairs": true,
+    "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked",
+    "steps_executed": 1800,
+    "final_mode": "policy",
+    "transitions": [
+      {
+        "time": 0.0,
+        "mode": "prone"
+      },
+      {
+        "time": 0.0,
+        "mode": "standing"
+      },
+      {
+        "time": 5.02,
+        "mode": "ready"
+      },
+      {
+        "time": 6.02,
+        "mode": "policy"
+      }
+    ],
+    "max_x": 17.631830066902236,
+    "final_x": 17.631830066902236,
+    "final_z": 0.5661913144764679,
+    "fell_in_policy": false,
+    "critic_used": false,
+    "trajectory": "/home/ubuntu/cyq_shixi_projects/rl_training/docs/m20_idle_stop_257100_20261012/three_model_comparison_v2_2400/v2_descent/control.npz",
+    "quiet": {
+      "QuietLanding/all/touchdown_count": 184.0,
+      "QuietLanding/all/raw_contact_edges": 367.0,
+      "QuietLanding/all/non_tread_edges": 15.0,
+      "QuietLanding/all/has_samples": 1.0,
+      "QuietLanding/all/map_valid_fraction": 1.0,
+      "QuietLanding/all/pre_speed_mean_m_s": 0.7147570252418518,
+      "QuietLanding/all/pre_speed_max_m_s": 2.315586805343628,
+      "QuietLanding/all/specific_energy_mean_J_kg": 0.4247278869152069,
+      "QuietLanding/all/height_window_event_coverage": 0.875,
+      "QuietLanding/all/pre_speed_p50_hist_m_s": 0.5250000357627869,
+      "QuietLanding/all/pre_speed_p95_hist_m_s": 1.5750000476837158,
+      "QuietLanding/all/histogram_tail_count": 0.0,
+      "QuietLanding/fl/touchdown_count": 29.0,
+      "QuietLanding/fl/raw_contact_edges": 51.0,
+      "QuietLanding/fl/non_tread_edges": 1.0,
+      "QuietLanding/fl/has_samples": 1.0,
+      "QuietLanding/fl/map_valid_fraction": 1.0,
+      "QuietLanding/fl/pre_speed_mean_m_s": 1.107885479927063,
+      "QuietLanding/fl/pre_speed_max_m_s": 1.6846078634262085,
+      "QuietLanding/fl/specific_energy_mean_J_kg": 0.7070154547691345,
+      "QuietLanding/fl/height_window_event_coverage": 0.8275862336158752,
+      "QuietLanding/fl/pre_speed_p50_hist_m_s": 1.274999976158142,
+      "QuietLanding/fl/pre_speed_p95_hist_m_s": 1.524999976158142,
+      "QuietLanding/fl/histogram_tail_count": 0.0,
+      "QuietLanding/fr/touchdown_count": 48.0,
+      "QuietLanding/fr/raw_contact_edges": 95.0,
+      "QuietLanding/fr/non_tread_edges": 9.0,
+      "QuietLanding/fr/has_samples": 1.0,
+      "QuietLanding/fr/map_valid_fraction": 1.0,
+      "QuietLanding/fr/pre_speed_mean_m_s": 0.382508784532547,
+      "QuietLanding/fr/pre_speed_max_m_s": 1.7719131708145142,
+      "QuietLanding/fr/specific_energy_mean_J_kg": 0.151337131857872,
+      "QuietLanding/fr/height_window_event_coverage": 0.9583333134651184,
+      "QuietLanding/fr/pre_speed_p50_hist_m_s": 0.17499999701976776,
+      "QuietLanding/fr/pre_speed_p95_hist_m_s": 1.1750000715255737,
+      "QuietLanding/fr/histogram_tail_count": 0.0,
+      "QuietLanding/hl/touchdown_count": 36.0,
+      "QuietLanding/hl/raw_contact_edges": 108.0,
+      "QuietLanding/hl/non_tread_edges": 5.0,
+      "QuietLanding/hl/has_samples": 1.0,
+      "QuietLanding/hl/map_valid_fraction": 1.0,
+      "QuietLanding/hl/pre_speed_mean_m_s": 1.010206937789917,
+      "QuietLanding/hl/pre_speed_max_m_s": 2.067207098007202,
+      "QuietLanding/hl/specific_energy_mean_J_kg": 0.643104076385498,
+      "QuietLanding/hl/height_window_event_coverage": 0.75,
+      "QuietLanding/hl/pre_speed_p50_hist_m_s": 1.274999976158142,
+      "QuietLanding/hl/pre_speed_p95_hist_m_s": 1.524999976158142,
+      "QuietLanding/hl/histogram_tail_count": 0.0,
+      "QuietLanding/hr/touchdown_count": 71.0,
+      "QuietLanding/hr/raw_contact_edges": 113.0,
+      "QuietLanding/hr/non_tread_edges": 0.0,
+      "QuietLanding/hr/has_samples": 1.0,
+      "QuietLanding/hr/map_valid_fraction": 1.0,
+      "QuietLanding/hr/pre_speed_mean_m_s": 0.6289962530136108,
+      "QuietLanding/hr/pre_speed_max_m_s": 2.315586805343628,
+      "QuietLanding/hr/specific_energy_mean_J_kg": 0.3835289776325226,
+      "QuietLanding/hr/height_window_event_coverage": 0.9014084339141846,
+      "QuietLanding/hr/pre_speed_p50_hist_m_s": 0.2750000059604645,
+      "QuietLanding/hr/pre_speed_p95_hist_m_s": 1.625,
+      "QuietLanding/hr/histogram_tail_count": 0.0,
+      "QuietLanding/distance_m": 18.745012283325195,
+      "QuietLanding/events_per_m": 9.81594467163086,
+      "QuietLanding/specific_energy_per_m_J_kg_m": 4.169105529785156,
+      "QuietCost/impact_peak": 249.85086059570312,
+      "QuietCost/impact_impulse": 121.40245056152344,
+      "QuietCost/loading_rate": 2.4903438091278076,
+      "QuietCost/wheel_jerk": 15.712081909179688,
+      "QuietCost/base_angular_acceleration": 2.7629549503326416,
+      "QuietCost/base_vertical_acceleration": 0.09005770832300186,
+      "QuietCost/torque_rate": 0.4896698296070099,
+      "QuietCost/wheel_slip": 0.765927791595459,
+      "QuietCost/swing_clearance": 0.43784192204475403,
+      "QuietLanding/impact_window_force_max_N": 1820.55224609375,
+      "QuietLanding/impact_window_excess_impulse_max_N_s": 17.336288452148438,
+      "QuietLanding/impact_window_loading_rate_max_N_s": 364110.46875,
+      "QuietLanding/contact_gated_slip_time_mean_m_s": 0.006887821014970541,
+      "QuietLoad/fl/mean_normal_force_N": 94.14527893066406,
+      "QuietLoad/fl/contact_fraction": 0.9109923839569092,
+      "QuietLoad/fr/mean_normal_force_N": 87.85735321044922,
+      "QuietLoad/fr/contact_fraction": 0.9044456481933594,
+      "QuietLoad/hl/mean_normal_force_N": 76.4280776977539,
+      "QuietLoad/hl/contact_fraction": 0.9139174818992615,
+      "QuietLoad/hr/mean_normal_force_N": 78.72048950195312,
+      "QuietLoad/hr/contact_fraction": 0.8934415578842163,
+      "QuietLoad/stable_support_fraction": 0.0,
+      "QuietLoad/stable_has_samples": 0.0
+    },
+    "quiet_trajectory": "/home/ubuntu/cyq_shixi_projects/rl_training/docs/m20_idle_stop_257100_20261012/three_model_comparison_v2_2400/v2_descent/control_quiet.npz"
+  },
+  "wall_seconds": 53.7758178699296,
+  "peak_RSS_MiB": 1176.25,
+  "substitutions": [
+    "keyboard input follows frozen schedule",
+    "headless live video viewer",
+    "wall pacing disabled"
+  ],
+  "instrumentation": [
+    "original observe return copied",
+    "step1/step2 invocation counters",
+    "separate MjData forwarded for measurements/render only"
+  ]
+}

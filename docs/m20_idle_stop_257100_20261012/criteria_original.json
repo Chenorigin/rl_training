@@ -1,0 +1,164 @@
+{
+  "checkpoints": {
+    "baseline": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-48-58_quiet_landing_v1/model_257100.pt"
+  },
+  "checkpoint_sha256": {
+    "V1_257100": "368fa6287d3fc5e999b4ad596ad9f84be23f25d72bbd861236ec535a66b51c1c",
+    "旧V1.5_236200": "9b7d25e4af5d325e6206090035be8fc3b1e7578bb45c408dff70719eeeef31f0",
+    "新V1.5_230900": "6b36dd2f613be8fcc81482af85d74c6ca31367398cffff2269e599d0918a896c"
+  },
+  "model": "/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+  "terrain": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/all_terrain.xml",
+  "sections": [
+    [
+      -1,
+      1,
+      "起步平地"
+    ],
+    [
+      1,
+      2.8,
+      "上楼"
+    ],
+    [
+      2.8,
+      4.8,
+      "楼顶平台"
+    ],
+    [
+      4.8,
+      6.6,
+      "下楼"
+    ],
+    [
+      6.6,
+      8,
+      "缓冲1"
+    ],
+    [
+      8,
+      11,
+      "上坡"
+    ],
+    [
+      11,
+      12.5,
+      "坡顶"
+    ],
+    [
+      12.5,
+      15.5,
+      "下坡"
+    ],
+    [
+      15.5,
+      17,
+      "缓冲2"
+    ],
+    [
+      17,
+      20,
+      "粗糙路面"
+    ],
+    [
+      20,
+      21,
+      "缓冲3"
+    ],
+    [
+      21,
+      24,
+      "错位障碍"
+    ],
+    [
+      24,
+      25,
+      "缓冲4"
+    ],
+    [
+      25,
+      27.22,
+      "障碍条"
+    ],
+    [
+      27.22,
+      29,
+      "缓冲5"
+    ],
+    [
+      29,
+      32,
+      "横坡"
+    ],
+    [
+      32,
+      34,
+      "缓冲6"
+    ],
+    [
+      34,
+      36,
+      "低摩擦"
+    ],
+    [
+      36,
+      38,
+      "终点平地"
+    ]
+  ],
+  "source_sha256": {
+    "deploy/deploy_mujoco/deploy_mujoco.py": "dc619164c56aebd3e65b1fe192d3c1bbb767f85732820b284ed012af83120e15",
+    "deploy/deploy_mujoco/quiet_landing_metrics.py": "898157df1655055e36f6693845ea2a168825880e116f6232b2c87f2cd1a07a26",
+    "/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml": "98ac70602d930dac0f0b65124309c59c9c98cca9186f071262981e0e32bceb7a",
+    "deploy/deploy_mujoco/terrains/all_terrain.xml": "78e8cbb5a0eaeff9b08566f58fa7589a01a1115777053f76189b18bd7538af5a"
+  },
+  "freeze_time_CST": "2026-10-12T11:54:12.232532+08:00",
+  "operations": {
+    "z_s": 0,
+    "c_s": 6,
+    "w_s": 8,
+    "duration_s": 36,
+    "command_body": [
+      0.7,
+      0,
+      0
+    ],
+    "external_correction": false
+  },
+  "reuse": {},
+  "resources": {
+    "smoke_peak_RSS_MiB": 3949.3,
+    "memory_available_GiB": 103,
+    "gpu_free_MiB": 47667,
+    "training_plan": "512 envs, 200 iterations, one process one GPU; estimated <=12GiB host, <=8GiB GPU from 16env 3.95GiB host plus conservative scene/batch scaling; timeout900s; <=100MiB checkpoint outputs plus source snapshots"
+  },
+  "exclusion": "Entire falling replay excluded from landing averages. Nonfall stairs subset not claimed to be complete all_terrain traversal. Complete eight-step force windows entirely within moving phase only.",
+  "replay_folders": {
+    "V1_257100": "docs/quiet_landing_三个运行最新模型步态调整起点对比_20261012",
+    "旧V1.5_236200": "docs/quiet_landing_三个运行最新模型步态调整起点对比_20261012",
+    "新V1.5_230900": "docs/quiet_landing_三个运行最新模型步态调整起点对比_20261012"
+  },
+  "comparison": "Three requested runs, each latest checkpoint frozen before first replay. Six fresh original interactive_rollout replays; no external correction; no reward, policy, gains or training edits.",
+  "decision_rule": "First check no fall and traverse common stairs. Compare zero-command drift, world-axis and initial-heading path error, flat roll/pitch and diagonal load; preserve quiet using both per-event velocity/energy/40ms force peaks and cumulative energy per meter plus event counts. No invented scalar ranking; if metrics conflict state tradeoffs. Only empirical start-point recommendation, not whole-terrain or real-robot certification.",
+  "instrument_positive_negative_checks": "Existing energy/force recomputation assertions cross-check arrays; zero/W command manifests must match [0,0,0]/[0.7,0,0]; false labels and changed hashes fail. Both absent-event/fall handling and event-window force calculation checked independently.",
+  "scope": "Fresh diagnosis only; original policy/control/rewards untouched. zero, forward, flat stop. No corrective yaw feedback.",
+  "diagnostic_rules": "Original fall rule unchanged. Report stationary drift/roll/load; route yaw/side offset; contact timing and touchdown speeds with video inspection. Contact transitions alone do not prove harmful chatter; mean balanced load cannot exclude instantaneous instability. No claim of repair or whole-course acceptance.",
+  "flat_terrain": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/flat.xml",
+  "acceptance": {
+    "stationary_window_s": [
+      10,
+      36
+    ],
+    "max_stationary_drift_m": 0.05,
+    "max_last10_residual_speed_m_s": 0.005,
+    "stop_time_s": 14.02,
+    "max_stop_displacement_m": 0.1,
+    "stationary_yaw_drift_deg": 1.0,
+    "no_policy_fall": true,
+    "stairs_exit_x_m": 6.6,
+    "max_stairs_exit_delay_relative_to_baseline_s": 2.0,
+    "stairs_40ms_mean_peak_ratio_max": 1.15,
+    "stairs_specific_energy_per_forward_m_ratio_max": 1.15,
+    "note": "Engineering targets chosen before candidate evaluation; same original fall rule and 36s duration. Passing one geometry/heading is only this fixed regression, not full terrain certification."
+  }
+}

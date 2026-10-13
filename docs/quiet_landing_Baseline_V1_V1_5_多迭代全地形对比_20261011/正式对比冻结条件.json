@@ -1,0 +1,142 @@
+{
+  "checkpoints": {
+    "Baseline": "logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-09_01-55-35_gait_fix_descent_entry/model_214700.pt",
+    "V1_230300": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-48-58_quiet_landing_v1/model_230300.pt",
+    "V1_237200": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-48-58_quiet_landing_v1/model_237200.pt",
+    "V1_233500": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-48-58_quiet_landing_v1/model_233500.pt",
+    "V1_255900": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-48-58_quiet_landing_v1/model_255900.pt",
+    "V1.5_230300": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_quiet_landing_v1_5/2026-10-10_17-55-27_quiet_landing_v1_5_from_baseline/model_230300.pt",
+    "V1.5_233500": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_quiet_landing_v1_5/2026-10-10_17-55-27_quiet_landing_v1_5_from_baseline/model_233500.pt"
+  },
+  "sha256": {
+    "Baseline": "19743a46229a2ba138716adb7f02dafa318684a2500d13c8107661279c217dd5",
+    "V1_230300": "7d79479e11715b0ae5bb7cd29f2bb2bccd357b16a6004eb56f03494a52a2fa67",
+    "V1_237200": "c325d841e0c301cc77df570f2c6e545cad6106a1033fb82418ef95f4c271a277",
+    "V1_233500": "76d93a90c87749da36c27ac4693b3e5a1e396e7751fea7a9927d7fde262088bf",
+    "V1_255900": "d14d5042f2976d4b7c89b8877e3392c930bb69662b8674f3bec09518d9fd6aad",
+    "V1.5_230300": "13b5e7622c61966c6ccbc4c7dc341f13e18a3f9eb63737ee15ff7207ac133dc5",
+    "V1.5_233500": "de3a5e0c6d2fb805bc1845870378fed231790923fc37af73a44d305ad3595248"
+  },
+  "preflight": "Sequential CPU OMP/MKL=1; available RAM 97214MiB, disk45GiB; extra RAM<=2GiB and outputs<100MiB/model based on identical previous sampler; max24000 physics steps/model.",
+  "baseline_feasibility": "same course command controller: world forward0.5m/s; lateral=-0.5*y capped0.25m/s; yaw_rate=0.5*wrapped headingerror capped0.5rad/s",
+  "duration_max_s": 120,
+  "stop": "first fall or all wheels finish inside course",
+  "physics_dt": 0.005,
+  "policy_dt": 0.02,
+  "model": "/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+  "terrain": "deploy/deploy_mujoco/terrains/all_terrain.xml",
+  "acceptance": "Only no-fall completed traversals enter primary comparison; failures stored separately, no outcome-driven checkpoint choice. Freeze final conditions after baseline feasibility, before comparative runs.",
+  "sections": [
+    [
+      -1,
+      1,
+      "起步平地"
+    ],
+    [
+      1,
+      2.8,
+      "上楼"
+    ],
+    [
+      2.8,
+      4.8,
+      "楼顶平台"
+    ],
+    [
+      4.8,
+      6.6,
+      "下楼"
+    ],
+    [
+      6.6,
+      8,
+      "缓冲1"
+    ],
+    [
+      8,
+      11,
+      "上坡"
+    ],
+    [
+      11,
+      12.5,
+      "坡顶"
+    ],
+    [
+      12.5,
+      15.5,
+      "下坡"
+    ],
+    [
+      15.5,
+      17,
+      "缓冲2"
+    ],
+    [
+      17,
+      20,
+      "粗糙路面"
+    ],
+    [
+      20,
+      21,
+      "缓冲3"
+    ],
+    [
+      21,
+      24,
+      "错位障碍"
+    ],
+    [
+      24,
+      25,
+      "缓冲4"
+    ],
+    [
+      25,
+      27.22,
+      "障碍条"
+    ],
+    [
+      27.22,
+      29,
+      "缓冲5"
+    ],
+    [
+      29,
+      32,
+      "横坡"
+    ],
+    [
+      32,
+      34,
+      "缓冲6"
+    ],
+    [
+      34,
+      36,
+      "低摩擦"
+    ],
+    [
+      36,
+      38,
+      "终点平地"
+    ]
+  ],
+  "measurement": "production tracker: 5/2N hysteresis, >=10ms airborne, >=100ms reset grace, tread_force_ratio>=0.5; estimated scan normal",
+  "energy": "pre wheel COM normal closing speed squared/2 J/kg; multiply wheel mass0.638 gives wheel-only normal kinetic proxy",
+  "force": "static terrain net vector norm; max over 8 solved5ms intervals beginning at event; no incomplete windows",
+  "domain": "rootx[-1,38], t>=0.1; only entirely no-fall/cleared_terrain runs; segments by root x, no obstacle-bypass proof",
+  "source_sha256": {
+    "deploy/deploy_mujoco/deploy_mujoco.py": "dc619164c56aebd3e65b1fe192d3c1bbb767f85732820b284ed012af83120e15",
+    "deploy/deploy_mujoco/quiet_landing_metrics.py": "898157df1655055e36f6693845ea2a168825880e116f6232b2c87f2cd1a07a26",
+    "/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml": "98ac70602d930dac0f0b65124309c59c9c98cca9186f071262981e0e32bceb7a",
+    "deploy/deploy_mujoco/terrains/all_terrain.xml": "78e8cbb5a0eaeff9b08566f58fa7589a01a1115777053f76189b18bd7538af5a"
+  },
+  "comparison": "Frozen latest V1 255900 and V1.5 233500, historical V1 230300/237200, matched iteration V1/V1.5 230300 and233500, Baseline214700. Three previous verified matching-source rollouts reused; four new actual rollouts.",
+  "reuse_sources": {
+    "Baseline": "docs/quiet_landing_Baseline与V1两次迭代对比_20261010/Baseline_正式回放_quiet.npz",
+    "V1_230300": "docs/quiet_landing_Baseline与V1两次迭代对比_20261010/V1_230300_正式回放_quiet.npz",
+    "V1_237200": "docs/quiet_landing_Baseline与V1两次迭代对比_20261010/V1_237200_正式回放_quiet.npz"
+  }
+}
