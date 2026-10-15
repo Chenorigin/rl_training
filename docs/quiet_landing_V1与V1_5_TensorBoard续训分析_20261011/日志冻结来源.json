@@ -1,0 +1,22 @@
+{
+  "V1": {
+    "path": "logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-48-58_quiet_landing_v1/events.out.tfevents.1791564549.ubuntu-ThinkStation-P3-Tower-Gen-2.2171799.0",
+    "frozen_bytes": 317983296,
+    "prefix_sha256": "25a3a5d04ac713cbdbd5e19ed98fa948b97556bbcd14d008fd79a7c9490017ee",
+    "parsed_events": 4381521,
+    "scalar_tags": 104,
+    "step_min": 214700,
+    "step_max": 256829,
+    "snapshot_time": "2026-10-11T23:14:15.497717"
+  },
+  "V1.5": {
+    "path": "logs/rsl_rl/deeprobotics_m20_quiet_landing_v1_5/2026-10-10_17-55-27_quiet_landing_v1_5_from_baseline/events.out.tfevents.1791626140.ubuntu-ThinkStation-P3-Tower-Gen-2.3618401.0",
+    "frozen_bytes": 167004124,
+    "prefix_sha256": "63a2b6f9500f626cd6d31be618537d11cd235c9bb3ed142ca382f1c6f8dd640c",
+    "parsed_events": 2305932,
+    "scalar_tags": 117,
+    "step_min": 214700,
+    "step_max": 234414,
+    "snapshot_time": "2026-10-11T23:14:32.739802"
+  }
+}

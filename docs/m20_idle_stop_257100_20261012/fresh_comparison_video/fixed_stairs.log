@@ -1,0 +1,187 @@
+[TERRAIN] {"terrain": "custom", "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/all_terrain.xml", "terrain_parameters": {"width": [4.0], "friction": [1.0, 0.01, 0.01], "spawn_xy": [-1.0, 0.0], "spawn_yaw_deg": [0.0], "goal_x": [38.0]}, "goal_x": 38.0, "course_width": 4.0}
+[KEYS] Z stand | C teacher policy | X lie down | R damping | H height scan | Esc quit
+[HEIGHTMAP] 187 points: green=local ground, red=higher, blue=lower
+[KEYS] W/S forward/back | A/D left/right | Q/E turn left/right
+[KEYS] Input: MuJoCo window
+[KEYS] Window motion: repeat events with timeout; use focused terminal if window only reports PRESS
+[MODE] prone
+[MODE] standing t=0.00s
+step=0000 mode=standing t=0.02s x=-1.000 z=0.199 cmd=[0.0, 0.0, 0.0]
+[MODE] ready t=5.02s
+[MODE] policy t=6.02s
+step=0600 mode=policy t=12.02s x=1.791 z=1.003 cmd=[0.699999988079071, 0.0, 0.0]
+step=1200 mode=policy t=24.02s x=9.988 z=0.996 cmd=[0.699999988079071, 0.0, 0.0]
+/home/ubuntu/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-bshjn7ss because there was an issue with the default path (/home/ubuntu/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+{
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_idle_stop_v1/2026-10-12_idle_stop_distilled_257100/model_257100_idle_stop.pt",
+  "model": "/home/ubuntu/\u684c\u9762/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+  "terrain": "custom",
+  "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/all_terrain.xml",
+  "terrain_parameters": {
+    "width": [
+      4.0
+    ],
+    "friction": [
+      1.0,
+      0.01,
+      0.01
+    ],
+    "spawn_xy": [
+      -1.0,
+      0.0
+    ],
+    "spawn_yaw_deg": [
+      0.0
+    ],
+    "goal_x": [
+      38.0
+    ]
+  },
+  "goal_x": 38.0,
+  "course_width": 4.0,
+  "crossed_finish": false,
+  "inside_course": true,
+  "cleared_terrain": false,
+  "cleared_stairs": false,
+  "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked",
+  "steps_executed": 1800,
+  "final_mode": "policy",
+  "transitions": [
+    {
+      "time": 0.0,
+      "mode": "prone"
+    },
+    {
+      "time": 0.0,
+      "mode": "standing"
+    },
+    {
+      "time": 5.02,
+      "mode": "ready"
+    },
+    {
+      "time": 6.02,
+      "mode": "policy"
+    }
+  ],
+  "max_x": 17.561931692762826,
+  "final_x": 17.561931692762826,
+  "final_z": 0.6302536421380794,
+  "fell_in_policy": false,
+  "critic_used": false,
+  "trajectory": "/home/ubuntu/cyq_shixi_projects/rl_training/docs/m20_idle_stop_257100_20261012/fresh_comparison_video/evaluations/fixed/fixed_\u4ec5w_\u539f\u90e8\u7f72\u56de\u653e.npz",
+  "quiet": {
+    "QuietLanding/all/touchdown_count": 158.0,
+    "QuietLanding/all/raw_contact_edges": 342.0,
+    "QuietLanding/all/non_tread_edges": 27.0,
+    "QuietLanding/all/has_samples": 1.0,
+    "QuietLanding/all/map_valid_fraction": 1.0,
+    "QuietLanding/all/pre_speed_mean_m_s": 0.5406093597412109,
+    "QuietLanding/all/pre_speed_max_m_s": 3.082298755645752,
+    "QuietLanding/all/specific_energy_mean_J_kg": 0.3986422121524811,
+    "QuietLanding/all/height_window_event_coverage": 0.8417721390724182,
+    "QuietLanding/all/pre_speed_p50_hist_m_s": 0.125,
+    "QuietLanding/all/pre_speed_p95_hist_m_s": 2.0250000953674316,
+    "QuietLanding/all/histogram_tail_count": 0.0,
+    "QuietLanding/fl/touchdown_count": 28.0,
+    "QuietLanding/fl/raw_contact_edges": 78.0,
+    "QuietLanding/fl/non_tread_edges": 5.0,
+    "QuietLanding/fl/has_samples": 1.0,
+    "QuietLanding/fl/map_valid_fraction": 1.0,
+    "QuietLanding/fl/pre_speed_mean_m_s": 0.8170586228370667,
+    "QuietLanding/fl/pre_speed_max_m_s": 2.4260568618774414,
+    "QuietLanding/fl/specific_energy_mean_J_kg": 0.6465800404548645,
+    "QuietLanding/fl/height_window_event_coverage": 0.9285714030265808,
+    "QuietLanding/fl/pre_speed_p50_hist_m_s": 0.32500001788139343,
+    "QuietLanding/fl/pre_speed_p95_hist_m_s": 2.325000047683716,
+    "QuietLanding/fl/histogram_tail_count": 0.0,
+    "QuietLanding/fr/touchdown_count": 40.0,
+    "QuietLanding/fr/raw_contact_edges": 85.0,
+    "QuietLanding/fr/non_tread_edges": 8.0,
+    "QuietLanding/fr/has_samples": 1.0,
+    "QuietLanding/fr/map_valid_fraction": 1.0,
+    "QuietLanding/fr/pre_speed_mean_m_s": 0.5153293013572693,
+    "QuietLanding/fr/pre_speed_max_m_s": 3.082298755645752,
+    "QuietLanding/fr/specific_energy_mean_J_kg": 0.4222245216369629,
+    "QuietLanding/fr/height_window_event_coverage": 0.800000011920929,
+    "QuietLanding/fr/pre_speed_p50_hist_m_s": 0.125,
+    "QuietLanding/fr/pre_speed_p95_hist_m_s": 2.075000047683716,
+    "QuietLanding/fr/histogram_tail_count": 0.0,
+    "QuietLanding/hl/touchdown_count": 37.0,
+    "QuietLanding/hl/raw_contact_edges": 90.0,
+    "QuietLanding/hl/non_tread_edges": 8.0,
+    "QuietLanding/hl/has_samples": 1.0,
+    "QuietLanding/hl/map_valid_fraction": 1.0,
+    "QuietLanding/hl/pre_speed_mean_m_s": 0.5266837477684021,
+    "QuietLanding/hl/pre_speed_max_m_s": 2.076817512512207,
+    "QuietLanding/hl/specific_energy_mean_J_kg": 0.3551429510116577,
+    "QuietLanding/hl/height_window_event_coverage": 0.9459459185600281,
+    "QuietLanding/hl/pre_speed_p50_hist_m_s": 0.125,
+    "QuietLanding/hl/pre_speed_p95_hist_m_s": 1.975000023841858,
+    "QuietLanding/hl/histogram_tail_count": 0.0,
+    "QuietLanding/hr/touchdown_count": 53.0,
+    "QuietLanding/hr/raw_contact_edges": 89.0,
+    "QuietLanding/hr/non_tread_edges": 6.0,
+    "QuietLanding/hr/has_samples": 1.0,
+    "QuietLanding/hr/map_valid_fraction": 1.0,
+    "QuietLanding/hr/pre_speed_mean_m_s": 0.4233616590499878,
+    "QuietLanding/hr/pre_speed_max_m_s": 2.3073816299438477,
+    "QuietLanding/hr/specific_energy_mean_J_kg": 0.28022563457489014,
+    "QuietLanding/hr/height_window_event_coverage": 0.7547169923782349,
+    "QuietLanding/hr/pre_speed_p50_hist_m_s": 0.17499999701976776,
+    "QuietLanding/hr/pre_speed_p95_hist_m_s": 1.9250000715255737,
+    "QuietLanding/hr/histogram_tail_count": 0.0,
+    "QuietLanding/distance_m": 18.79518699645996,
+    "QuietLanding/events_per_m": 8.406407356262207,
+    "QuietLanding/specific_energy_per_m_J_kg_m": 3.351148843765259,
+    "QuietCost/impact_peak": 169.07546997070312,
+    "QuietCost/impact_impulse": 92.4256362915039,
+    "QuietCost/loading_rate": 1.9052537679672241,
+    "QuietCost/wheel_jerk": 14.824663162231445,
+    "QuietCost/base_angular_acceleration": 2.194174289703369,
+    "QuietCost/base_vertical_acceleration": 0.1038292869925499,
+    "QuietCost/torque_rate": 0.659548282623291,
+    "QuietCost/wheel_slip": 1.7055238485336304,
+    "QuietCost/swing_clearance": 1.3442420959472656,
+    "QuietLanding/impact_window_force_max_N": 1663.298583984375,
+    "QuietLanding/impact_window_excess_impulse_max_N_s": 18.56459617614746,
+    "QuietLanding/impact_window_loading_rate_max_N_s": 332659.71875,
+    "QuietLanding/contact_gated_slip_time_mean_m_s": 0.01132428739219904,
+    "QuietLoad/fl/mean_normal_force_N": 94.1797866821289,
+    "QuietLoad/fl/contact_fraction": 0.9068136215209961,
+    "QuietLoad/fr/mean_normal_force_N": 74.62177276611328,
+    "QuietLoad/fr/contact_fraction": 0.8745042681694031,
+    "QuietLoad/hl/mean_normal_force_N": 75.34388732910156,
+    "QuietLoad/hl/contact_fraction": 0.918792724609375,
+    "QuietLoad/hr/mean_normal_force_N": 91.66620635986328,
+    "QuietLoad/hr/contact_fraction": 0.9070922136306763,
+    "QuietLoad/stable_support_fraction": 0.0,
+    "QuietLoad/stable_has_samples": 0.0
+  },
+  "quiet_trajectory": "/home/ubuntu/cyq_shixi_projects/rl_training/docs/m20_idle_stop_257100_20261012/fresh_comparison_video/evaluations/fixed/fixed_\u4ec5w_\u539f\u90e8\u7f72\u56de\u653e_quiet.npz"
+}
+{"label": "fixed", "case": "仅w", "frames": 350, "step1": 7200, "step2": 7200}
+	Command being timed: "timeout 240 /home/ubuntu/miniconda3/envs/m20_wzh/bin/python /home/ubuntu/cyq_shixi_projects/rl_training/docs/m20_idle_stop_257100_20261012/fresh_comparison_video/record.py fixed 仅w"
+	User time (seconds): 34.90
+	System time (seconds): 0.68
+	Percent of CPU this job got: 105%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:33.72
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 1208432
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 253852
+	Voluntary context switches: 10144
+	Involuntary context switches: 4952
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 14928
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

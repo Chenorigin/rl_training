@@ -1,5 +1,7 @@
 # M20 Quiet Landing V1.5
 
+2026-10-12：工作区 V1.5 已追加零命令驻足和世界直行路径奖励，原上楼方向项由覆盖下楼的路径项替代，角速度改为世界竖直轴跟踪。Actor/动作/固定 PD 保持；新诊断为 `QuietStand/*`、`QuietRoute/*`。修改和真实接线检查已完成，旧 checkpoint 尚未通过这些目标的新行为验收。复现图、参数来源、训练命令及观测能力边界见[零命令与仅 w 偏航修正说明](../quiet_landing_零命令倾斜与直线上下楼修复_20261011/零命令对角偏载与仅w楼梯偏航_复现证据和V1_5训练修正说明.md)。下文保留 2026-10-10 初始融合版本的记录。
+
 V1.5 合并连续力峰尾部和稳定四足支撑负载平衡。独立任务 `Rough-Deeprobotics-M20-QuietLanding-V1_5-v0`，使用现有 `train.py`，不新增训练入口。V1 保留；V1.1/V1.2 的独立任务注册、env_config 和 ppo_config 类已移除，历史 checkpoint、训练日志与评测记录保留。
 
 Actor 57+187=244D、Critic285D、Action16D 和固定 PD 保持。接触、力及平衡信号只用于奖励和诊断，不加入策略观测。环境不继承 pre_teacher/stair_teacher；任务通过能力奖励采用独立快照。V2 留作奖励课程学习拓展，本次没有启用权重课程。
@@ -44,8 +46,6 @@ CPU反例检查：
 
 当前工作区已通过两项CPU检查和8环境、2次PPO更新：第1次Critic预热、第2次Actor更新，保存checkpoint；组合反例验证尾部惩罚与负载平衡同时存在、新触地会关闭平衡、reset清空状态。0.6s短回合不能证明正式训练会获得足够稳定支撑样本。没有进行正式V1.5长训练或all_terrain效果验收。
 
-本次合并目标为 Chenorigin/rl_training，从该仓库最新main创建隔离worktree，仅提交quiet任务及必要依赖，保留已有teacher/student任务与历史文件。该仓库已移除AMP，本次保持其标准训练wrapper。复审由同family Codex完成，未进行跨family复审。
+发布采用从最新origin/main创建的隔离worktree，仅提交quiet任务及必要依赖，保留上游AMP训练分支；不带入当前工作区其他机器人删除或teacher/student改动。复审由同family Codex完成，未进行跨family复审。
 
-Chenorigin发布快照同样通过CPU检查及原train.py的8环境、2次PPO更新，确认与目标仓库现有训练架构兼容。工作区checkpoint检查：Actor首层244/输出16、Critic首层285；Critic预热后Actor与V1差为0，下一次Actor更新最大权重差0.0001887083，参考Actor仍由V1初始化。TensorBoard未出现gait/ascent/descent调试卡；短程稳定支撑覆盖率为0，因此本次不证明负载平衡在真实长回合中有效。
-
-本次 Chenorigin/rl_training 集成验证：基于main提交5741909，CPU两项检查PASS；原train.py执行8环境、2次PPO更新PASS（critic预热1次、actor更新1次）。保留目标仓库原有标准wrapper与teacher/student任务。
+发布快照同样通过CPU检查及原train.py的8环境、2次PPO更新，确认上游保留AMP代码后仍可启动本任务。工作区checkpoint检查：Actor首层244/输出16、Critic首层285；Critic预热后Actor与V1差为0，下一次Actor更新最大权重差0.0001887083，参考Actor仍由V1初始化。TensorBoard未出现gait/ascent/descent调试卡；短程稳定支撑覆盖率为0，因此本次不证明负载平衡在真实长回合中有效。

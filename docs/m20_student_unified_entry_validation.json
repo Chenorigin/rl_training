@@ -1,0 +1,110 @@
+{
+  "change": "Unified task-selected v0/v1 distillation entrypoint",
+  "source_sha256": {
+    "scripts/reinforcement_learning/rsl_rl/distill_student.py": "0f5f1857e5ac9e99175f9d34b0a31d5a1a5c8e1410fe53deccf5b2e8266a9945",
+    "scripts/reinforcement_learning/rsl_rl/distill_student_v1.py": "ed58a203132d01cc5e9ea6c9665649db9bc2eee54016104ed9b78634b9c1a156",
+    "tests/test_distill_student_entry.py": "42a976d323ef67b0d6bdbb82a141701236b234e7c2330f07d1958bbf45f0251d",
+    "docs/m20_student_v1.md": "6d19dd5950f3c71809ca3bdc67126d7add08012fef36a6d0590ebc8d93a792ec"
+  },
+  "cpu_tests": {
+    "entry_routing": 13,
+    "student_v1": 27,
+    "passed": 40
+  },
+  "preflight": {
+    "v0": {
+      "version": "v0",
+      "task": "Rough-Deeprobotics-M20-Student-v0",
+      "trained": false,
+      "simulator_started": false,
+      "optimizer_updates": 0,
+      "actor_dim": 618,
+      "teacher_dim": 244,
+      "export_max_action_error": 0.0,
+      "num_envs": 4,
+      "device": "cpu",
+      "mem_available_bytes": 91531853824,
+      "swap_used_bytes": 2139357184,
+      "disk_free_bytes": 18540003328,
+      "log_root": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_student_v0",
+      "disk_output_budget": {
+        "checkpoint_estimate_bytes": 9579040,
+        "checkpoint_count": 1,
+        "run_output_estimate_bytes": 163020384,
+        "min_free_disk_bytes": 2147483648,
+        "required_free_bytes": 2310504032,
+        "basis": "float32 MLP weights + Adam moments + full replay, scheduled/final/recovery checkpoints, TensorBoard/code allowance; engineering estimate"
+      },
+      "load_average": [
+        0.53369140625,
+        0.638671875,
+        0.693359375
+      ],
+      "sample_buffer_formula": "N*T*(618+16)*4*replay_rollouts + N*T*((618+618+244+16+16+1)*4+1)",
+      "basis": "budget = 8 GiB startup allowance + 4 MiB per env + rollout/replay tensors; engineering reserve, validate measured peak before scaling",
+      "planned_increment_bytes": 8608785024,
+      "sample_buffer_bytes": 2073216,
+      "replay_bytes": 1298432,
+      "rollout_bytes": 774784,
+      "fleet_cap_fraction": 0.85
+    },
+    "v1": {
+      "version": "v1",
+      "source_path": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-48-58_quiet_landing_v1/model_257100.pt",
+      "source_sha256": "368fa6287d3fc5e999b4ad596ad9f84be23f25d72bbd861236ec535a66b51c1c",
+      "initialization": {
+        "source_input_dim": 244,
+        "target_input_dim": 789,
+        "optimizer_loaded": false,
+        "replay_loaded": false,
+        "max_source_action_error": 0.0,
+        "float64_max_source_action_error": 1.9895196601282805e-13,
+        "float32_parity_tolerance": {
+          "atol": 0.0001,
+          "rtol": 1e-05
+        }
+      },
+      "actor_dim": 789,
+      "teacher_dim": 244,
+      "export_max_action_error": 0.0,
+      "num_envs": 4096,
+      "device": "cpu",
+      "host_available_bytes": 91402809344,
+      "host_total_bytes": 134370000896,
+      "disk_free_bytes": 18539999232,
+      "planned_increment_bytes": 31062589440,
+      "budget": {
+        "replay_bytes": 4263772160,
+        "rollout_bytes": 972947456,
+        "map_bytes": 56066048,
+        "sample_buffer_bytes": 5292785664,
+        "sample_buffer_formula": "(regular+critical)*((actor_dim+16)*4+tag4*8+holdout1) + rollout + map packets",
+        "checkpoint_estimate_bytes": 9369428,
+        "checkpoint_count": 51,
+        "checkpoint_replay_bytes": 0,
+        "save_replay": false,
+        "run_output_estimate_bytes": 1286157412,
+        "min_free_disk_bytes": 2147483648,
+        "required_free_bytes": 3433641060,
+        "basis": "MLP weights, Adam moments, optional replay serialization, atomic/recovery checkpoints, event/code allowance; live replay always included in memory budget"
+      },
+      "occupancy_cap_fraction": 0.85,
+      "basis": "8 GiB simulator allowance + 4 MiB/env + actual tensor budget; engineering reserve, validate peak before scaling",
+      "trained": false,
+      "simulator_started": false,
+      "optimizer_updates": 0
+    }
+  },
+  "independent_review": {
+    "passed": true,
+    "same_model_family": true
+  },
+  "training_started": false,
+  "simulator_started": false,
+  "optimizer_updates": 0,
+  "skipped": [
+    "Isaac runtime wiring",
+    "GPU/4096 environment measured peak",
+    "training and physics rollouts"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "楼梯总体": {
+    "normal_speed_m_s": 35.305729797326045,
+    "specific_energy_J_kg": 38.410060417414925,
+    "force_peak_40ms_N": 35.77718469227313,
+    "events_percent": -28.8135593220339,
+    "energy_per_m_percent": -1.454672450072314
+  },
+  "上楼": {
+    "normal_speed_m_s": 5.566189462871929,
+    "specific_energy_J_kg": -0.03150760164578603,
+    "force_peak_40ms_N": 9.990973206548937,
+    "events_percent": 3.3333333333333437,
+    "energy_per_m_percent": 4.267308964170002
+  },
+  "楼顶平台": {
+    "normal_speed_m_s": 37.03357897920232,
+    "specific_energy_J_kg": -14.35949712825526,
+    "force_peak_40ms_N": 1.4762821189913566,
+    "events_percent": -60.0,
+    "energy_per_m_percent": -66.41523569789813
+  },
+  "下楼": {
+    "normal_speed_m_s": 38.61144859759964,
+    "specific_energy_J_kg": 54.45514654373471,
+    "force_peak_40ms_N": 43.24183555457148,
+    "events_percent": -35.61643835616438,
+    "energy_per_m_percent": 0.7573546675926579
+  }
+}

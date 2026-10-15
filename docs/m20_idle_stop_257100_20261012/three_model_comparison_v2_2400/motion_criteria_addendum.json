@@ -1,0 +1,7 @@
+{
+  "reason": "Use the existing regression judge movement requirement, not a new threshold selected after results.",
+  "prestop_forward_progress_min_fraction_of_v1": 0.8,
+  "source": "docs/m20_idle_stop_257100_20261012/judge.py:72",
+  "source_sha256": "c94d2950f2345c84922b9470d329daf4d2cb8b785725c5be9ed00db4c34a9abf",
+  "freeze_before_any_move_stop_case": true
+}

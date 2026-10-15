@@ -1,0 +1,71 @@
+{
+  "checks": [
+    {
+      "num_envs": 64,
+      "actor_dim": 789,
+      "accepted": true
+    },
+    {
+      "num_envs": 512,
+      "actor_dim": 789,
+      "accepted": true
+    },
+    {
+      "num_envs": 4096,
+      "actor_dim": 789,
+      "accepted": true
+    },
+    {
+      "num_envs": 8192,
+      "actor_dim": 789,
+      "accepted": true
+    }
+  ],
+  "resume_4096_preserved": true,
+  "changed_resume_rejected": true,
+  "budget": {
+    "replay_bytes": 4263772160,
+    "rollout_bytes": 972947456,
+    "map_bytes": 56066048,
+    "sample_buffer_bytes": 5292785664,
+    "sample_buffer_formula": "(regular+critical)*((actor_dim+16)*4+tag4*8+holdout1) + rollout + map packets",
+    "checkpoint_estimate_bytes": 9369428,
+    "checkpoint_count": 51,
+    "checkpoint_replay_bytes": 0,
+    "save_replay": false,
+    "run_output_estimate_bytes": 1286157412,
+    "min_free_disk_bytes": 2147483648,
+    "required_free_bytes": 3433641060,
+    "basis": "MLP weights, Adam moments, optional replay serialization, atomic/recovery checkpoints, event/code allowance; live replay always included in memory budget"
+  },
+  "resource_estimate_not_measured_peak": true,
+  "simulator_started": false,
+  "training_started": false,
+  "optimizer_updates": 0,
+  "source_sha256": "445975e54b78356766d2278d23101cdad7449b3d7a391644c1694bc2cb18c471",
+  "full_replay_budget": {
+    "replay_bytes": 4263772160,
+    "rollout_bytes": 972947456,
+    "map_bytes": 56066048,
+    "sample_buffer_bytes": 5292785664,
+    "sample_buffer_formula": "(regular+critical)*((actor_dim+16)*4+tag4*8+holdout1) + rollout + map packets",
+    "checkpoint_estimate_bytes": 4912707412,
+    "checkpoint_count": 51,
+    "checkpoint_replay_bytes": 4263772160,
+    "save_replay": true,
+    "run_output_estimate_bytes": 261163070564,
+    "min_free_disk_bytes": 2147483648,
+    "required_free_bytes": 263310554212,
+    "basis": "MLP weights, Adam moments, optional replay serialization, atomic/recovery checkpoints, event/code allowance; live replay always included in memory budget"
+  },
+  "tests_passed": 27,
+  "checkpoint_resume": "models, Adam and curriculum restored; light replay rebuilt; full and legacy replay restored",
+  "reviewer_family": "Codex (same family; no heterogeneous-family review available)",
+  "file_sha256": {
+    "scripts/reinforcement_learning/rsl_rl/distill_student_v1.py": "445975e54b78356766d2278d23101cdad7449b3d7a391644c1694bc2cb18c471",
+    "source/rl_training/m20_student_v1/configuration.py": "56dfce78e33c3e39d806a294f62d339fb903a5fbacbf7c41100872e4c59258fc",
+    "source/rl_training/m20_student_v1/distillation.py": "cdba89e9a0e69250975d800ca18e55e4d2150fc9ed7ef64dcfa281f732c826ac",
+    "source/rl_training/m20_student_v1/output_storage.py": "e7b3fd455aa8bf4d0dc041f3dea6c2c3894c26e3ca27c24e292e901e9bcc801c",
+    "tests/test_student_v1.py": "e38c1fde470d23fbffe6ce527edb77fd6d9f44f2fcf6d0fbe7e967d677cdc487"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "source_before_sha256": {
+    "deploy/deploy_mujoco/deploy_mujoco.py": "dc619164c56aebd3e65b1fe192d3c1bbb767f85732820b284ed012af83120e15",
+    "source/rl_training/m20_quiet/extended.py": "1bbb2454be1b5c9440e8cc3e705a4e1747ed79414fcc173d110748a510d95cd7",
+    "source/rl_training/rl_training/quiet_landing_env.py": "4e9326e55ac6ae9dffee64c63f1c555ecec7e2b187fa175df86ef2602b4b8067",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/quiet_landing_traversal.py": "3ec13fe4c09fe3b1ab3d0240611858e6ed594ad901284ef803ca5a04c5c051aa",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/quiet_landing_env_cfg.py": "8dc30b787b82451ded4a70c841ffe87ba6f89685e01bec90dcdcda3c101309b1"
+  },
+  "source_after_sha256": {
+    "deploy/deploy_mujoco/deploy_mujoco.py": "dc619164c56aebd3e65b1fe192d3c1bbb767f85732820b284ed012af83120e15",
+    "source/rl_training/m20_quiet/extended.py": "062a243cffe03f41215347d0946a58d3002c82fbe1e1c66a6199edd35a3136d4",
+    "source/rl_training/rl_training/quiet_landing_env.py": "4817ec7d7359d1b746774b90f23731d94c65d101b5601a38da38aa377bb33659",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/quiet_landing_traversal.py": "24dd7cc85742abe6692a5400ace10586788593be2642e868c44ce35f5a23820b",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/quiet_landing_env_cfg.py": "cb5506af99273c8aee818acd6c22f38113ba64a631b202fec5346a4c5ad26959"
+  },
+  "deployment_source_unchanged": true,
+  "cpu_checks": [
+    "check_quiet_landing.py",
+    "check_quiet_extended.py",
+    "check_quiet_stability.py"
+  ],
+  "cpu_checks_passed": true,
+  "isaac_final_log": "实际训练环境接线核验_最终修正.log",
+  "isaac_exit_code": 0,
+  "isaac_result_sha256": "0bb03a23764e3266efc5f515d29fa371a9f74e59be9fdda7dab8754d7cae0dfd",
+  "formal_training_started": false,
+  "new_checkpoint_behavior_accepted": false,
+  "review": "same-family Codex read-only; heterogeneous review not available"
+}

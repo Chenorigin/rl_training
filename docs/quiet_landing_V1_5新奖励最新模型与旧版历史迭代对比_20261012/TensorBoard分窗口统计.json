@@ -1,0 +1,260 @@
+{
+  "source": [
+    {
+      "file": "logs/rsl_rl/deeprobotics_m20_quiet_landing_v1_5/2026-10-12_00-52-08_quiet_landing_v1_5_from_baseline/events.out.tfevents.1791737539.ubuntu-ThinkStation-P3-Tower-Gen-2.2577026.0",
+      "frozen_bytes": 144435269,
+      "prefix_sha256": "daea520292d503c0e47ce27aadbc64a935de46021b3aa0b60c66d4a00a736d22",
+      "parsed_events": 2000636
+    }
+  ],
+  "scalar_tags": 129,
+  "max_log_iteration": 230208,
+  "window_definition": "Each checkpoint iteration k: [k-1000,k), equal 1000-update means. Training includes failures and curriculum; force peak is mean of reset-batch maxima.",
+  "statistics": {
+    "215800": {
+      "QuietLanding/all/pre_speed_mean_m_s": {
+        "samples": 1000,
+        "mean": 0.44740193796157834,
+        "median": 0.4471411257982254
+      },
+      "QuietLanding/all/specific_energy_mean_J_kg": {
+        "samples": 1000,
+        "mean": 0.3396947952955961,
+        "median": 0.3386187255382538
+      },
+      "QuietLanding/specific_energy_per_m_J_kg_m": {
+        "samples": 1000,
+        "mean": 6.115746190071106,
+        "median": 6.105297327041626
+      },
+      "QuietLanding/impact_window_force_max_N": {
+        "samples": 1000,
+        "mean": 3804.2334125976563,
+        "median": 3738.5882568359375
+      },
+      "QuietLanding/impact_window_excess_impulse_max_N_s": {
+        "samples": 1000,
+        "mean": 35.50115336418152,
+        "median": 31.593591690063477
+      },
+      "QuietLanding/events_per_m": {
+        "samples": 1000,
+        "mean": 19.463599294662476,
+        "median": 18.96277904510498
+      },
+      "Metrics/base_velocity/error_vel_xy": {
+        "samples": 1000,
+        "mean": 0.3539663414657116,
+        "median": 0.35815851390361786
+      },
+      "Metrics/base_velocity/error_vel_yaw": {
+        "samples": 1000,
+        "mean": 0.27932159227132797,
+        "median": 0.27969640493392944
+      },
+      "Train/mean_episode_length": {
+        "samples": 1000,
+        "mean": 998.4358997802734,
+        "median": 999.6799926757812
+      },
+      "Task/episode_reward_rate": {
+        "samples": 1000,
+        "mean": 4.429750739574432,
+        "median": 4.3615663051605225
+      },
+      "Loss/value": {
+        "samples": 1000,
+        "mean": 0.6545097692608833,
+        "median": 0.6348967254161835
+      },
+      "Loss/anchor": {
+        "samples": 1000,
+        "mean": 0.025741527858190238,
+        "median": 0.026414399966597557
+      },
+      "Policy/mean_std": {
+        "samples": 1000,
+        "mean": 0.22598936027288438,
+        "median": 0.22590043395757675
+      },
+      "QuietLoad/stable_support_fraction": {
+        "samples": 1000,
+        "mean": 8.951558467117593e-05,
+        "median": 7.566449494333938e-05
+      },
+      "QuietLoad/stable_diagonal_abs_mean": {
+        "samples": 996,
+        "mean": 0.18101012456767546,
+        "median": 0.17415378987789154
+      },
+      "QuietReward/quiet_load_balance": {
+        "samples": 1000,
+        "mean": -3.2755426010108167e-06,
+        "median": -2.186040319429594e-06
+      },
+      "QuietReward/quiet_impact_peak": {
+        "samples": 1000,
+        "mean": -0.34866567540168764,
+        "median": -0.34767621755599976
+      },
+      "QuietStand/mean_xy_speed_m_s": {
+        "samples": 1000,
+        "mean": 0.17062932582572102,
+        "median": 0.1446247547864914
+      },
+      "QuietStand/diagonal_abs_mean": {
+        "samples": 1000,
+        "mean": 0.22068407028913498,
+        "median": 0.21741479635238647
+      },
+      "QuietStand/idle_flat_fraction": {
+        "samples": 1000,
+        "mean": 0.06574113923404366,
+        "median": 0.06386929750442505
+      },
+      "QuietStand/loaded_fraction": {
+        "samples": 1000,
+        "mean": 0.8821068599820137,
+        "median": 0.8875667154788971
+      },
+      "QuietRoute/cross_track_abs_mean_m": {
+        "samples": 1000,
+        "mean": 0.3246761389970779,
+        "median": 0.31607766449451447
+      },
+      "QuietRoute/heading_error_abs_mean_deg": {
+        "samples": 1000,
+        "mean": 4.995271551847458,
+        "median": 4.959868431091309
+      },
+      "QuietRoute/straight_fraction": {
+        "samples": 1000,
+        "mean": 0.36057224825024603,
+        "median": 0.3599301725625992
+      }
+    },
+    "230200": {
+      "QuietLanding/all/pre_speed_mean_m_s": {
+        "samples": 1000,
+        "mean": 0.4100232895314693,
+        "median": 0.40971121191978455
+      },
+      "QuietLanding/all/specific_energy_mean_J_kg": {
+        "samples": 1000,
+        "mean": 0.2771099340170622,
+        "median": 0.27638620138168335
+      },
+      "QuietLanding/specific_energy_per_m_J_kg_m": {
+        "samples": 1000,
+        "mean": 4.341887410640717,
+        "median": 4.33431339263916
+      },
+      "QuietLanding/impact_window_force_max_N": {
+        "samples": 1000,
+        "mean": 3703.9391215820315,
+        "median": 3624.759033203125
+      },
+      "QuietLanding/impact_window_excess_impulse_max_N_s": {
+        "samples": 1000,
+        "mean": 38.50348155784607,
+        "median": 36.97466468811035
+      },
+      "QuietLanding/events_per_m": {
+        "samples": 1000,
+        "mean": 16.718857090950014,
+        "median": 16.388023376464844
+      },
+      "Metrics/base_velocity/error_vel_xy": {
+        "samples": 1000,
+        "mean": 0.38073773214221,
+        "median": 0.38035687804222107
+      },
+      "Metrics/base_velocity/error_vel_yaw": {
+        "samples": 1000,
+        "mean": 0.2730143520832062,
+        "median": 0.2728261500597
+      },
+      "Train/mean_episode_length": {
+        "samples": 1000,
+        "mean": 997.4666701049805,
+        "median": 998.6799926757812
+      },
+      "Task/episode_reward_rate": {
+        "samples": 1000,
+        "mean": 4.817905902862549,
+        "median": 4.817281007766724
+      },
+      "Loss/value": {
+        "samples": 1000,
+        "mean": 0.5449571671485901,
+        "median": 0.5293289124965668
+      },
+      "Loss/anchor": {
+        "samples": 1000,
+        "mean": 0.06830025479197502,
+        "median": 0.06820491328835487
+      },
+      "Policy/mean_std": {
+        "samples": 1000,
+        "mean": 0.15668393860757351,
+        "median": 0.15666992217302322
+      },
+      "QuietLoad/stable_support_fraction": {
+        "samples": 1000,
+        "mean": 0.003765643234131858,
+        "median": 0.0037066967925056815
+      },
+      "QuietLoad/stable_diagonal_abs_mean": {
+        "samples": 1000,
+        "mean": 0.14310688487440348,
+        "median": 0.14066626876592636
+      },
+      "QuietReward/quiet_load_balance": {
+        "samples": 1000,
+        "mean": -7.613394636246085e-05,
+        "median": -7.260245911311358e-05
+      },
+      "QuietReward/quiet_impact_peak": {
+        "samples": 1000,
+        "mean": -0.2731579877436161,
+        "median": -0.272414892911911
+      },
+      "QuietStand/mean_xy_speed_m_s": {
+        "samples": 1000,
+        "mean": 0.16538464155048133,
+        "median": 0.1449291706085205
+      },
+      "QuietStand/diagonal_abs_mean": {
+        "samples": 1000,
+        "mean": 0.15110856413841248,
+        "median": 0.14269700646400452
+      },
+      "QuietStand/idle_flat_fraction": {
+        "samples": 1000,
+        "mean": 0.06699431699234992,
+        "median": 0.06502596661448479
+      },
+      "QuietStand/loaded_fraction": {
+        "samples": 1000,
+        "mean": 0.9083208904862404,
+        "median": 0.9126243591308594
+      },
+      "QuietRoute/cross_track_abs_mean_m": {
+        "samples": 1000,
+        "mean": 0.3441671491265297,
+        "median": 0.3333996832370758
+      },
+      "QuietRoute/heading_error_abs_mean_deg": {
+        "samples": 1000,
+        "mean": 5.25308021903038,
+        "median": 5.205658912658691
+      },
+      "QuietRoute/straight_fraction": {
+        "samples": 1000,
+        "mean": 0.3361063164770603,
+        "median": 0.33592022955417633
+      }
+    }
+  },
+  "new_standing_route_tags_present": true
+}

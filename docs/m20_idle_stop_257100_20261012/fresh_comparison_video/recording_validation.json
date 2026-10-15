@@ -1,0 +1,350 @@
+{
+  "recordings": [
+    {
+      "label": "baseline",
+      "case": "零命令",
+      "width": 640,
+      "height": 456,
+      "fps": "25/1",
+      "frames": 650,
+      "duration_s": 26.0,
+      "bytes": 713003,
+      "sha256": "539e2ae19ae749b01d7f5991f4336f89efd6777160d41178232d1d8775d4911e",
+      "physics_state_bitwise_matches_previous": {
+        "time": true,
+        "qpos": true,
+        "qvel": true
+      },
+      "step1_calls": 7200,
+      "step2_calls": 7200
+    },
+    {
+      "label": "baseline",
+      "case": "平地启停",
+      "width": 640,
+      "height": 456,
+      "fps": "25/1",
+      "frames": 750,
+      "duration_s": 30.0,
+      "bytes": 1874286,
+      "sha256": "e2ea026234e8ce6d28e60f15beaddacbde264328f15ee063202321ce474a1a1f",
+      "physics_state_bitwise_matches_previous": {
+        "time": true,
+        "qpos": true,
+        "qvel": true
+      },
+      "step1_calls": 7200,
+      "step2_calls": 7200
+    },
+    {
+      "label": "baseline",
+      "case": "仅w",
+      "width": 640,
+      "height": 456,
+      "fps": "25/1",
+      "frames": 350,
+      "duration_s": 14.0,
+      "bytes": 2030544,
+      "sha256": "a1a53bcdffc308af66f3819b76d8c5ed650d930eecaa1aaa8007ba8d878ff51f",
+      "physics_state_bitwise_matches_previous": {
+        "time": true,
+        "qpos": true,
+        "qvel": true
+      },
+      "step1_calls": 7200,
+      "step2_calls": 7200
+    },
+    {
+      "label": "fixed",
+      "case": "零命令",
+      "width": 640,
+      "height": 456,
+      "fps": "25/1",
+      "frames": 650,
+      "duration_s": 26.0,
+      "bytes": 331706,
+      "sha256": "8d6aca8fb04b8a79e91e6363b77b225ea54fb24df0410df776f28b8fef549cd6",
+      "physics_state_bitwise_matches_previous": {
+        "time": true,
+        "qpos": true,
+        "qvel": true
+      },
+      "step1_calls": 7200,
+      "step2_calls": 7200
+    },
+    {
+      "label": "fixed",
+      "case": "平地启停",
+      "width": 640,
+      "height": 456,
+      "fps": "25/1",
+      "frames": 750,
+      "duration_s": 30.0,
+      "bytes": 1514963,
+      "sha256": "13e608a27776d6fa993335358f0baf8890e84f954ea5b9c28c5f056bb9d6c6c8",
+      "physics_state_bitwise_matches_previous": {
+        "time": true,
+        "qpos": true,
+        "qvel": true
+      },
+      "step1_calls": 7200,
+      "step2_calls": 7200
+    },
+    {
+      "label": "fixed",
+      "case": "仅w",
+      "width": 640,
+      "height": 456,
+      "fps": "25/1",
+      "frames": 350,
+      "duration_s": 14.0,
+      "bytes": 2019350,
+      "sha256": "da983a30f276b4243993e8c976c30fb12808473d9670887ff3ef2c156b89a5a0",
+      "physics_state_bitwise_matches_previous": {
+        "time": true,
+        "qpos": true,
+        "qvel": true
+      },
+      "step1_calls": 7200,
+      "step2_calls": 7200
+    }
+  ],
+  "outputs": {
+    "stationary_compare.mp4": {
+      "width": 1280,
+      "height": 456,
+      "fps": "25/1",
+      "frames": 650,
+      "duration_s": 26.0,
+      "bytes": 981414,
+      "sha256": "67f1e5386e1966cdca45cb47839fe12b2768453f8ab003930ecd5a697628fe56"
+    },
+    "move_stop_compare.mp4": {
+      "width": 1280,
+      "height": 456,
+      "fps": "25/1",
+      "frames": 750,
+      "duration_s": 30.0,
+      "bytes": 3232686,
+      "sha256": "b5461cde71449dcef0942a28b7e0ea51d7fe5554199aec79c99f84e3d20878b0"
+    },
+    "stairs_compare.mp4": {
+      "width": 1280,
+      "height": 456,
+      "fps": "25/1",
+      "frames": 350,
+      "duration_s": 14.0,
+      "bytes": 3829506,
+      "sha256": "3dfd24c9a68d5632db364225f0f823b959431d4794d375589c2634b0519f1371"
+    },
+    "m20_257100_vs_idle_stop_mujoco.mp4": {
+      "width": 1280,
+      "height": 456,
+      "fps": "25/1",
+      "frames": 1750,
+      "duration_s": 70.0,
+      "bytes": 8042208,
+      "sha256": "539054ca5353ff70e7167423270d627f486d5b09f235d707068c79047afd1783"
+    },
+    "original_257100_mujoco.mp4": {
+      "width": 640,
+      "height": 456,
+      "fps": "25/1",
+      "frames": 1750,
+      "duration_s": 70.0,
+      "bytes": 4616451,
+      "sha256": "2cfc811b8f7300f11a1d04d513974d9991cd08e06f890fa686910fc26be01342"
+    },
+    "fixed_idle_stop_mujoco.mp4": {
+      "width": 640,
+      "height": 456,
+      "fps": "25/1",
+      "frames": 1750,
+      "duration_s": 70.0,
+      "bytes": 3864637,
+      "sha256": "7836804c0e3d563c0ff8315e4a258e2031e2f011c68eb32b47bcf31e23ed9ede"
+    }
+  },
+  "primary_verdict": {
+    "candidate": "fixed",
+    "passed": true,
+    "checks": {
+      "no_fall": true,
+      "full_duration": true,
+      "stationary_drift": true,
+      "stationary_yaw": true,
+      "stop_displacement": true,
+      "stop_yaw": true,
+      "prestop_moving": true,
+      "residual_speed": true,
+      "stairs_exit": true,
+      "quiet_peak": true,
+      "quiet_cumulative_energy": true
+    },
+    "result": {
+      "零命令": {
+        "fell": false,
+        "duration_s": 35.999999999999964,
+        "actor_action_dimension": 16,
+        "no_runtime_stop_clamp": true,
+        "drift_m": 0.021335733272148653,
+        "net_displacement_m": 0.021335733272148653,
+        "window_path_m": 0.021336287355046654,
+        "residual_last10_m_s": 0.0006319187128333084,
+        "yaw_excursion_deg": 0.34268733845386334,
+        "final_wheel_actions": [
+          0.004312962293624878,
+          0.004594773054122925,
+          -0.024126175791025162,
+          0.00962691567838192
+        ]
+      },
+      "平地启停": {
+        "fell": false,
+        "duration_s": 35.999999999999964,
+        "actor_action_dimension": 16,
+        "no_runtime_stop_clamp": true,
+        "drift_m": 0.0732306272341555,
+        "net_displacement_m": 0.06128799127597651,
+        "window_path_m": 0.10237530133979905,
+        "residual_last10_m_s": 0.0006092430576228916,
+        "yaw_excursion_deg": 0.6243377848634926,
+        "final_wheel_actions": [
+          0.004305928945541382,
+          0.004621595144271851,
+          -0.024143312126398087,
+          0.009638478979468346
+        ],
+        "prestop_forward_progress_m": 3.5953298101401874
+      },
+      "仅w": {
+        "fell": false,
+        "duration_s": 35.999999999999964,
+        "actor_action_dimension": 16,
+        "no_runtime_stop_clamp": true,
+        "stairs_exit_time_s": 18.680000000000568,
+        "stairs_events": 85,
+        "stairs_40ms_mean_peak_N": 444.5665227166075,
+        "stairs_specific_energy_per_forward_m": 9.193470391097078,
+        "stairs_max_abs_y_m": 0.2105193316881393
+      }
+    },
+    "baseline": {
+      "零命令": {
+        "fell": false,
+        "duration_s": 35.999999999999964,
+        "actor_action_dimension": 16,
+        "no_runtime_stop_clamp": true,
+        "drift_m": 0.8615137144913466,
+        "net_displacement_m": 0.8615137144913466,
+        "window_path_m": 0.8616214995946923,
+        "residual_last10_m_s": 0.03310529348379041,
+        "yaw_excursion_deg": 3.1378152711671277,
+        "final_wheel_actions": [
+          -0.22970865666866302,
+          -0.5536505579948425,
+          0.2235236018896103,
+          0.26447176933288574
+        ]
+      },
+      "平地启停": {
+        "fell": false,
+        "duration_s": 35.999999999999964,
+        "actor_action_dimension": 16,
+        "no_runtime_stop_clamp": true,
+        "drift_m": 0.7672898201697123,
+        "net_displacement_m": 0.7672898201697123,
+        "window_path_m": 0.7688891830352254,
+        "residual_last10_m_s": 0.03310799326159031,
+        "yaw_excursion_deg": 2.8615978223142102,
+        "final_wheel_actions": [
+          -0.22971211373806,
+          -0.5536518692970276,
+          0.22352446615695953,
+          0.26447421312332153
+        ],
+        "prestop_forward_progress_m": 3.6574533174242254
+      },
+      "仅w": {
+        "fell": false,
+        "duration_s": 35.999999999999964,
+        "actor_action_dimension": 16,
+        "no_runtime_stop_clamp": true,
+        "stairs_exit_time_s": 18.560000000000592,
+        "stairs_events": 97,
+        "stairs_40ms_mean_peak_N": 402.10734382985885,
+        "stairs_specific_energy_per_forward_m": 9.149163244798544,
+        "stairs_max_abs_y_m": 0.2495380323856255
+      }
+    },
+    "criteria": "/home/ubuntu/cyq_shixi_projects/rl_training/docs/m20_idle_stop_257100_20261012/fresh_comparison_video/criteria.json"
+  },
+  "resource_measurements": {
+    "fixed_stairs.log": {
+      "max_rss_KiB": 1208432,
+      "wall_time": "0:33.72"
+    },
+    "baseline_stop.log": {
+      "max_rss_KiB": 1218460,
+      "wall_time": "0:54.35"
+    },
+    "baseline_stairs.log": {
+      "max_rss_KiB": 1207704,
+      "wall_time": "0:34.18"
+    },
+    "fixed_zero.log": {
+      "max_rss_KiB": 1215388,
+      "wall_time": "0:49.35"
+    },
+    "baseline_zero.log": {
+      "max_rss_KiB": 1215508,
+      "wall_time": "0:47.41"
+    },
+    "fixed_stop.log": {
+      "max_rss_KiB": 1219020,
+      "wall_time": "0:54.68"
+    }
+  },
+  "scene_only_changes": [
+    "camera",
+    "render grid",
+    "shadow flags",
+    "text overlays"
+  ],
+  "original_control_physics_observations_unchanged": true,
+  "speed": "1x, 25fps; no time remapping",
+  "left": "original 257100",
+  "right": "fixed idle_stop",
+  "montage_chapters_s": [
+    {
+      "start": 0,
+      "end": 26,
+      "case": "零命令"
+    },
+    {
+      "start": 26,
+      "end": 56,
+      "case": "平地启停",
+      "release_W_at_video_s": 34
+    },
+    {
+      "start": 56,
+      "end": 70,
+      "case": "仅w"
+    }
+  ],
+  "visual_review": {
+    "reviewed_encoded_frames": [
+      "stationary_compare_preview.jpg",
+      "move_stop_compare_preview.jpg",
+      "stairs_compare_preview.jpg"
+    ],
+    "model_labels_and_commands_legible": true,
+    "both_robots_and_ground_reference_visible": true,
+    "full_montage_decode": {
+      "tool": "ffmpeg -loglevel error -threads 1 -i <montage> -map 0:v:0 -an -threads 1 -f null -",
+      "returncode": 0,
+      "errors": []
+    }
+  }
+}

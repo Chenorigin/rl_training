@@ -14,6 +14,7 @@
 """Launch Isaac Sim Simulator first."""
 
 import argparse
+import hashlib
 import os
 import sys
 from pathlib import Path
@@ -48,6 +49,10 @@ parser.add_argument("--init_critic_from", type=str, default=None,
                     help="Initialize critic weights with --init_actor_from, keeping a fresh optimizer.")
 parser.add_argument("--preserve_actor_from", type=str, default=None,
                     help="Freeze a task-capable reference for StairGuardedPPO (also persisted in checkpoints).")
+parser.add_argument("--correction_replay_manifest", type=str, default=None,
+                    help="Override the gait refinement PPO configuration's idle/stop replay manifest.")
+parser.add_argument("--descent_entry_focus", action="store_true",
+                    help="Opt-in isolated top-platform sampling with entry-only policy task gradients.")
 parser.add_argument(
     "--distributed", action="store_true", default=False, help="Run training with multiple GPUs or nodes."
 )
@@ -178,6 +183,25 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         else:
             resume_path = get_checkpoint_path(log_root_path, agent_cfg.load_run, agent_cfg.load_checkpoint)
 
+    if args_cli.descent_entry_focus:
+        if (args_cli.task != "Rough-Deeprobotics-M20-StairTeacher-v0"
+                or not args_cli.preserve_actor_from or not agent_cfg.resume):
+            raise ValueError("Descent-entry experiment requires the teacher task, full resume, and an explicit preservation baseline")
+        focus_resume = Path(resume_path).resolve()
+        focus_reference = Path(args_cli.preserve_actor_from).expanduser().resolve()
+        resume_sha = hashlib.sha256(focus_resume.read_bytes()).hexdigest()
+        reference_sha = hashlib.sha256(focus_reference.read_bytes()).hexdigest()
+        if resume_sha != reference_sha:
+            raise ValueError("Descent-entry resume and preservation reference must be the same exact baseline")
+        print("[INFO] Focus baseline:", {"resume": str(focus_resume), "reference": str(focus_reference), "sha256": resume_sha})
+        from rl_training.tasks.manager_based.locomotion.velocity.config.wheeled.deeprobotics_m20.stair_teacher_env_cfg import configure_descent_entry_experiment
+        print("[INFO] Descent-entry experiment:", configure_descent_entry_experiment(env_cfg, agent_cfg))
+
+    if args_cli.correction_replay_manifest is not None:
+        if not hasattr(agent_cfg.algorithm, "correction_replay_manifest"):
+            raise ValueError("--correction_replay_manifest requires a compatible gait refinement PPO configuration")
+        agent_cfg.algorithm.correction_replay_manifest = args_cli.correction_replay_manifest
+
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
 
@@ -237,6 +261,9 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         print(f"[INFO]: Frozen task preservation actor from: {reference_path}")
     elif args_cli.preserve_actor_from:
         raise ValueError("--preserve_actor_from requires the StairGuardedPPO algorithm")
+
+    if hasattr(runner, "record_initialization"):
+        runner.record_initialization(vars(args_cli))
 
     # dump the configuration into log-directory
     dump_yaml(os.path.join(log_dir, "params", "env.yaml"), env_cfg)

@@ -1,0 +1,11 @@
+{
+  "physical_source_and_checkpoint_sha256": "PASS",
+  "six_replays_nonfall": "PASS",
+  "commands_exact_zero_or_W_only": "PASS",
+  "all_three_stairs_exit": "PASS",
+  "independent_event_window_energy_force_recompute": "PASS",
+  "new_rollouts": 2,
+  "historical_verified_replays": 4,
+  "complete_all_terrain_acceptance": false,
+  "training_modified": false
+}

@@ -1,0 +1,26 @@
+{
+  "V1": {
+    "QuietLanding/all/pre_speed_mean_m_s": 0.6949367341549717,
+    "QuietLanding/all/specific_energy_mean_J_kg": 0.5343310332157625,
+    "QuietLanding/specific_energy_per_m_J_kg_m": -0.09135047929001994,
+    "QuietLanding/impact_window_force_max_N": -1.6122451554991923,
+    "QuietLanding/impact_window_excess_impulse_max_N_s": -3.3909526931517497,
+    "QuietLanding/events_per_m": -0.5498588192537457,
+    "Metrics/base_velocity/error_vel_xy": -0.048686296211220004,
+    "Train/mean_episode_length": 0.00023947383214206752,
+    "Policy/mean_std": -4.777251847804287,
+    "Loss/anchor": 2.6057269596301724
+  },
+  "V1.5": {
+    "QuietLanding/all/pre_speed_mean_m_s": -0.619748695380129,
+    "QuietLanding/all/specific_energy_mean_J_kg": -1.3948204142931742,
+    "QuietLanding/specific_energy_per_m_J_kg_m": -3.004402378172877,
+    "QuietLanding/impact_window_force_max_N": -0.7348729581613922,
+    "QuietLanding/impact_window_excess_impulse_max_N_s": 1.296828244664061,
+    "QuietLanding/events_per_m": -1.7650011704636426,
+    "Metrics/base_velocity/error_vel_xy": -0.4839224242710216,
+    "Train/mean_episode_length": -0.018299049186687455,
+    "Policy/mean_std": -7.310120454293855,
+    "Loss/anchor": 6.165699536471703
+  }
+}

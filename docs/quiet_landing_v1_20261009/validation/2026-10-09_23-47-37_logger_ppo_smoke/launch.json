@@ -1,0 +1,41 @@
+{
+  "task": "Rough-Deeprobotics-M20-QuietLanding-v0",
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-09_01-55-35_gait_fix_descent_entry/model_214700.pt",
+  "checkpoint_sha256": "19743a46229a2ba138716adb7f02dafa318684a2500d13c8107661279c217dd5",
+  "reference": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-09_01-55-35_gait_fix_descent_entry/model_214700.pt",
+  "settings": {
+    "velocity_reference": 0.5,
+    "touchdown_weight": -0.02,
+    "contact_on_force": 5.0,
+    "contact_off_force": 2.0,
+    "minimum_air_time": 0.01,
+    "reset_grace_time": 0.1,
+    "tread_force_ratio": 0.5,
+    "wheel_radius": 0.09,
+    "nearest_map_distance": 0.12,
+    "approach_clearance": 0.06,
+    "histogram_bins": 80,
+    "histogram_max_speed": 4.0
+  },
+  "small_atlas": true,
+  "mode": "ppo_resume",
+  "source_sha256": {
+    "source/rl_training/m20_quiet/signals.py": "e2703283b202e04b6cba9e44a55861c9f1d4e2ee4e0370a01f9192b450025f1f",
+    "source/rl_training/rl_training/quiet_landing_env.py": "7caf8a33d3dc4a517eb613f572e51c1de3f2083462ac6101ee16ba94e440a529",
+    "source/rl_training/rl_training/quiet_landing_runner.py": "74d1323f4a40567ddb7a079915e4811a9e3381268a830b9288bd7c6225300111",
+    "source/rl_training/rl_training/stair_guarded_ppo.py": "3c14c56116f2c57963679fb61195f297d5e3b8f1463b6d94bfa44edbda02e580",
+    "scripts/reinforcement_learning/rsl_rl/train_quiet_landing.py": "e4778c15a11ec713288b85738e7dd3846d739e791431f6c3566544176837cb2d",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/quiet_landing_env_cfg.py": "a4d2a8f68afc3c559c86d7eca9f896b626a3afe3dc65e7f4c046963ce6d45350",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/quiet_landing_ppo_cfg.py": "58e98d20a4c5b39e9070898eba5718e56f1ca4fc5afb316cbd703efe591c84f7",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/gait_refinement.py": "0a12b91e370656114f53505bb35cecec069fdd0737d694f532de26382b9e9bc3",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/curriculums.py": "c65a2a197c431a40b6772ffcd34c7ff203a47a5437033fbf46316897a324711d",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_student.py": "d04249808dc91c0657f1540f956f523d6f901fc768cc3efaf5d21c48429a8bf6",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/observations.py": "21f05323699f4699350a13f8c15702faf1a248fb625aa7521317f5a56f1625b4",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/commands.py": "31877425d07293cfdefd29858e105885a0edf8f7d75dc72d2200c29706017641",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_teacher.py": "5d53c780b552a8aa539332f88c4afb86653a58023b55c369417a3421709742e7",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/rewards.py": "1317295c7f904bb12f93168e156b1335e3412d97e702dd6b7dafef79a7b22479",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/__init__.py": "3980de02cb00a0fa20762e39063c4da31925407a94c389a01d005a93fa7ec2ed",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_ascent.py": "0b21b2f04c378bfc0790106cc111473c556a9b07361c0edcb3047f67c63faf41",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/events.py": "fc43f91c9dc9ccd21c5e27fe7bf911ee6d20950c60d2e183589391a30d8ec15d"
+  }
+}

@@ -1,0 +1,49 @@
+PROGRESS baseline_clean_center t=20.02s x=9.139
+PROGRESS baseline_clean_center t=40.02s x=18.740
+PROGRESS baseline_clean_center t=60.02s x=29.695
+RESULT {"label": "baseline_clean_center", "complete": true, "duration_s": 79.56000000000013, "stop_reason": "finish", "max_x_m": 38.417238023723286, "wall_time_s": 20.177632480859756, "peak_process_rss_kib": 1004684}
+PROGRESS quiet_landing_v1_clean_center t=20.02s x=8.995
+PROGRESS quiet_landing_v1_clean_center t=40.02s x=18.543
+PROGRESS quiet_landing_v1_clean_center t=60.02s x=29.672
+PROGRESS quiet_landing_v1_clean_center t=80.02s x=38.064
+RESULT {"label": "quiet_landing_v1_clean_center", "complete": true, "duration_s": 80.83999999999897, "stop_reason": "finish", "max_x_m": 38.41246631932605, "wall_time_s": 20.67077163606882, "peak_process_rss_kib": 1065052}
+PROGRESS student_clean_center t=20.02s x=9.221
+PROGRESS student_clean_center t=40.02s x=19.875
+PROGRESS student_clean_center t=60.02s x=31.048
+RESULT {"label": "student_clean_center", "complete": true, "duration_s": 77.74000000000179, "stop_reason": "finish", "max_x_m": 38.42827069924664, "wall_time_s": 22.036238414933905, "peak_process_rss_kib": 1116036}
+PROGRESS baseline_clean_left t=20.02s x=9.267
+PROGRESS baseline_clean_left t=40.02s x=18.579
+PROGRESS baseline_clean_left t=60.02s x=29.837
+RESULT {"label": "baseline_clean_left", "complete": true, "duration_s": 79.30000000000037, "stop_reason": "finish", "max_x_m": 38.41688855887333, "wall_time_s": 20.30220081214793, "peak_process_rss_kib": 1137748}
+PROGRESS quiet_landing_v1_clean_left t=20.02s x=8.937
+PROGRESS quiet_landing_v1_clean_left t=40.02s x=18.462
+PROGRESS quiet_landing_v1_clean_left t=60.02s x=29.172
+PROGRESS quiet_landing_v1_clean_left t=80.02s x=37.664
+RESULT {"label": "quiet_landing_v1_clean_left", "complete": true, "duration_s": 81.73999999999815, "stop_reason": "finish", "max_x_m": 38.40805056142893, "wall_time_s": 20.76399264507927, "peak_process_rss_kib": 1147340}
+PROGRESS student_clean_left t=20.02s x=9.274
+PROGRESS student_clean_left t=40.02s x=19.584
+PROGRESS student_clean_left t=60.02s x=30.985
+RESULT {"label": "student_clean_left", "complete": true, "duration_s": 77.82000000000171, "stop_reason": "finish", "max_x_m": 38.41708359384327, "wall_time_s": 22.072949508903548, "peak_process_rss_kib": 1147724}
+PROGRESS baseline_clean_right t=20.02s x=9.168
+PROGRESS baseline_clean_right t=40.02s x=18.473
+PROGRESS baseline_clean_right t=60.02s x=29.479
+RESULT {"label": "baseline_clean_right", "complete": true, "duration_s": 79.95999999999977, "stop_reason": "finish", "max_x_m": 38.41901116748323, "wall_time_s": 20.54466342483647, "peak_process_rss_kib": 1158732}
+PROGRESS quiet_landing_v1_clean_right t=20.02s x=8.892
+PROGRESS quiet_landing_v1_clean_right t=40.02s x=18.404
+PROGRESS quiet_landing_v1_clean_right t=60.02s x=28.981
+PROGRESS quiet_landing_v1_clean_right t=80.02s x=37.469
+RESULT {"label": "quiet_landing_v1_clean_right", "complete": true, "duration_s": 82.41999999999753, "stop_reason": "finish", "max_x_m": 38.42704996794499, "wall_time_s": 21.233222380978987, "peak_process_rss_kib": 1173088}
+PROGRESS student_clean_right t=20.02s x=9.339
+PROGRESS student_clean_right t=40.02s x=20.030
+PROGRESS student_clean_right t=60.02s x=31.249
+RESULT {"label": "student_clean_right", "complete": true, "duration_s": 77.4000000000021, "stop_reason": "finish", "max_x_m": 38.432161411270364, "wall_time_s": 21.957788118859753, "peak_process_rss_kib": 1173856}
+PROGRESS student_train_center t=20.02s x=9.176
+PROGRESS student_train_center t=40.02s x=17.788
+PROGRESS student_train_center t=60.02s x=28.324
+PROGRESS student_train_center t=80.02s x=37.344
+RESULT {"label": "student_train_center", "complete": true, "duration_s": 82.5599999999974, "stop_reason": "finish", "max_x_m": 38.41775480944624, "wall_time_s": 23.052451826864854, "peak_process_rss_kib": 1175532}
+PROGRESS student_realistic_center t=20.02s x=9.761
+PROGRESS student_realistic_center t=40.02s x=19.260
+PROGRESS student_realistic_center t=60.02s x=30.261
+RESULT {"label": "student_realistic_center", "complete": true, "duration_s": 79.20000000000046, "stop_reason": "finish", "max_x_m": 38.40827791980616, "wall_time_s": 23.67312118411064, "peak_process_rss_kib": 1177452}
+SUITE_DONE 11

@@ -1,0 +1,626 @@
+{
+  "Episode_Termination/bad_orientation_2": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.0029296875
+  },
+  "Episode_Termination/terrain_out_of_bounds": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.01189168356359005
+  },
+  "Episode_Termination/time_out": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.9851786494255066
+  },
+  "Metrics/base_velocity/error_vel_xy": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.4300820231437683
+  },
+  "Metrics/base_velocity/error_vel_yaw": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.29620784521102905
+  },
+  "QuietLanding/all/has_samples": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.0
+  },
+  "QuietLanding/all/height_window_event_coverage": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.7816222906112671
+  },
+  "QuietLanding/all/histogram_tail_count": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.6666666865348816
+  },
+  "QuietLanding/all/map_valid_fraction": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.0
+  },
+  "QuietLanding/all/non_tread_edges": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 146.25
+  },
+  "QuietLanding/all/pre_speed_max_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 3.78352689743042
+  },
+  "QuietLanding/all/pre_speed_mean_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.4236026406288147
+  },
+  "QuietLanding/all/pre_speed_p50_hist_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.16458334028720856
+  },
+  "QuietLanding/all/pre_speed_p95_hist_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.7562501430511475
+  },
+  "QuietLanding/all/raw_contact_edges": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1818.291748046875
+  },
+  "QuietLanding/all/specific_energy_mean_J_kg": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.28376179933547974
+  },
+  "QuietLanding/all/touchdown_count": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1259.166748046875
+  },
+  "QuietLanding/contact_gated_slip_time_mean_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.11152093857526779
+  },
+  "QuietLanding/distance_m": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 76.79733276367188
+  },
+  "QuietLanding/events_per_m": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 18.711585998535156
+  },
+  "QuietLanding/fl/has_samples": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.0
+  },
+  "QuietLanding/fl/height_window_event_coverage": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.7919430732727051
+  },
+  "QuietLanding/fl/histogram_tail_count": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.3333333432674408
+  },
+  "QuietLanding/fl/map_valid_fraction": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.0
+  },
+  "QuietLanding/fl/non_tread_edges": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 29.70833396911621
+  },
+  "QuietLanding/fl/pre_speed_max_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 3.486501693725586
+  },
+  "QuietLanding/fl/pre_speed_mean_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.44029733538627625
+  },
+  "QuietLanding/fl/pre_speed_p50_hist_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.17083333432674408
+  },
+  "QuietLanding/fl/pre_speed_p95_hist_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.8250001668930054
+  },
+  "QuietLanding/fl/raw_contact_edges": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 447.29168701171875
+  },
+  "QuietLanding/fl/specific_energy_mean_J_kg": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.30855345726013184
+  },
+  "QuietLanding/fl/touchdown_count": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 319.625
+  },
+  "QuietLanding/fr/has_samples": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.0
+  },
+  "QuietLanding/fr/height_window_event_coverage": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.7745727300643921
+  },
+  "QuietLanding/fr/histogram_tail_count": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.1666666716337204
+  },
+  "QuietLanding/fr/map_valid_fraction": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.0
+  },
+  "QuietLanding/fr/non_tread_edges": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 33.16666793823242
+  },
+  "QuietLanding/fr/pre_speed_max_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 3.465822219848633
+  },
+  "QuietLanding/fr/pre_speed_mean_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.45125970244407654
+  },
+  "QuietLanding/fr/pre_speed_p50_hist_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.18958334624767303
+  },
+  "QuietLanding/fr/pre_speed_p95_hist_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.8187501430511475
+  },
+  "QuietLanding/fr/raw_contact_edges": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 442.8333435058594
+  },
+  "QuietLanding/fr/specific_energy_mean_J_kg": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.3120172619819641
+  },
+  "QuietLanding/fr/touchdown_count": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 308.625
+  },
+  "QuietLanding/hl/has_samples": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.0
+  },
+  "QuietLanding/hl/height_window_event_coverage": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.776081919670105
+  },
+  "QuietLanding/hl/histogram_tail_count": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.0833333358168602
+  },
+  "QuietLanding/hl/map_valid_fraction": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.0
+  },
+  "QuietLanding/hl/non_tread_edges": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 45.04166793823242
+  },
+  "QuietLanding/hl/pre_speed_max_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 2.956571578979492
+  },
+  "QuietLanding/hl/pre_speed_mean_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.4261418581008911
+  },
+  "QuietLanding/hl/pre_speed_p50_hist_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.177083358168602
+  },
+  "QuietLanding/hl/pre_speed_p95_hist_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.7333333492279053
+  },
+  "QuietLanding/hl/raw_contact_edges": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 461.125
+  },
+  "QuietLanding/hl/specific_energy_mean_J_kg": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.2732888460159302
+  },
+  "QuietLanding/hl/touchdown_count": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 310.875
+  },
+  "QuietLanding/hr/has_samples": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.0
+  },
+  "QuietLanding/hr/height_window_event_coverage": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.784369945526123
+  },
+  "QuietLanding/hr/histogram_tail_count": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.0833333358168602
+  },
+  "QuietLanding/hr/map_valid_fraction": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.0
+  },
+  "QuietLanding/hr/non_tread_edges": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 38.333335876464844
+  },
+  "QuietLanding/hr/pre_speed_max_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 3.012265682220459
+  },
+  "QuietLanding/hr/pre_speed_mean_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.39921361207962036
+  },
+  "QuietLanding/hr/pre_speed_p50_hist_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.15833334624767303
+  },
+  "QuietLanding/hr/pre_speed_p95_hist_m_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 1.681249976158142
+  },
+  "QuietLanding/hr/raw_contact_edges": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 467.04168701171875
+  },
+  "QuietLanding/hr/specific_energy_mean_J_kg": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.2537428140640259
+  },
+  "QuietLanding/hr/touchdown_count": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 320.04168701171875
+  },
+  "QuietLanding/impact_window_excess_impulse_max_N_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 29.283550262451172
+  },
+  "QuietLanding/impact_window_force_max_N": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 3667.487060546875
+  },
+  "QuietLanding/impact_window_loading_rate_max_N_s": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 700917.0
+  },
+  "QuietLanding/normal_fit_valid_fraction_last_substep": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.9993388056755066
+  },
+  "QuietLanding/specific_energy_per_m_J_kg_m": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 4.93433952331543
+  },
+  "QuietReward/action_smooth_l2": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.12153603881597519
+  },
+  "QuietReward/joint_acc_l2": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.053278978914022446
+  },
+  "QuietReward/joint_acc_wheel_l2": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.0449213907122612
+  },
+  "QuietReward/quiet_action_leg_rate": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.0027252393774688244
+  },
+  "QuietReward/quiet_action_wheel_rate": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.0022500145714730024
+  },
+  "QuietReward/quiet_base_angular_acceleration": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.007661481853574514
+  },
+  "QuietReward/quiet_base_vertical_acceleration": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.0001780997117748484
+  },
+  "QuietReward/quiet_impact_impulse": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.05348333716392517
+  },
+  "QuietReward/quiet_impact_peak": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.10781791061162949
+  },
+  "QuietReward/quiet_loading_rate": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.005350249819457531
+  },
+  "QuietReward/quiet_swing_clearance": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.0133402980864048
+  },
+  "QuietReward/quiet_torque_rate": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.0011483144480735064
+  },
+  "QuietReward/quiet_touchdown": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.6955119371414185
+  },
+  "QuietReward/quiet_wheel_jerk": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.03729783371090889
+  },
+  "QuietReward/quiet_wheel_slip": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.020042119547724724
+  },
+  "QuietReward/stair_joint_acceleration_cost": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.0032717834692448378
+  },
+  "Task/episode_reward_rate": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 4.9872307777404785
+  },
+  "Loss/value": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.5828067660331726
+  },
+  "Loss/surrogate": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -0.0036716535687446594
+  },
+  "Loss/entropy": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": -11.144296646118164
+  },
+  "Loss/anchor": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.06713363528251648
+  },
+  "Loss/critic_warmup": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.0
+  },
+  "Loss/learning_rate": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 9.999999747378752e-06
+  },
+  "Policy/mean_std": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.12762221693992615
+  },
+  "Perf/total_fps": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 17540.0
+  },
+  "Perf/collection_time": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 5.480615615844727
+  },
+  "Perf/learning_time": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 0.12392950057983398
+  },
+  "Train/mean_reward": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 97.6823959350586
+  },
+  "Train/mean_episode_length": {
+    "n": 42130,
+    "first_step": 214700,
+    "last_step": 256829,
+    "last_value": 999.3400268554688
+  },
+  "Train/mean_reward/time": {
+    "n": 42130,
+    "first_step": 3,
+    "last_step": 165647,
+    "last_value": 97.6823959350586
+  },
+  "Train/mean_episode_length/time": {
+    "n": 42130,
+    "first_step": 3,
+    "last_step": 165647,
+    "last_value": 999.3400268554688
+  }
+}

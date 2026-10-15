@@ -1,0 +1,165 @@
+{
+  "version": "v1",
+  "timestamp_utc": "2026-10-13T08:57:22.809771+00:00",
+  "execution_boundary": {
+    "training_started": false,
+    "simulator_started": false,
+    "physics_steps": 0,
+    "optimizer_updates": 0,
+    "gradient_check_only": true
+  },
+  "checks": {
+    "student_v1_offline": {
+      "passed": 25,
+      "command": "PYTHONPATH=source/rl_training python -m unittest discover -s tests -p test_student_v1.py -v"
+    },
+    "existing_v0_fov_regression": {
+      "passed": 8,
+      "command": "PYTHONPATH=source/rl_training python -m unittest discover -s tests -p test_student_v0_fov.py -v"
+    },
+    "syntax_files": 17,
+    "training_cli_parse": "passed",
+    "train_deploy_eval_cli_help": "passed",
+    "existing_task_registration_unchanged": true
+  },
+  "actual_checkpoints": {
+    "default_618": {
+      "version": "v1",
+      "source_path": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-48-58_quiet_landing_v1/model_257100.pt",
+      "source_sha256": "368fa6287d3fc5e999b4ad596ad9f84be23f25d72bbd861236ec535a66b51c1c",
+      "initialization": {
+        "source_input_dim": 618,
+        "target_input_dim": 618,
+        "optimizer_loaded": false,
+        "replay_loaded": false,
+        "max_source_action_error": 0.0,
+        "float64_max_source_action_error": 0.0,
+        "float32_parity_tolerance": {
+          "atol": 0.0001,
+          "rtol": 1e-05
+        },
+        "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_student_v0/2026-10-12_23-24-52_380795_student_v0_stage_a/model_29999.pt",
+        "sha256": "96f720f4cf3da436f68fac7bcbfc22d6c17bf17f81716dfd030dc645c64a0b95"
+      },
+      "actor_dim": 618,
+      "teacher_dim": 244,
+      "export_max_action_error": 0.0,
+      "num_envs": 64,
+      "device": "cpu",
+      "host_available_bytes": 90724892672,
+      "host_total_bytes": 134370000896,
+      "disk_free_bytes": 18669867008,
+      "planned_increment_bytes": 8924259840,
+      "budget": {
+        "replay_bytes": 52613120,
+        "rollout_bytes": 12400640,
+        "map_bytes": 876032,
+        "sample_buffer_bytes": 65889792,
+        "sample_buffer_formula": "(regular+critical)*((actor_dim+16)*4+tag4*8+holdout1) + rollout + map packets",
+        "checkpoint_estimate_bytes": 68666298,
+        "checkpoint_count": 51,
+        "run_output_estimate_bytes": 4428891522,
+        "min_free_disk_bytes": 2147483648,
+        "required_free_bytes": 6576375170,
+        "basis": "MLP weights, Adam moments, two replay buffers including tags/history, atomic/recovery checkpoints, event/code allowance"
+      },
+      "occupancy_cap_fraction": 0.85,
+      "basis": "8 GiB simulator allowance + 4 MiB/env + actual tensor budget; engineering reserve, validate peak before scaling",
+      "trained": false,
+      "simulator_started": false,
+      "optimizer_updates": 0
+    },
+    "optional_history_789": {
+      "version": "v1",
+      "source_path": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-48-58_quiet_landing_v1/model_257100.pt",
+      "source_sha256": "368fa6287d3fc5e999b4ad596ad9f84be23f25d72bbd861236ec535a66b51c1c",
+      "initialization": {
+        "source_input_dim": 618,
+        "target_input_dim": 789,
+        "optimizer_loaded": false,
+        "replay_loaded": false,
+        "max_source_action_error": 9.1552734375e-05,
+        "float64_max_source_action_error": 1.7053025658242404e-13,
+        "float32_parity_tolerance": {
+          "atol": 0.0001,
+          "rtol": 1e-05
+        },
+        "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_student_v0/2026-10-12_23-24-52_380795_student_v0_stage_a/model_29999.pt",
+        "sha256": "96f720f4cf3da436f68fac7bcbfc22d6c17bf17f81716dfd030dc645c64a0b95"
+      },
+      "actor_dim": 789,
+      "teacher_dim": 244,
+      "export_max_action_error": 0.0,
+      "num_envs": 64,
+      "device": "cpu",
+      "host_available_bytes": 91149955072,
+      "host_total_bytes": 134370000896,
+      "disk_free_bytes": 18664513536,
+      "planned_increment_bytes": 8941069824,
+      "budget": {
+        "replay_bytes": 66621440,
+        "rollout_bytes": 15202304,
+        "map_bytes": 876032,
+        "sample_buffer_bytes": 82699776,
+        "sample_buffer_formula": "(regular+critical)*((actor_dim+16)*4+tag4*8+holdout1) + rollout + map packets",
+        "checkpoint_estimate_bytes": 85984084,
+        "checkpoint_count": 51,
+        "run_output_estimate_bytes": 5346734180,
+        "min_free_disk_bytes": 2147483648,
+        "required_free_bytes": 7494217828,
+        "basis": "MLP weights, Adam moments, two replay buffers including tags/history, atomic/recovery checkpoints, event/code allowance"
+      },
+      "occupancy_cap_fraction": 0.85,
+      "basis": "8 GiB simulator allowance + 4 MiB/env + actual tensor budget; engineering reserve, validate peak before scaling",
+      "trained": false,
+      "simulator_started": false,
+      "optimizer_updates": 0
+    }
+  },
+  "review": {
+    "independent_reviewer": "/root/student_v1_review",
+    "family": "Codex",
+    "heterogeneous_family_available": false,
+    "final_result": "no further blocking issue found in offline/read-only review",
+    "fixes": [
+      "synchronous scratch kinematics and policy-boundary distance",
+      "terrain difficulty in replay sampling keys",
+      "paired confidence-quality profiles",
+      "gravity/map orientation sign and tilted-pose Jacobian",
+      "disable process XR override"
+    ]
+  },
+  "skipped": [
+    "Isaac environment construction and physical smoke test",
+    "MuJoCo closed-loop evaluation",
+    "training",
+    "hardware calibration and deployment",
+    "ruff/pyflakes unavailable"
+  ],
+  "limits": [
+    "online random-frame holdout is not independent trajectory validation",
+    "map sensor is a 2.5D surrogate, without beam scan, reflectivity, overhang or self-shadow",
+    "sensor defaults not calibrated on hardware",
+    "GRU, auxiliary reconstruction and PPO not implemented",
+    "Hub knowledge writeback unavailable in restricted environment"
+  ],
+  "source_sha256": {
+    "source/rl_training/m20_student_v1/output_storage.py": "adca6b2ee831a850cf49e673f14117d62bb0de9a1c5565e9854c0fa59aa23e8b",
+    "source/rl_training/m20_student_v1/environment.py": "5839c934832d1a30e3eba87852c0ec02068318a4547a99d1075ffe60e0d946c3",
+    "source/rl_training/m20_student_v1/perception.py": "eb0d94c7eb79e9c575c602d905accc4e0a9430e31365027830425e88e2ff40c4",
+    "source/rl_training/m20_student_v1/model_io.py": "1eb0dfd0eb953df759ca87340c8c2cccc0a137b7c24ff834db70b2c6348eae22",
+    "source/rl_training/m20_student_v1/configuration.py": "79ac22a8e274bd2a501e74eca45d2a7278c55459a5a3be9acaedd73dbfc3ded6",
+    "source/rl_training/m20_student_v1/__init__.py": "15f2de04c368a227a11293f1f443a63d32b927191858e5f1220f28627bfedaad",
+    "source/rl_training/m20_student_v1/profiles.py": "7c4feb69998d6f6686e86d61f5a8cf9f156edd2cabd2d30f6d104a8e2eb7994c",
+    "source/rl_training/m20_student_v1/distillation.py": "0dd6f6005066a2a710e9cfad7c3672dcb8f60c5595c203d9f30705b4fdf5e675",
+    "source/rl_training/m20_student_v1/contract.py": "4dcab0d1613b0d5eb226200db81d8d176adc0f428fc0f0e0837d4237296b1edd",
+    "source/rl_training/m20_student_v1/runner.py": "ef15b44417de530499016df3ba24ed4d5637dcc0d2a67a803bd5acb5df3704f6",
+    "scripts/reinforcement_learning/rsl_rl/distill_student_v1.py": "d938d5cbacb633e9fb3b3e156d62de9cc9f7606d564b8ee5886c1bb9269c3906",
+    "scripts/tools/evaluate_student_v1.py": "97268b852bcb0c956d205ef5229a4926797c02196eec583ba56d1e72a29de6bb",
+    "deploy/deploy_mujoco/deploy_student_v1.py": "ba6190b020ab98fc868382cc1c2226ce1bc0f0c1a11b4949f5fd9ed6076a9214",
+    "deploy/deploy_mujoco/student_v1_adapter.py": "3d20f724dd8ed212283c3c21158aa4ede9def5d2e6f8ed6cc48c7a452fa7ce42",
+    "tests/test_student_v1.py": "daef5d6841d599eeb66f8ce15357ab964b29326893074fd639d24c6f8561db09",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/student_v1_env_cfg.py": "8ce2645da4cef350953de22f53f0bda87f7d93a0d469a3593fa1a8296823036c",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/student_v1_distillation_cfg.py": "9e1bf39f7ee20af1941d4823baa8b412a6f30cd76c0af25a8ea379ca7127c829"
+  }
+}

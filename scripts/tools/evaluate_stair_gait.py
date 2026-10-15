@@ -24,7 +24,7 @@ def main():
     parser.add_argument("--model", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--steps", type=int, default=750)
-    parser.add_argument("--cases", nargs="+", choices=("ascent", "descent", "turn_left", "turn_right", "flat"),
+    parser.add_argument("--cases", nargs="+", choices=("ascent", "descent", "turn_left", "turn_right", "flat", "slope_up", "slope_down", "rough", "obstacles", "hurdles"),
                         default=["ascent", "descent", "turn_left", "turn_right", "flat"])
     parser.add_argument("--stair-height", type=float, default=0.15)
     parser.add_argument("--tread-depth", type=float, default=0.30)
@@ -41,7 +41,7 @@ def main():
     results = dict(checkpoint=str(args.checkpoint.resolve()),
                    checkpoint_sha256=hashlib.sha256(args.checkpoint.read_bytes()).hexdigest(), cases={})
     for case in args.cases:
-        terrain = case if case in {"ascent", "descent", "flat"} else "flat"
+        terrain = "flat" if case in {"turn_left", "turn_right"} else case
         cfg = argparse.Namespace(terrain=terrain, terrain_xml=None,
             stair_height=args.stair_height if terrain in {"ascent", "descent"} else None,
             tread_depth=args.tread_depth if terrain in {"ascent", "descent"} else None,
@@ -51,10 +51,10 @@ def main():
         data = mujoco.MjData(model)
         contract.reset(data)
         metrics = GaitMetrics(contract, min_extension=args.min_extension)
-        command = np.array([args.command_vx, 0, 0] if case in {"ascent", "descent", "flat"}
+        command = np.array([args.command_vx, 0, 0] if case not in {"turn_left", "turn_right"}
                            else [0, 0, 0.6 if case == "turn_left" else -0.6], dtype=np.float32)
         previous = np.zeros(16, dtype=np.float32)
-        records = {k: [] for k in ("time", "root_pos", "root_quat", "joint_pos", "joint_vel", "command", "action", "wheel_pos", "hip_pos", "wheel_ground", "contact_force")}
+        records = {k: [] for k in ("time", "root_pos", "root_quat", "joint_pos", "joint_vel", "command", "action", "policy_obs", "wheel_pos", "hip_pos", "wheel_ground", "contact_force")}
         fell = False
         for _ in range(args.steps):
             obs = contract.observe(data, command, previous)
@@ -70,7 +70,7 @@ def main():
             sample = metrics.samples[-1]
             values = dict(time=data.time, root_pos=data.xpos[contract.base_id].copy(),
                 root_quat=data.xquat[contract.base_id].copy(), joint_pos=data.qpos[contract.qpos_ids].copy(),
-                joint_vel=data.qvel[contract.qvel_ids].copy(), command=command.copy(), action=action.copy(),
+                joint_vel=data.qvel[contract.qvel_ids].copy(), command=command.copy(), action=action.copy(), policy_obs=obs.copy(),
                 wheel_pos=data.xpos[contract.wheel_body_ids].copy(), hip_pos=data.xpos[metrics.hips].copy(),
                 wheel_ground=sample["wheel_ground"], contact_force=sample["forces"])
             for key, value in values.items():

@@ -1,0 +1,11 @@
+{
+  "time_unix": 1791861507.9877656,
+  "scope": "CPU-only student inference, 12 serial fixed-command episodes, no training, no GPU",
+  "basis": "test_student_v0_mujoco: peak RSS 769328 KiB; add robot assets and rollout arrays within 1.5 GiB budget",
+  "formula": "618*512+512*256+256*128+128*16+biases = ~483k FP32 parameters; checkpoint 27.76 MB with replay, no optimizer construction; 12*1000*~2700 bytes trajectory <= 33 MB before compression",
+  "memory_available_kib": 87842464,
+  "cpu_loadavg": "3.77 2.71 2.49 4/3296 2195407",
+  "gpu_allocation": 0,
+  "limits": "one process, torch/BLAS threads 1, timeout 180s; cgroup hard limit not available in sandbox, bounded episodes and arrays",
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_student_v0/2026-10-12_23-24-52_380795_student_v0_stage_a/model_21000.pt"
+}

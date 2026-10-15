@@ -8,9 +8,67 @@ import gymnasium as gym
 
 from . import agents
 
+for task_id, env_class in (
+    ("Rough-Deeprobotics-M20-Student-v1", "DeeproboticsM20StudentV1EnvCfg"),
+    ("Rough-Deeprobotics-M20-StudentV15-v1", "DeeproboticsM20StudentV15V1EnvCfg"),
+):
+    gym.register(
+        id=task_id,
+        entry_point=f"{__name__}.student_v1_env_cfg:M20StudentV1Env",
+        disable_env_checker=True,
+        kwargs={
+            "env_cfg_entry_point": f"{__name__}.student_v1_env_cfg:{env_class}",
+            "rsl_rl_cfg_entry_point": f"{agents.__name__}.student_v1_distillation_cfg:DeeproboticsM20StudentV1DistillationCfg",
+        },
+    )
+
+for task_id, env_class in (
+    ("Rough-Deeprobotics-M20-Student-v0", "DeeproboticsM20StudentV0EnvCfg"),
+    ("Rough-Deeprobotics-M20-StudentV15-v0", "DeeproboticsM20StudentV15V0EnvCfg"),
+):
+    gym.register(
+        id=task_id,
+        entry_point=f"{__name__}.student_v0_env_cfg:M20StudentV0Env",
+        disable_env_checker=True,
+        kwargs={
+            "env_cfg_entry_point": f"{__name__}.student_v0_env_cfg:{env_class}",
+            "rsl_rl_cfg_entry_point": f"{agents.__name__}.student_v0_distillation_cfg:DeeproboticsM20StudentV0DistillationCfg",
+        },
+    )
+
+gym.register(
+    id="Rough-Deeprobotics-M20-GaitRefinement-v2",
+    entry_point="rl_training.tasks.manager_based.locomotion.velocity.mdp.gait_refinement_v2_env:M20GaitRefinementV2Env",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.gait_refinement_v2_env_cfg:DeeproboticsM20GaitRefinementV2EnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.gait_refinement_v2_ppo_cfg:DeeproboticsM20GaitRefinementV2PPORunnerCfg",
+    },
+)
+
+gym.register(
+    id="Rough-Deeprobotics-M20-QuietLanding-v0",
+    entry_point="rl_training.tasks.manager_based.locomotion.velocity.mdp.quiet_landing_traversal:M20QuietLandingEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.quiet_landing_env_cfg:DeeproboticsM20QuietLandingEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.quiet_landing_ppo_cfg:DeeproboticsM20QuietLandingPPORunnerCfg",
+    },
+)
+
 ##
 # Register Gym environments.
 ##
+
+gym.register(
+    id="Rough-Deeprobotics-M20-QuietLanding-V1_5-v0",
+    entry_point="rl_training.tasks.manager_based.locomotion.velocity.mdp.quiet_landing_traversal:M20QuietLandingEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.quiet_landing_env_cfg:DeeproboticsM20QuietLandingV15EnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.quiet_landing_ppo_cfg:DeeproboticsM20QuietLandingV15PPORunnerCfg",
+    },
+)
 
 gym.register(
     id="Flat-Deeprobotics-M20-v0",
@@ -61,29 +119,5 @@ gym.register(
     kwargs={
         "env_cfg_entry_point": f"{__name__}.stair_student_env_cfg:DeeproboticsM20StairStudentEnvCfg",
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.stair_student_ppo_cfg:DeeproboticsM20StairStudentPPORunnerCfg",
-    },
-)
-
-gym.register(
-    id="Rough-Deeprobotics-M20-QuietLanding-v0",
-    entry_point="rl_training.quiet_landing_env:M20QuietLandingEnv",
-    disable_env_checker=True,
-    kwargs={
-        "env_cfg_entry_point": f"{__name__}.quiet_landing_env_cfg:DeeproboticsM20QuietLandingEnvCfg",
-        "rsl_rl_cfg_entry_point": f"{agents.__name__}.quiet_landing_ppo_cfg:DeeproboticsM20QuietLandingPPORunnerCfg",
-    },
-)
-
-##
-# Register Gym environments.
-##
-
-gym.register(
-    id="Rough-Deeprobotics-M20-QuietLanding-V1_5-v0",
-    entry_point="rl_training.quiet_landing_env:M20QuietLandingEnv",
-    disable_env_checker=True,
-    kwargs={
-        "env_cfg_entry_point": f"{__name__}.quiet_landing_env_cfg:DeeproboticsM20QuietLandingV15EnvCfg",
-        "rsl_rl_cfg_entry_point": f"{agents.__name__}.quiet_landing_ppo_cfg:DeeproboticsM20QuietLandingV15PPORunnerCfg",
     },
 )

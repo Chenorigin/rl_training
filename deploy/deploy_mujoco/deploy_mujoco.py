@@ -78,8 +78,11 @@ PRE_STAND_JOINT_POS = np.array(
 STAND_PHASE_DURATION = 2.5
 TELEOP_KEY_TIMEOUT = 0.5
 TELEOP_VELOCITIES = {"w": (0.7, 0.0, 0.0), "s": (-0.7, 0.0, 0.0),
-                     "a": (0.0, 0.5, 0.0), "d": (0.0, -0.5, 0.0),
-                     "q": (0.0, 0.0, 0.6), "e": (0.0, 0.0, -0.6)}
+                      "a": (0.0, 0.5, 0.0), "d": (0.0, -0.5, 0.0),
+                      "q": (0.0, 0.0, 0.6), "e": (0.0, 0.0, -0.6)}
+# TELEOP_VELOCITIES = {"w": (2.0, 0.0, 0.0), "s": (-2.0, 0.0, 0.0),
+#                      "a": (0.0, 1.0, 0.0), "d": (0.0, -1.0, 0.0),
+#                      "q": (0.0, 0.0, 2.0), "e": (0.0, 0.0, -2.0)}
 
 
 def scan_grid() -> np.ndarray:
@@ -351,6 +354,7 @@ class TeleopKeyboard:
         for key in pressed:
             command += TELEOP_VELOCITIES[key]
         return np.clip(command, [-0.7, -0.5, -0.6], [0.7, 0.5, 0.6]).astype(np.float32)
+        # return np.clip(command, [-2.0, -1.0, -2.0], [2.0, 1.0, 2.0]).astype(np.float32)
 
 
 class TerminalInput:
@@ -452,6 +456,12 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
     contract = M20Contract(model, args.terrain_config)
     data = mujoco.MjData(model)
     contract.reset(data, prone=True)
+    metrics = live = None
+    if getattr(args, "quiet_landing", False):
+        from quiet_landing_metrics import QuietMujocoMetrics, LiveSignals
+        contract.height_scan(data)
+        metrics = QuietMujocoMetrics(model, contract)
+        live = LiveSignals() if args.live_plot else None
     print("[TERRAIN] " + json.dumps(args.terrain_config.summary()), flush=True)
     keys = TeleopKeyboard()
     terminal = TerminalInput(keys)
@@ -559,6 +569,11 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
                 enter("prone")
 
             command = keys.velocity_command() if mode == "policy" else np.zeros(3, dtype=np.float32)
+            if metrics is not None:
+                metrics.command_xy = command[:2]
+                metrics.tracker.begin_step()
+                current = metrics.kinematics if data.time > 0 else data
+                quiet_start_xy = current.xpos[contract.base_id, :2].copy()
             applied_action = np.zeros(ACTION_DIM, dtype=np.float32)
             if mode == "policy":
                 obs = contract.observe(data, command, previous_action)
@@ -583,7 +598,7 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
                 target = lie_initial + blend * (PRONE_JOINT_POS - lie_initial)
             elif mode == "ready":
                 target = DEFAULT_JOINT_POS
-            if mode != "policy" and show_height_scan:
+            if mode != "policy" and (show_height_scan or metrics is not None):
                 contract.height_scan(data)
 
             if records is not None:
@@ -599,9 +614,25 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
                     contract.apply_pose_pd(data, target)
                 else:
                     contract.apply_damping(data)
-                mujoco.mj_step(model, data)
+                if metrics is None:
+                    mujoco.mj_step(model, data)
+                else:
+                    mujoco.mj_step1(model, data)
+                    snapshot = metrics.pre_step(data)
+                    mujoco.mj_step2(model, data)
+                    metrics.post_step(data, snapshot, record=args.output is not None or live is not None)
+                    if args.output is None:
+                        for group in (metrics.records, metrics.extended_records):
+                            for values in group.values(): del values[:-1000]
+                        del metrics.events[:-1000]
             steps_done += 1
+            if metrics is not None:
+                metrics.tracker.distance[0] += float(np.linalg.norm(metrics.kinematics.xpos[contract.base_id, :2]-quiet_start_xy))
             draw_height_scan(viewer, contract, show_height_scan)
+            if metrics is not None:
+                metrics.draw(viewer, data)
+            if live is not None and step % 5 == 0:
+                live.update(metrics)
             viewer.sync()
             time.sleep(max(0.0, POLICY_DT - (time.perf_counter() - tick_start)))
             position = data.xpos[contract.base_id]
@@ -629,6 +660,8 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
                 close_viewer(viewer, viewer_threads)
             finally:
                 keys.close()
+                if live is not None:
+                    live.close()
 
     result = {
         "checkpoint": str(args.checkpoint.resolve()),
@@ -650,6 +683,12 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         np.savez_compressed(args.output, **records, summary=json.dumps(result))
         result["trajectory"] = str(args.output.resolve())
+    if metrics is not None:
+        result["quiet"] = metrics.summary()
+        if args.output is not None:
+            quiet_path = args.output.with_name(args.output.stem+"_quiet.npz")
+            metrics.save(quiet_path, result)
+            result["quiet_trajectory"] = str(quiet_path.resolve())
     print(json.dumps(result, indent=2), flush=True)
     return result
 
@@ -661,13 +700,19 @@ def rollout(args: argparse.Namespace) -> dict:
     contract = M20Contract(model, args.terrain_config)
     data = mujoco.MjData(model)
     contract.reset(data)
+    metrics = live = None
+    if getattr(args, "quiet_landing", False):
+        from quiet_landing_metrics import QuietMujocoMetrics, LiveSignals
+        contract.height_scan(data)
+        metrics = QuietMujocoMetrics(model, contract)
+        live = LiveSignals() if args.live_plot else None
     print("[TERRAIN] " + json.dumps(args.terrain_config.summary()), flush=True)
     command = np.array([args.command_x, args.command_y, args.command_yaw], dtype=np.float32)
     previous_action = np.zeros(ACTION_DIM, dtype=np.float32)
     substeps = round(POLICY_DT / PHYSICS_DT)
     if not math.isclose(substeps * PHYSICS_DT, POLICY_DT):
         raise RuntimeError("Policy period is not an integer number of physics steps")
-    records = {"time": [], "root_pos": [], "root_quat": [], "observation": [], "action": []}
+    records = {"time": [], "root_pos": [], "root_quat": [], "observation": [], "action": [], "command": []}
     start_x = float(data.xpos[contract.base_id, 0])
     fell = False
     fell_ever = False
@@ -680,6 +725,19 @@ def rollout(args: argparse.Namespace) -> dict:
     try:
         for step in range(args.steps if args.steps is not None else 1000):
             tic = time.perf_counter()
+            if getattr(args, "track_course", False):
+                # Same external command generator for every policy. Keep the
+                # course heading/center rather than requesting zero yaw rate.
+                rotation = data.xmat[contract.base_id].reshape(3, 3)
+                yaw = math.atan2(rotation[1, 0], rotation[0, 0])
+                target = contract.terrain.spawn_yaw
+                lateral = float(np.clip(-0.5*(data.xpos[contract.base_id, 1]-contract.terrain.spawn_xy[1]), -0.25, 0.25))
+                world_x = args.command_x*math.cos(target)-lateral*math.sin(target)
+                world_y = args.command_x*math.sin(target)+lateral*math.cos(target)
+                command[:2] = (math.cos(yaw)*world_x+math.sin(yaw)*world_y,
+                               -math.sin(yaw)*world_x+math.cos(yaw)*world_y)
+                heading_error = math.atan2(math.sin(target-yaw), math.cos(target-yaw))
+                command[2] = np.clip(0.5*heading_error, -0.5, 0.5)
             obs = contract.observe(data, command, previous_action)
             with torch.inference_mode():
                 tensor_obs = TensorDict(
@@ -689,19 +747,41 @@ def rollout(args: argparse.Namespace) -> dict:
             if action.shape != (ACTION_DIM,) or not np.isfinite(action).all():
                 raise RuntimeError(f"Invalid actor action at step {step}: {action}")
             action = np.clip(action, -100.0, 100.0)
+            if metrics is not None:
+                metrics.command_xy = command[:2]
+                metrics.tracker.begin_step()
+                current = metrics.kinematics if data.time > 0 else data
+                quiet_start_xy = current.xpos[contract.base_id, :2].copy()
             records["time"].append(float(data.time))
             records["root_pos"].append(data.xpos[contract.base_id].copy())
             records["root_quat"].append(data.xquat[contract.base_id].copy())
             records["observation"].append(obs)
             records["action"].append(action.copy())
+            records["command"].append(command.copy())
             for _ in range(substeps):
                 contract.apply_pd(data, action)
-                mujoco.mj_step(model, data)
+                if metrics is None:
+                    mujoco.mj_step(model, data)
+                else:
+                    mujoco.mj_step1(model, data)
+                    snapshot = metrics.pre_step(data)
+                    mujoco.mj_step2(model, data)
+                    metrics.post_step(data, snapshot, record=args.output is not None or live is not None)
+                    if args.output is None:
+                        for group in (metrics.records, metrics.extended_records):
+                            for values in group.values(): del values[:-1000]
+                        del metrics.events[:-1000]
             previous_action = action.astype(np.float32)
+            if metrics is not None:
+                metrics.tracker.distance[0] += float(np.linalg.norm(metrics.kinematics.xpos[contract.base_id, :2]-quiet_start_xy))
             if viewer is not None:
                 draw_height_scan(viewer, contract, True)
+                if metrics is not None:
+                    metrics.draw(viewer, data)
                 viewer.sync()
                 time.sleep(max(0.0, POLICY_DT - (time.perf_counter() - tic)))
+            if live is not None and step % 5 == 0:
+                live.update(metrics)
             position = data.xpos[contract.base_id]
             gravity_z = float(data.xmat[contract.base_id].reshape(3, 3)[:, 2] @ np.array([0.0, 0.0, -1.0]))
             local_ground = contract.ground_height(data, float(position[0]), float(position[1]))
@@ -716,10 +796,14 @@ def rollout(args: argparse.Namespace) -> dict:
                 )
             if fell and args.stop_on_fall:
                 break
+            if getattr(args, "stop_at_goal", False) and contract.crossing_summary(data, fell_ever)["cleared_terrain"]:
+                break
             if viewer is not None and not viewer.is_running():
                 break
     finally:
         close_viewer(viewer, viewer_threads)
+        if live is not None:
+            live.close()
 
     for key in records:
         records[key] = np.asarray(records[key])
@@ -739,11 +823,18 @@ def rollout(args: argparse.Namespace) -> dict:
         "max_x": max_x,
         "forward_distance": float(final_pos[0] - start_x),
         "fell": fell_ever,
+        "track_course": getattr(args, "track_course", False),
     }
     if args.output is not None:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         np.savez_compressed(args.output, **records, summary=json.dumps(result))
         result["trajectory"] = str(args.output.resolve())
+    if metrics is not None:
+        result["quiet"] = metrics.summary()
+        if args.output is not None:
+            quiet_path = args.output.with_name(args.output.stem+"_quiet.npz")
+            metrics.save(quiet_path, result)
+            result["quiet_trajectory"] = str(quiet_path.resolve())
     print(json.dumps(result, indent=2), flush=True)
     return result
 
@@ -768,10 +859,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--print-every", type=int, default=10,
                         help="Print status every N policy steps (default: 10 = 0.2 simulated seconds)")
     parser.add_argument("--stop-on-fall", action="store_true")
+    parser.add_argument("--track-course", action="store_true",
+                        help="Autoplay only: shared heading/center-line velocity command feedback")
+    parser.add_argument("--stop-at-goal", action="store_true",
+                        help="Autoplay only: stop once all wheels cross the goal inside the course without falling")
     parser.add_argument("--viewer", action="store_true", help="Open interactive keyboard teleop")
     parser.add_argument("--autoplay", action="store_true", help="Run the old fixed-command rollout with --viewer")
     parser.add_argument("--output", type=Path, help="Optional compressed trajectory .npz")
+    parser.add_argument("--quiet-landing", action="store_true",
+                        help="Show four-wheel velocity/translation energy/terrain contact force overlays")
+    parser.add_argument("--live-plot", action="store_true",
+                        help="Live four-wheel speed/energy/force curves; enables --quiet-landing")
     args = parser.parse_args()
+    args.quiet_landing = args.quiet_landing or args.live_plot
     if ((args.steps is not None and args.steps <= 0)
         or any(value is not None and value <= 0 for value in
                (args.stair_count, args.stair_height, args.tread_depth))):

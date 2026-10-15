@@ -1,0 +1,20 @@
+{
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-48-58_quiet_landing_v1/model_255900.pt",
+  "checkpoint_sha256": "d14d5042f2976d4b7c89b8877e3392c930bb69662b8674f3bec09518d9fd6aad",
+  "Z_s": 0,
+  "C_s": 6,
+  "W_s": null,
+  "command_body": [
+    0,
+    0,
+    0
+  ],
+  "course_correction": false,
+  "physics": true,
+  "entry": "deploy_mujoco.interactive_rollout",
+  "headless_substitutions": [
+    "window draw",
+    "keyboard source",
+    "wall time pacing"
+  ]
+}

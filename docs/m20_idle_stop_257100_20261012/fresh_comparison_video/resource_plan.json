@@ -1,0 +1,9 @@
+{
+  "live_available_memory_GiB": 107,
+  "live_disk_free_GiB": 33,
+  "basis": "Prior real original rollout ~1.1GiB RSS; 480x360 double-pane renderer 440 frames RSS1.085GiB in26.3s. New640x360 single pane, renderer data and encoder: conservative2GiB RSS per process, outputs<=250MiB; 650/750/350frames per case.",
+  "placement": "CPU only CUDA_VISIBLE_DEVICES empty; OSMesa LP_NUM_THREADS=1; one simulation process at a time and one ffmpeg encoder thread; no Isaac/GPU training",
+  "per_case_timeout_s": 240,
+  "cases": 6,
+  "original_runtime_source_frozen": true
+}
