@@ -1,0 +1,109 @@
+{
+  "model": "v1",
+  "profile": "student-v1",
+  "seed": 42,
+  "scene": "descent",
+  "completed": true,
+  "fell": false,
+  "outside_course": false,
+  "duration_s": 13.400000000000695,
+  "steps": 670,
+  "descent_physics_samples": 1785,
+  "minimum_gap_m": {
+    "left": 0.0,
+    "right": -0.00177891370784492,
+    "cross": 0.23256276688330854
+  },
+  "all_episode_minimum_gap_m": {
+    "left": 0.0,
+    "right": -0.00177891370784492,
+    "cross": 0.23256276688330854
+  },
+  "contact_physics_samples": {
+    "left": 0,
+    "right": 25,
+    "cross": 0
+  },
+  "contact_events": {
+    "left": 0,
+    "right": 3,
+    "cross": 0
+  },
+  "interleg_force_peak_N": 842.8673666273537,
+  "actual_forward_speed_m_s": 0.7577179875463326,
+  "end_base_position": [
+    7.839405137937828,
+    -0.2642300398500137,
+    0.5667184547550584
+  ],
+  "wall_time_s": 1.9485479530412704,
+  "effective_perception": {
+    "level": 1.0,
+    "clean_probability": 0.15,
+    "stress_probability": 0.15,
+    "stress_multiplier": 2.0,
+    "lidar_horizontal_fov_deg": 135.0,
+    "front_sensor_offset_m": [
+      0.1,
+      0.0,
+      0.15
+    ],
+    "rear_sensor_offset_m": [
+      -0.1,
+      0.0,
+      0.15
+    ],
+    "lidar_min_range_m": 0.05,
+    "lidar_max_range_m": 5.0,
+    "vertical_fov_min_deg": -90.0,
+    "vertical_fov_max_deg": 90.0,
+    "terrain_visibility": true,
+    "visibility_samples": 16,
+    "visibility_tolerance_m": 0.015,
+    "map_update_period_s": 0.1,
+    "update_jitter_s": 0.02,
+    "max_delay_s": 0.06,
+    "max_map_age_s": 0.3,
+    "packet_dropout": 0.05,
+    "burst_probability": 0.02,
+    "burst_duration_s": 0.3,
+    "point_dropout": 0.03,
+    "occlusion_probability": 0.3,
+    "occlusion_width_m": 0.4,
+    "occlusion_height_m": 0.3,
+    "occlusion_hold_s": 0.5,
+    "height_noise_std": 0.02,
+    "height_bias_std": 0.015,
+    "correlated_height_std": 0.01,
+    "map_artifact_probability": 0.03,
+    "map_artifact_height_std": 0.05,
+    "xy_bias_std": 0.015,
+    "yaw_bias_std": 0.01,
+    "pose_drift_xy_std": 0.015,
+    "pose_drift_yaw_std": 0.01,
+    "drift_time_constant_s": 2.0,
+    "roll_pitch_std": 0.01,
+    "gyro_std_rad_s": 0.015,
+    "gyro_bias_std_rad_s": 0.005,
+    "joint_position_std_rad": 0.002,
+    "joint_velocity_std_rad_s": 0.05,
+    "action_delay_steps": 1,
+    "variance_growth_per_s": 0.001,
+    "confidence_reference_std": 0.05,
+    "confidence_age_tau_s": 0.5,
+    "confidence_log_std": 0.2,
+    "confidence_overestimate_probability": 0.02,
+    "confidence_overestimate_factor": 0.25
+  },
+  "sensor_extras": {
+    "action_delay_steps": 1,
+    "history_steps": 4
+  },
+  "measured_distance_calibration_m": {
+    "left": 0.3804398966693303,
+    "right": 0.3804398966693303,
+    "cross": 0.4647832989445412
+  },
+  "rss_peak_kib": 1255876,
+  "weights_updated": false
+}

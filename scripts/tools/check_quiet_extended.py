@@ -6,8 +6,8 @@ from types import SimpleNamespace
 
 import torch
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]/"source/rl_training"))
-from m20_quiet.extended import ExtendedQuietSettings, ExtendedQuietTracker, surface_normals, extended_cost, action_group_rate
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]/"source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp"))
+from quiet_landing_signals import ExtendedQuietSettings, ExtendedQuietTracker, surface_normals, extended_cost, action_group_rate
 
 
 def main():

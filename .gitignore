@@ -37,6 +37,19 @@ docker/artifacts/
 *.pth
 *.ckpt
 *.safetensors
+*.onnx
+*.jit
+
+# Local worktrees and machine-specific files
+.scratch/
+.aws/
+.codex/
+.agents/
+.env
+.env.*
+!.env.example
+MUJOCO_LOG.TXT
+error.log
 
 # Isaac-Sim packman
 _isaac_sim*

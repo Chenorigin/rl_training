@@ -1,0 +1,34 @@
+{
+  "checkpoint": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_student_v0/2026-10-12_23-24-52_380795_student_v0_stage_a/model_21000.pt",
+  "policy_sha256": "e3c08b47f6aba6898a34add1aacd29f547679668da4a03e4ded5d4576fd754d9",
+  "source_sha256": {
+    "deploy/deploy_mujoco/deploy_student_v0.py": "fb1129a39213a34b3d6af0d11e120cf43d2d52017714f3ab6bcb68a6ee9c2000",
+    "deploy/deploy_mujoco/student_v0_adapter.py": "e680570841a31adba7e438041b54e3b14694f50d8b126180d734fe2329240dbe",
+    "deploy/deploy_mujoco/student_v0_profiles.json": "ee9e456cd9d9d771cbf33fb28587da03f1ca56738fb37b4a9b21f33ba0332620",
+    "source/rl_training/m20_student_v0/perception.py": "7a0f1fe919d7b760c5b7cf8304985befabc1485df96d8cbbe299640b70b5e234",
+    "source/rl_training/m20_student_v0/contract.py": "d25ded36dacd594d1374a4531d827421c56b373b92dc3c87ae2285dab445b12c",
+    "deploy/deploy_mujoco/deploy_mujoco.py": "dc619164c56aebd3e65b1fe192d3c1bbb767f85732820b284ed012af83120e15",
+    "deploy/deploy_mujoco/terrain_loader.py": "52fc8a6fb1f75a9d3f1e22f647f21898f1cf02d2bc7c03d5ff759b2f9afe56dc",
+    "tests/test_student_v0_mujoco.py": "dead8c855c727f8a911324dc866cfa089cdd3eeb76cce9c98d13f68cc3d09d4a"
+  },
+  "unit_tests": {
+    "count": 6,
+    "passed": true,
+    "independent_review_family": "GPT",
+    "heterogeneous_review": "skipped; family unavailable"
+  },
+  "rsl_equivalence": {
+    "random_inputs": 100,
+    "max_abs_action_error": 0.0,
+    "checkpoint_sha256": "e3c08b47f6aba6898a34add1aacd29f547679668da4a03e4ded5d4576fd754d9"
+  },
+  "export_max_action_error": 0.0,
+  "published_smoke": {
+    "steps": 5,
+    "physics_s": 0.10000000000000002,
+    "finite_actions": true
+  },
+  "formal_training_started": false,
+  "training_interrupted": false,
+  "real_robot": "not run"
+}

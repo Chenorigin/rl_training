@@ -93,9 +93,20 @@ TUNING = {
     "entry_forward_speed": 0.05, "entry_wheel_reverse_tolerance": 0.05,
     "entry_rearm_time": 0.50, "entry_retract_weight": 0.75,
     "entry_range_cost_weight": -1.0,
+    "entry_forward_position_gain": 4.0,
+    "entry_forward_position_cap": 4.0,
     "entry_swing_x_lower": -0.10, "entry_swing_x_upper": 0.22,
     "entry_swing_min_extension": 0.30, "entry_swing_min_extension_high": 0.26,
     "descent_cost_soft_cap": 4.0,
+    # Conservative same-side front/rear collision proxy.  Radii come from the
+    # collision boxes/wheels in the canonical M20 MuJoCo model.  The margin
+    # is an advance-warning band: a zero-only proxy was proven too late and
+    # missed two exact-contact frames in the first controlled candidate.
+    "interleg_front_upper_radius": 0.035,
+    "interleg_front_lower_radius": 0.030,
+    "interleg_clearance_margin": 0.02,
+    "interleg_clearance_scale": 0.02,
+    "interleg_clearance_weight": -2.0,
 
 }
 
@@ -2174,6 +2185,99 @@ def descent_forward_excess(value):
     return huber/(1+huber/TUNING["descent_cost_soft_cap"])
 
 
+def descent_entry_forward_position_cost(rear_x, upper):
+    """One-sided hip-relative X cost; caller supplies the entry-only gate.
+
+    Preserve a zero-cost reachable band, with a squared forward excess and a
+    smooth finite cap.  Unlike the legacy guard, airborne legs get no discount.
+    """
+    excess = ((rear_x-upper)/TUNING["entry_x_scale"]).clamp_min(0)
+    cap = TUNING["entry_forward_position_cap"]
+    return TUNING["entry_forward_position_gain"]*cap*torch.tanh(excess.square()/cap)
+
+
+def descent_interleg_clearance(body_positions):
+    """Same-side rear-wheel clearance from the front leg collision envelope.
+
+    Body order is FL/FR hip-y, FL/FR knee, FL/FR wheel, HL/HR wheel.  Each
+    front link is approximated by its body-centre segment plus the collision
+    half-thickness; the wheel pair uses the exact wheel radii.
+    """
+    if body_positions.shape[-2] != 8 or body_positions.shape[-1] != 3:
+        raise ValueError(
+            "descent_interleg_clearance expects body positions shaped (..., 8, 3), "
+            f"got {tuple(body_positions.shape)}"
+        )
+
+    def point_segment_distance(point, start, end):
+        direction = end - start
+        alpha = ((point - start) * direction).sum(-1) / direction.square().sum(-1).clamp_min(1e-9)
+        closest = start + alpha.clamp(0.0, 1.0)[..., None] * direction
+        return torch.linalg.vector_norm(point - closest, dim=-1)
+
+    hip = body_positions[..., 0:2, :]
+    knee = body_positions[..., 2:4, :]
+    front_wheel = body_positions[..., 4:6, :]
+    rear_wheel = body_positions[..., 6:8, :]
+    wheel_radius = TUNING["wheel_radius"]
+    upper = point_segment_distance(rear_wheel, hip, knee) - (
+        wheel_radius + TUNING["interleg_front_upper_radius"]
+    )
+    lower = point_segment_distance(rear_wheel, knee, front_wheel) - (
+        wheel_radius + TUNING["interleg_front_lower_radius"]
+    )
+    wheels = torch.linalg.vector_norm(rear_wheel - front_wheel, dim=-1) - 2.0 * wheel_radius
+    return torch.minimum(torch.minimum(upper, lower), wheels)
+
+
+def _update_interleg_clearance_stats(env, active, clearance, cost):
+    state = getattr(env, "_m20_interleg_clearance_stats", None)
+    if state is None:
+        zeros = lambda: torch.zeros(env.num_envs, 2, device=env.device)
+        state = {name: zeros() for name in
+                 ("samples", "clearance_sum", "below_target", "collision", "cost_sum")}
+        state["clearance_min"] = torch.full(
+            (env.num_envs, 2), torch.inf, device=env.device
+        )
+        env._m20_interleg_clearance_stats = state
+    reset = env.episode_length_buf <= 1
+    for name, value in state.items():
+        value[reset] = torch.inf if name == "clearance_min" else 0
+    mask = active[:, None]
+    state["samples"] += mask
+    state["clearance_sum"] += torch.where(mask, clearance, 0.0)
+    state["below_target"] += mask & (clearance < TUNING["interleg_clearance_margin"])
+    state["collision"] += mask & (clearance < 0.0)
+    state["cost_sum"] += torch.where(mask, cost, 0.0)
+    state["clearance_min"] = torch.minimum(
+        state["clearance_min"], torch.where(mask, clearance, torch.inf)
+    )
+
+
+def stair_descent_entry_mask(env, asset_cfg, hip_cfg, knee_cfg, sensor_cfg, contact_sensor_cfg):
+    """Training-only phase tag; never appended to the teacher actor input."""
+    gait = _context(env, asset_cfg, hip_cfg, knee_cfg, sensor_cfg, contact_sensor_cfg)
+    entry = env._m20_descent_entry_state
+    return (gait["down"] & entry["active"])[:, None].float()
+
+
+def stair_descent_interleg_clearance_cost(
+    env, asset_cfg, hip_cfg, knee_cfg, sensor_cfg, contact_sensor_cfg, clearance_cfg
+):
+    """Penalize same-side front/rear leg overlap during the first descent transfer."""
+    gait = _context(env, asset_cfg, hip_cfg, knee_cfg, sensor_cfg, contact_sensor_cfg)
+    positions = env.scene[clearance_cfg.name].data.body_pos_w[:, clearance_cfg.body_ids]
+    clearance = descent_interleg_clearance(positions)
+    deficit = (TUNING["interleg_clearance_margin"] - clearance).clamp_min(0.0)
+    cost = descent_forward_excess(deficit / TUNING["interleg_clearance_scale"])
+    entry = getattr(env, "_m20_descent_entry_state", None)
+    active = gait["down"] & entry["active"] if entry is not None else torch.zeros(
+        env.num_envs, dtype=torch.bool, device=env.device
+    )
+    _update_interleg_clearance_stats(env, active, clearance, cost)
+    return (cost * active[:, None]).mean(-1)
+
+
 def descent_entry_position_band(depth,relax):
     """Soft hip-relative X band, limited by both measured reach and leg tilt."""
     lower = torch.full_like(depth,TUNING["entry_x_lower"])
@@ -2297,7 +2401,11 @@ def _descent_entry_retract_context(env,scan,down,wheels,body_delta,ground,valid,
     compact_cost=descent_forward_excess((swing_extension-extension)/TUNING["pose_length_scale"])
     position_cost=descent_forward_excess(guard_error/TUNING["entry_x_scale"])
     # Rearward placement must not be achieved only by collapsing the swing leg.
-    cost=torch.maximum(position_cost,compact_cost*(~loaded[:,2:]))*guard*guard_gain
+    legacy_cost=torch.maximum(position_cost,compact_cost*(~loaded[:,2:]))*guard_gain
+    forward_cost=descent_entry_forward_position_cost(rear_x,guard_upper)
+    # Strengthen only excessive forward placement.  Keep the original rearward
+    # and compact-leg guards unchanged, and reuse the existing entry lifetime.
+    cost=torch.maximum(legacy_cost,forward_cost)*guard
     stats=state["stats"];stats["samples"]+=support;stats["x_sum"]+=rear_x*support
     stats["in_band"]+=support&(error<=1e-6);stats["too_forward"]+=support&(rear_x>upper)
     stats["too_rearward"]+=support&(rear_x<lower);stats["credit"]+=gain;stats["blocked"]+=support&~allowed
@@ -2452,6 +2560,23 @@ def gait_quality_metrics(env,env_ids):
             result[f"{leg}_entry_transfer_swing_fraction"]=ss["transfer_swing_samples"]/transfer
             result[f"{leg}_entry_transfer_cost_mean"]=ss["transfer_cost_sum"]/transfer
             result[f"{leg}_entry_transfer_compact_fraction"]=ss["transfer_compact"]/ss["transfer_swing_samples"].clamp_min(1)
+    clearance = getattr(env, "_m20_interleg_clearance_stats", None)
+    if clearance is not None:
+        cs = {key: value[env_ids].sum(0) for key, value in clearance.items()
+              if key != "clearance_min"}
+        samples = cs["samples"]
+        for index, side in enumerate(("left", "right")):
+            count = samples[index].clamp_min(1)
+            minimum = clearance["clearance_min"][env_ids, index]
+            has_samples = samples[index] > 0
+            result[f"descent_entry_{side}_interleg_samples"] = samples[index]
+            result[f"descent_entry_{side}_interleg_clearance_mean_m"] = cs["clearance_sum"][index] / count
+            result[f"descent_entry_{side}_interleg_clearance_min_m"] = torch.where(
+                has_samples, minimum.amin(), samples[index].new_zeros(())
+            )
+            result[f"descent_entry_{side}_interleg_below_target_fraction"] = cs["below_target"][index] / count
+            result[f"descent_entry_{side}_interleg_collision_proxy_fraction"] = cs["collision"][index] / count
+            result[f"descent_entry_{side}_interleg_cost_mean"] = cs["cost_sum"][index] / count
     return result
 
 

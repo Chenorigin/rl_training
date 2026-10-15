@@ -1,0 +1,23 @@
+{
+  "V1": {
+    "finiteness": "PASS",
+    "nondecreasing_steps": "PASS",
+    "recent_window_complete": "PASS",
+    "window_means": "PASS",
+    "last_update": 256829
+  },
+  "V1.5": {
+    "finiteness": "PASS",
+    "nondecreasing_steps": "PASS",
+    "recent_window_complete": "PASS",
+    "window_means": "PASS",
+    "last_update": 234414
+  },
+  "skipped": [
+    "本轮未运行新的MuJoCo回放",
+    "日志缺少楼梯方向和地形难度分层",
+    "未记录各门控条件拒绝率",
+    "V1没有QuietLoad指标",
+    "未测真实声音或真机"
+  ]
+}

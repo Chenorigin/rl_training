@@ -38,6 +38,20 @@ def _gait_entities():
     }
 
 
+def _interleg_entities():
+    """Bind the calibrated collision-proxy body order explicitly."""
+    entities = _gait_entities()
+    entities["clearance_cfg"] = SceneEntityCfg(
+        "robot",
+        body_names=[
+            "fl_hipy", "fr_hipy", "fl_knee", "fr_knee",
+            "fl_wheel", "fr_wheel", "hl_wheel", "hr_wheel",
+        ],
+        preserve_order=True,
+    )
+    return entities
+
+
 @configclass
 class M20StairTeacherObservationsCfg(ObservationsCfg):
     """Teacher receives the M20 proprioceptive vector and the height scan."""
@@ -241,6 +255,10 @@ class M20StairTeacherRewardsCfg(DeeproboticsM20RewardsCfg):
     stair_descent_entry_position_cost = RewTerm(
         func=stair_teacher.stair_descent_entry_position_cost,
         weight=stair_teacher.TUNING["entry_range_cost_weight"], params=_gait_entities(),
+    )
+    stair_descent_interleg_clearance_cost = RewTerm(
+        func=stair_teacher.stair_descent_interleg_clearance_cost,
+        weight=stair_teacher.TUNING["interleg_clearance_weight"], params=_interleg_entities(),
     )
     stair_ascent_front_body_clearance_cost = RewTerm(
         func=stair_teacher.ascent_front_body_clearance_cost,
@@ -602,3 +620,63 @@ class DeeproboticsM20StairTeacherEnvCfg(DeeproboticsM20RoughEnvCfg):
                 cls._scale_mapping(value, scale)
             elif isinstance(value, (tuple, list)) and len(value) == 2:
                 cls._scale_event_range(mapping, key, scale, center=0.0)
+
+
+# Optional historical top-platform descent-entry configuration.
+def configure_descent_entry_experiment(env_cfg, agent_cfg):
+    from isaaclab.managers import ObservationGroupCfg, ObservationTermCfg
+    from isaaclab.utils import configclass
+    from rl_training.tasks.manager_based.locomotion.velocity.config.wheeled.deeprobotics_m20.stair_teacher_env_cfg import _gait_entities
+    from rl_training.tasks.manager_based.locomotion.velocity.mdp import stair_teacher
+    from rl_training.tasks.manager_based.locomotion.velocity.mdp import rewards
+
+    @configclass
+    class EntryPhaseCfg(ObservationGroupCfg):
+        active = ObservationTermCfg(func=stair_teacher.stair_descent_entry_mask,
+                                    params=_gait_entities())
+        enable_corruption = False
+        concatenate_terms = True
+
+    env_cfg.observations.descent_entry_mask = EntryPhaseCfg()
+    generator = deepcopy(env_cfg.scene.terrain.terrain_generator)
+    stairs = deepcopy(generator.sub_terrains["pyramid_stairs"])
+    stairs.proportion = 1.0
+    stairs.step_height_range = (0.15, 0.15)
+    stairs.step_width = 0.30
+    stairs.platform_width = 3.0
+    generator.sub_terrains = {"pyramid_stairs": stairs}
+    generator.curriculum = False
+    generator.num_rows = 2
+    generator.num_cols = 4
+    env_cfg.scene.terrain.terrain_generator = generator
+    env_cfg.scene.terrain.max_init_terrain_level = 0
+    env_cfg.curriculum.terrain_levels = None
+    # The original checkpoint's TensorBoard gait_level at iteration218000 is1.
+    # Disabling terrain-origin promotion must not disable existing regularizers.
+    rewards.update_gait_level_from_terrain_mean(3.0)
+    if rewards.gait_level != 1.0:
+        raise ValueError("Could not restore baseline gait regularizer scaling")
+    # Do not log terrain families that are absent from this isolated generator.
+    for name in ("pyramid_stairs_inv", "boxes", "random_rough", "hf_pyramid_slope",
+                 "hf_pyramid_slope_inv", "flat"):
+        setattr(env_cfg.curriculum, f"terrain_level_{name}", None)
+    # Reset on the top platform, facing its +X edge, not mid-air on a stair.
+    pose = env_cfg.events.randomize_reset_base.params["pose_range"]
+    pose.update(x=(0.40, 0.60), y=(-0.10, 0.10), yaw=(-0.05, 0.05))
+    command = env_cfg.commands.base_velocity
+    command.heading_command = False
+    command.rel_heading_envs = 0.0
+    for name in ("rel_standing_envs", "rel_zero_vel_envs", "rel_only_lin_x_envs",
+                 "rel_only_lin_y_envs", "rel_only_ang_z_envs"):
+        setattr(command, name, 0.0)
+    command.ranges.lin_vel_x = (0.5, 0.5)
+    command.ranges.lin_vel_y = (0.0, 0.0)
+    command.ranges.ang_vel_z = (0.0, 0.0)
+    env_cfg.episode_length_s = 6.0
+    # A separate tag is stored for PPO but actor=244 and critic=285 stay fixed.
+    agent_cfg.algorithm.actor_update_mask_key = "descent_entry_mask"
+    agent_cfg.algorithm.anchor_coefficient = 10.0
+    agent_cfg.algorithm.anchor_uneven_weight = 0.1
+    agent_cfg.algorithm.critic_warmup_iterations = 20
+    return {"focus": "top-platform descent entry", "actor_task_gradient": "entry only", "gait_level": rewards.gait_level,
+            "outside_entry": "reference anchoring; not an exact functional guarantee"}

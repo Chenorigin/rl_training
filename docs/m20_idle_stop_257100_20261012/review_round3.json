@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "round": 3,
+  "reviewer": "/root/idle_stop_review",
+  "actual_harness_family": "Codex",
+  "heterogeneous_family_status": "missing; independent review within same Codex family",
+  "reviewed_at_CST": "2026-10-12T12:49:56.498266+08:00",
+  "scope": "read-only checkpoint/ridge/recording/instrument review; no new physical simulation, GPU or Isaac started",
+  "reviewed_files_sha256": {
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/fit_wheel_head.py": "caae9129e56e6b484e6445635e5df935f7353aadab74954ee6d34a38cefb5df0",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/collect_inputs.py": "4d82da81caa9d39267f98a6eb68a7f63d0a804263a7e0b15e1d8b9801dfddffa",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/run_case.py": "42c7db92158ad28f57aaf57c26e60ab31dc070b2b345fedc45806fc53f814ff2",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/judge.py": "26f8f645c1acd18dd1988b457631c6e1f92b98f51b96d107f0d350bf20210835",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/instrument_sources.json": "0e57b99d2026ae40a9a401e400a2085afb4a8fa77ed8681b93f0a54db1ebbb8d",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/criteria.json": "401d9a2a1d0d9dd0d75f4e3343fd8ea055d04fe075385f9d419ab8d601201b89",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/calibrated/ridge_1/model_257100_idle_stop.pt": "0f7b79f71bcf227c10d21cef5fa16a5ff42f872fd5899d1fc861e4b75fad68c9"
+  },
+  "reviewed_input_sha256": {
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distill_reference/零命令_inputs.npz": "1b781aefd613625f90b9ff1b15ecb81446de40eaa13172ffca508d0062f8a46e",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distill_reference/平地启停_inputs.npz": "010015f40c61b180c5861f43d544defc9ab9c5eb49661f7a144460ca0d60aae3",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distill_reference/仅w_inputs.npz": "92ba23bb3b22312c64be73bb68db3ce47b5abf2fbb6ee4d6731769c503aa1b4d",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/wheel_feedback/零命令_inputs.npz": "34af584f22a2c16e5c3dccd2eea79e75cafea39828971d60a4c75a8e8b2e0fff",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/wheel_feedback/平地启停_inputs.npz": "d609650ee906088586cb25216ecd405b3646e38da2a52814b283c35702fe7f6b",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/wheel_feedback/仅w_inputs.npz": "27d00bf3ffed92067086f58518cb2de51a57e304230a0d49635678eed44e97f6"
+  },
+  "resources": {
+    "CPU_threads": 1,
+    "max_RSS_MiB": 870.473,
+    "limit_MiB": 2048,
+    "new_GPU_Isaac_or_physics_rollout": false
+  },
+  "code_review_verdict": "passed; no blocking implementation defect found for the reviewed ridge_1 artifact",
+  "behavior_review_verdict": "failed; current wheel_head_round3 is not eligible for promotion",
+  "passed": [
+    {
+      "name": "exactly four wheel output rows changed",
+      "evidence": "actual checkpoint changes only mlp.6.weight in last4 rows (512elements) and mlp.6.bias in last4 entries; first12 rows/bias, all hidden layer tensors, log_std parameter and critic tensors preserved"
+    },
+    {
+      "name": "same-input leg outputs preserved",
+      "evidence": "actual original and calibrated actor inference over all8994 recorded inputs plus512 random244D inputs;12 leg outputs bitwise equal in every9506 row. This is a same-input invariant, not closed-loop trajectory equality"
+    },
+    {
+      "name": "real capture hook preserves observations",
+      "evidence": "collect_inputs wraps original M20Contract.observe, appends copied return and pre-physics time, returns original value unchanged; invokes original run_case/interactive_rollout; no action or physics modifications"
+    },
+    {
+      "name": "six real input archives match actual deployment",
+      "evidence": "1499policy frames per archive; all command6:9 exactly match saved commands; all previous_action41:57 exactly match previous applied_action (first policy row zero); joint_vel25:41 and joint_pos9:25 match actual qvel/qpos indexed by model joint names; original actor inference agrees with actual action after startup blend within8.4043e-6"
+    },
+    {
+      "name": "feature order and normalization",
+      "evidence": "baseline dm.load_actor uses obs_normalization=False; preserved actor has no additional normalization state; fit uses first6 ordered _modules entries: Linear512/ELU/Linear256/ELU/Linear128/ELU, then constant bias column. Actual baseline wrapper/input order is unchanged"
+    },
+    {
+      "name": "mask/label/augmentation boundaries",
+      "evidence": "command6:9, scan57:244 use existing F1-fixed idle mask; measured velocity/support cannot disable stationary target. wheel previous actions53:57, wheel joint velocities37:41, angular velocity0:3 are correct. Nonidle labels come from baseline actor at each recorded or augmented state, never from feedback candidate; augmented inputs are explicitly described as supervision rather than physics"
+    },
+    {
+      "name": "independent ridge reconstruction",
+      "evidence": "independently recomputed weighted double-precision Gram/RHS with einsum,129feature columns,ridge1,nonidle weight100. All36984samples/33588idle/3396nonidle match fit.json; max coefficient difference versus saved float32weights5.1086e-8; idle RMS.05888860297861915 and nonidle RMS delta.01018430756936578 reproduce fit.json"
+    },
+    {
+      "name": "optimizer reset and runtime contract",
+      "evidence": "actual optimizer_state_dict.state is empty; original parameter groups remain. No runtime branch: unchanged standard244D→16D actor and original actuator deployment apply all16 outputs normally. Future RL should explicitly initialize/preserve the selected calibrated actor rather than rely on inherited reference/update history"
+    },
+    {
+      "name": "F5 closed; hashes cover actual stopping terrain",
+      "evidence": "instrument_sources adds flat.xml and terrain_loader.py; both match current source and private pre-training runtime copies. Latest run_case/judge merge both frozen manifests. In-memory changed read_bytes for each real file yields AssertionError without writing disk"
+    },
+    {
+      "name": "latest judge timestamp and real candidate failure",
+      "evidence": "judge uses original pre-physics actor timestamp directly; max excursion and real pre-stop motion checks remain. Re-executed actual judge over real wheel_head_round3 files with all write_text calls intercepted: passed=false, stationary_drift=false, quiet_cumulative_energy=false, identical to saved verdict"
+    }
+  ],
+  "failed": [
+    {
+      "id": "B1",
+      "type": "behavior acceptance",
+      "name": "stationary_drift",
+      "actual_m": 0.05563816567254029,
+      "maximum_m": 0.05,
+      "evidence": "current real MuJoCo trajectory maximum10–36s excursion exceeds frozen threshold"
+    },
+    {
+      "id": "B2",
+      "type": "behavior regression",
+      "name": "quiet_cumulative_energy",
+      "actual_ratio": 1.1760089496839523,
+      "maximum_ratio": 1.15,
+      "evidence": "current real paired stairs event energy per forward meter worsens beyond frozen allowance"
+    }
+  ],
+  "important_limits": [
+    "Fitting data cover only zero command, forward W, and one flat start/stop sequence from two policies; reverse, sideways, turns, other headings, randomization and other geometry are unmeasured. A global wheel-head change can affect these states.",
+    "Preserving hidden/leg output rows only proves equality at identical244D inputs. Wheel changes alter previous_action and physical feedback; actual leg trajectories can therefore change in closed loop.",
+    "Gram condition number approximately1.5149e8; double-precision ridge solve and float32 artifact reconstruction passed, but ill-conditioning plus out-of-distribution states still requires physical regression.",
+    "Calibration metadata lists input paths but does not embed their hashes; this independent receipt freezes the six measured input file hashes to make this review reproducible.",
+    "Checkpoint retains original critic, preservation_reference_actor and preservation_updates. Clearing optimizer moments does not make a full resume equivalent to a fresh initialized training run.",
+    "Current stairs max side deviation0.63557m versus baseline about0.24954m is an additional observed path tradeoff; no numeric side-deviation acceptance threshold was invented in this review."
+  ],
+  "untested": [
+    {
+      "name": "candidate after any future ridge/refit",
+      "reason": "receipt applies only to the pinned ridge_1 SHA"
+    },
+    {
+      "name": "reverse/sideways/turning commands and alternative geometry",
+      "reason": "not in these six recorded sets or fixed regressions"
+    },
+    {
+      "name": "full terrain completion, randomized training domain and real robot",
+      "reason": "outside current task/reviewer scope"
+    },
+    {
+      "name": "fresh independent MuJoCo replay",
+      "reason": "used current real saved arrays plus reran actual judge; reviewer started no new physical run"
+    },
+    {
+      "name": "GPU/Isaac continuation training",
+      "reason": "outside reviewer execution authorization"
+    }
+  ],
+  "commands": [
+    "CPU torch.load original and ridge_1 checkpoint; compare all actor state tensors, leg output rows and optimizer state; observed only four wheel rows/bias changed",
+    "CPU load six actual inputs/action/full-state NPZ; match command/previous_action/qpos/qvel and re-run each recording actor to compare saved action; all assertions passed",
+    "CPU weighted ridge reconstruction using double-precision einsum Gram/RHS and solve; maximum saved coefficient difference5.1086e-8, matching error metrics",
+    "CPU infer original/calibrated actor on8994real+512random observations; same-input leg outputs bitwise equal",
+    "CPU execute real current judge via runpy with writes intercepted; observed current candidate still failed two checks",
+    "CPU alter only in-memory read_bytes for each new frozen source; actual judge rejects both flat.xml and terrain_loader.py changes"
+  ],
+  "verification_harness_issue": {
+    "finding": "initial independent reconstruction incorrectly iterated nn.Module.children(), which deduplicates the shared ELU instance and omitted two activations",
+    "correction": "reconstructed through ordered _modules entries and independently formed einsum weighted equations; result matches artifact",
+    "classification": "review probe error corrected; not a fitting implementation defect"
+  },
+  "counts": {
+    "passed": 10,
+    "failed": 2,
+    "skipped": 5,
+    "empty_run": 0,
+    "cannot_decide": 0
+  },
+  "mutations": "only review_round3.json; no source or evaluation artifact edits, no installs or external messages"
+}

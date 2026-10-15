@@ -1,0 +1,89 @@
+{
+  "model": "v0",
+  "profile": "fov_only",
+  "seed": 43,
+  "scene": "descent",
+  "completed": true,
+  "fell": false,
+  "outside_course": false,
+  "duration_s": 13.340000000000686,
+  "steps": 667,
+  "descent_physics_samples": 1813,
+  "minimum_gap_m": {
+    "left": 0.0,
+    "right": 0.0,
+    "cross": 0.3229012354509293
+  },
+  "all_episode_minimum_gap_m": {
+    "left": 0.0,
+    "right": 0.0,
+    "cross": 0.3229012354509293
+  },
+  "contact_physics_samples": {
+    "left": 0,
+    "right": 0,
+    "cross": 0
+  },
+  "contact_events": {
+    "left": 0,
+    "right": 0,
+    "cross": 0
+  },
+  "interleg_force_peak_N": 0.0,
+  "actual_forward_speed_m_s": 0.7607016188241231,
+  "end_base_position": [
+    7.823519027587441,
+    -0.21352000654618622,
+    0.5672574410093335
+  ],
+  "wall_time_s": 1.6039217170327902,
+  "effective_perception": {
+    "level": 0.25,
+    "height_noise_std": 0.02,
+    "height_bias_std": 0.015,
+    "xy_bias_std": 0.015,
+    "yaw_bias_std": 0.01,
+    "point_dropout": 0.03,
+    "occlusion_probability": 0.3,
+    "occlusion_width_m": 0.4,
+    "occlusion_height_m": 0.3,
+    "occlusion_hold_s": 0.5,
+    "map_update_period_s": 0.1,
+    "max_delay_s": 0.06,
+    "packet_dropout": 0.05,
+    "max_map_age_s": 0.3,
+    "variance_growth_per_s": 0.001,
+    "confidence_reference_std": 0.05,
+    "confidence_age_tau_s": 0.5
+  },
+  "sensor_extras": {
+    "lidar_visibility": true,
+    "sensor_offset_body_m": [
+      0.1,
+      0.0,
+      0.15
+    ],
+    "lidar_horizontal_fov_deg": 135.0,
+    "rear_sensor_offset_body_m": [
+      -0.1,
+      0.0,
+      0.15
+    ],
+    "gyro_std_rad_s": 0.0,
+    "gravity_tilt_std_rad": 0.0,
+    "joint_position_std_rad": 0.0,
+    "joint_velocity_std_rad_s": 0.0,
+    "action_delay_steps": 0,
+    "blackout_start_s": 3.0,
+    "blackout_period_s": 8.0,
+    "blackout_duration_s": 0.0
+  },
+  "measured_distance_calibration_m": {
+    "left": 0.3804398966693303,
+    "right": 0.3804398966693303,
+    "cross": 0.4647832989445412
+  },
+  "rss_peak_kib": 1082024,
+  "weights_updated": false,
+  "visibility_mode": "same sectors, scoped deterministic angular mask without geometric ray test"
+}

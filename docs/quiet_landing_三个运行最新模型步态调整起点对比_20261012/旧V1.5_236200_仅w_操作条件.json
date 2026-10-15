@@ -1,0 +1,20 @@
+{
+  "checkpoint": "logs/rsl_rl/deeprobotics_m20_quiet_landing_v1_5/2026-10-10_17-55-27_quiet_landing_v1_5_from_baseline/model_236200.pt",
+  "checkpoint_sha256": "9b7d25e4af5d325e6206090035be8fc3b1e7578bb45c408dff70719eeeef31f0",
+  "Z_s": 0,
+  "C_s": 6,
+  "W_s": 8,
+  "command_body": [
+    0.7,
+    0,
+    0
+  ],
+  "course_correction": false,
+  "physics": true,
+  "entry": "deploy_mujoco.interactive_rollout",
+  "headless_substitutions": [
+    "window draw",
+    "keyboard source",
+    "wall time pacing"
+  ]
+}

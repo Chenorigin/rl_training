@@ -1,0 +1,145 @@
+{
+  "clips": [
+    {
+      "case": "idle",
+      "title": "驻足",
+      "file": "idle_compare.mp4",
+      "sha256": "94af20782d451c4d8b60b096d1658b4507fedd808d77768f800f9b1a75f98f62",
+      "probe": {
+        "width": 1920,
+        "height": 456,
+        "r_frame_rate": "25/1",
+        "duration": "26.000000",
+        "nb_frames": "650"
+      },
+      "source_clip_start_s": 10,
+      "side_by_side_order": [
+        "v1",
+        "cpu",
+        "v2"
+      ],
+      "playback_speed": 1.0,
+      "early_termination_padding": {}
+    },
+    {
+      "case": "move_stop",
+      "title": "前进后停车",
+      "file": "move_stop_compare.mp4",
+      "sha256": "46ecf82ca96c1edd2515dcc107b81a11a1a987da6e0959f87e95e0af7a493deb",
+      "probe": {
+        "width": 1920,
+        "height": 456,
+        "r_frame_rate": "25/1",
+        "duration": "30.000000",
+        "nb_frames": "750"
+      },
+      "source_clip_start_s": 6,
+      "side_by_side_order": [
+        "v1",
+        "cpu",
+        "v2"
+      ],
+      "playback_speed": 1.0,
+      "early_termination_padding": {}
+    },
+    {
+      "case": "combined",
+      "title": "连续上下楼（各6阶）",
+      "file": "combined_stairs_compare.mp4",
+      "sha256": "8d8d9129940be1bcb96677fa03afdf6508f2a73f1c961ba0c2511e7e4bd42435",
+      "probe": {
+        "width": 1920,
+        "height": 456,
+        "r_frame_rate": "25/1",
+        "duration": "16.000000",
+        "nb_frames": "400"
+      },
+      "source_clip_start_s": 8,
+      "side_by_side_order": [
+        "v1",
+        "cpu",
+        "v2"
+      ],
+      "playback_speed": 1.0,
+      "early_termination_padding": {}
+    },
+    {
+      "case": "ascent",
+      "title": "独立上楼（20阶）",
+      "file": "ascent_compare.mp4",
+      "sha256": "900994c5d77ab721e1fcea50be01ee2b3fa21f40256c54cfe26c1ee381e3e82b",
+      "probe": {
+        "width": 1920,
+        "height": 456,
+        "r_frame_rate": "25/1",
+        "duration": "28.000000",
+        "nb_frames": "700"
+      },
+      "source_clip_start_s": 8,
+      "side_by_side_order": [
+        "v1",
+        "cpu",
+        "v2"
+      ],
+      "playback_speed": 1.0,
+      "early_termination_padding": {
+        "v1": {
+          "original_video_duration_s": 19.12,
+          "padded_frozen_seconds": 8.879999999999999,
+          "termination_annotation": true
+        },
+        "cpu": {
+          "original_video_duration_s": 18.84,
+          "padded_frozen_seconds": 9.16,
+          "termination_annotation": true
+        },
+        "v2": {
+          "original_video_duration_s": 25.68,
+          "padded_frozen_seconds": 2.3200000000000003,
+          "termination_annotation": true
+        }
+      }
+    },
+    {
+      "case": "descent",
+      "title": "独立下楼（20阶）",
+      "file": "descent_compare.mp4",
+      "sha256": "72dc87450834e55dc46ff8130c1a7c20ece8fe390ea98c9b654c2f3f8e9ebd1b",
+      "probe": {
+        "width": 1920,
+        "height": 456,
+        "r_frame_rate": "25/1",
+        "duration": "28.000000",
+        "nb_frames": "700"
+      },
+      "source_clip_start_s": 8,
+      "side_by_side_order": [
+        "v1",
+        "cpu",
+        "v2"
+      ],
+      "playback_speed": 1.0,
+      "early_termination_padding": {}
+    }
+  ],
+  "full_video": {
+    "file": "m20_v1_cpu_v2_2400_mujoco_compare.mp4",
+    "sha256": "abfc3498b7efe183b7db621a58c3fbaa9df62cec5b9036dba481bb3c5ffaf50c",
+    "probe": {
+      "width": 1920,
+      "height": 456,
+      "r_frame_rate": "25/1",
+      "duration": "128.000000",
+      "nb_frames": "3200"
+    }
+  },
+  "segment_order": [
+    "idle",
+    "move_stop",
+    "combined",
+    "ascent",
+    "descent"
+  ],
+  "no_time_stretch": true,
+  "original_live_capture_preserved": true
+}

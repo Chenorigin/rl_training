@@ -1,0 +1,70 @@
+{
+  "旧V1.5_236200": {
+    "楼梯总体": {
+      "normal_speed_m_s": 24.508665512688687,
+      "specific_energy_J_kg": 19.05965633605229,
+      "force_peak_40ms_N": 20.848071065271867,
+      "specific_energy_per_m_J_kg_m": 1.1711090215891007,
+      "specific_energy_per_forward_m_J_kg_m": 2.989158950889337,
+      "max_abs_world_y_m": 403.289225104791
+    },
+    "上楼": {
+      "normal_speed_m_s": 15.303641367131004,
+      "specific_energy_J_kg": 2.5767376187723734,
+      "force_peak_40ms_N": 14.815484294983605,
+      "specific_energy_per_m_J_kg_m": 13.229139602405127,
+      "specific_energy_per_forward_m_J_kg_m": 12.762948092027138,
+      "max_abs_world_y_m": 91.39589315245284
+    },
+    "楼顶平台": {
+      "normal_speed_m_s": 40.24837185136576,
+      "specific_energy_J_kg": -8.162025514831694,
+      "force_peak_40ms_N": -9.006649659881994,
+      "specific_energy_per_m_J_kg_m": -33.55716096125073,
+      "specific_energy_per_forward_m_J_kg_m": -30.940434667585905,
+      "max_abs_world_y_m": 518.3710709500355
+    },
+    "下楼": {
+      "normal_speed_m_s": 19.46249160642932,
+      "specific_energy_J_kg": 19.24620828461967,
+      "force_peak_40ms_N": 19.96637020644485,
+      "specific_energy_per_m_J_kg_m": -9.606069979535869,
+      "specific_energy_per_forward_m_J_kg_m": -8.232523775233059,
+      "max_abs_world_y_m": 403.289225104791
+    }
+  },
+  "新V1.5_230900": {
+    "楼梯总体": {
+      "normal_speed_m_s": 6.869176980187697,
+      "specific_energy_J_kg": -4.6766490456569665,
+      "force_peak_40ms_N": 9.127265245627347,
+      "specific_energy_per_m_J_kg_m": -15.272498927704625,
+      "specific_energy_per_forward_m_J_kg_m": -12.417776475566933,
+      "max_abs_world_y_m": 382.9165381361623
+    },
+    "上楼": {
+      "normal_speed_m_s": 9.411473271488656,
+      "specific_energy_J_kg": -3.678221606350063,
+      "force_peak_40ms_N": 9.366743464377713,
+      "specific_energy_per_m_J_kg_m": -8.519945043211552,
+      "specific_energy_per_forward_m_J_kg_m": -7.120075630826516,
+      "max_abs_world_y_m": 17.121930231164264
+    },
+    "楼顶平台": {
+      "normal_speed_m_s": 71.60336668644169,
+      "specific_energy_J_kg": 77.6003312684367,
+      "force_peak_40ms_N": 54.42991765312015,
+      "specific_energy_per_m_J_kg_m": -14.08335229502018,
+      "specific_energy_per_forward_m_J_kg_m": -11.104727417550365,
+      "max_abs_world_y_m": 283.4354784557658
+    },
+    "下楼": {
+      "normal_speed_m_s": -2.4048027726287335,
+      "specific_energy_J_kg": -15.287561963155106,
+      "force_peak_40ms_N": 3.6509861557301626,
+      "specific_energy_per_m_J_kg_m": -23.15037423563002,
+      "specific_energy_per_forward_m_J_kg_m": -19.297090152255723,
+      "max_abs_world_y_m": 382.9165381361623
+    }
+  }
+}

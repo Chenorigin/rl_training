@@ -1,0 +1,198 @@
+{
+  "frozen_at": "2026-10-13T12:18:01.400942+08:00",
+  "checkpoints": {
+    "baseline": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-09_01-55-35_gait_fix_descent_entry/model_214700.pt",
+    "quiet_landing_v1": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-48-58_quiet_landing_v1/model_257100.pt",
+    "student": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_student_v0/2026-10-12_23-24-52_380795_student_v0_stage_a/model_22800.pt"
+  },
+  "checkpoint_sha256": {
+    "baseline": "19743a46229a2ba138716adb7f02dafa318684a2500d13c8107661279c217dd5",
+    "quiet_landing_v1": "368fa6287d3fc5e999b4ad596ad9f84be23f25d72bbd861236ec535a66b51c1c",
+    "student": "834fd2edfb243c00ffb69edff3e36e89fe58120913447d81f2947fa98c34327c"
+  },
+  "model": "/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+  "model_sha256": "98ac70602d930dac0f0b65124309c59c9c98cca9186f071262981e0e32bceb7a",
+  "terrain": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/all_terrain.xml",
+  "terrain_sha256": "78e8cbb5a0eaeff9b08566f58fa7589a01a1115777053f76189b18bd7538af5a",
+  "source_sha256": {
+    "deploy/deploy_mujoco/deploy_mujoco.py": "dc619164c56aebd3e65b1fe192d3c1bbb767f85732820b284ed012af83120e15",
+    "deploy/deploy_mujoco/quiet_landing_metrics.py": "d2afbb844119693dafa3e060a2dd83200f8679d789e7be0712797961880d369d",
+    "deploy/deploy_mujoco/student_v0_adapter.py": "e680570841a31adba7e438041b54e3b14694f50d8b126180d734fe2329240dbe",
+    "deploy/deploy_mujoco/student_v0_profiles.json": "ee9e456cd9d9d771cbf33fb28587da03f1ca56738fb37b4a9b21f33ba0332620",
+    "source/rl_training/m20_student_v0/perception.py": "7a0f1fe919d7b760c5b7cf8304985befabc1485df96d8cbbe299640b70b5e234",
+    "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/quiet_landing_signals.py": "92c34024f9ac70075ce867375ca62c0538540211d77c7bc11946a72a16dd522c"
+  },
+  "sections": [
+    [
+      -1,
+      1,
+      "起步平地"
+    ],
+    [
+      1,
+      2.8,
+      "上楼"
+    ],
+    [
+      2.8,
+      4.8,
+      "楼顶平台"
+    ],
+    [
+      4.8,
+      6.6,
+      "下楼"
+    ],
+    [
+      6.6,
+      8,
+      "缓冲1"
+    ],
+    [
+      8,
+      11,
+      "上坡"
+    ],
+    [
+      11,
+      12.5,
+      "坡顶"
+    ],
+    [
+      12.5,
+      15.5,
+      "下坡"
+    ],
+    [
+      15.5,
+      17,
+      "缓冲2"
+    ],
+    [
+      17,
+      20,
+      "粗糙路面"
+    ],
+    [
+      20,
+      21,
+      "缓冲3"
+    ],
+    [
+      21,
+      24,
+      "错位障碍"
+    ],
+    [
+      24,
+      25,
+      "缓冲4"
+    ],
+    [
+      25,
+      27.22,
+      "障碍条"
+    ],
+    [
+      27.22,
+      29,
+      "缓冲5"
+    ],
+    [
+      29,
+      32,
+      "横坡"
+    ],
+    [
+      32,
+      34,
+      "缓冲6"
+    ],
+    [
+      34,
+      36,
+      "低摩擦"
+    ],
+    [
+      36,
+      38,
+      "终点平地"
+    ]
+  ],
+  "cases": [
+    {
+      "name": "center",
+      "y_offset_m": 0.0,
+      "yaw_offset_rad": 0.0,
+      "seed": 42
+    },
+    {
+      "name": "left",
+      "y_offset_m": -0.03,
+      "yaw_offset_rad": -0.03,
+      "seed": 43
+    },
+    {
+      "name": "right",
+      "y_offset_m": 0.03,
+      "yaw_offset_rad": 0.03,
+      "seed": 44
+    }
+  ],
+  "primary": {
+    "models": [
+      "baseline",
+      "quiet_landing_v1",
+      "student"
+    ],
+    "noise_profile": "clean",
+    "cases": [
+      "center",
+      "left",
+      "right"
+    ]
+  },
+  "secondary": {
+    "models": [
+      "student"
+    ],
+    "noise_profiles": [
+      "train",
+      "realistic"
+    ],
+    "cases": [
+      "center"
+    ]
+  },
+  "control": {
+    "physics_dt_s": 0.005,
+    "policy_dt_s": 0.02,
+    "max_duration_s": 120.0,
+    "forward_world_m_s": 0.5,
+    "lateral_gain": 0.5,
+    "lateral_cap_m_s": 0.25,
+    "yaw_gain": 0.5,
+    "yaw_cap_rad_s": 0.5,
+    "initial_state": "contract.reset standing pose, zero qvel, offset y/yaw only",
+    "route_feedback": "same algorithm for all models; actual commands depend on each pose",
+    "policy": "deterministic inference; no optimizer; baseline/v1 244D vs student 618D"
+  },
+  "fall": {
+    "min_body_ground_height_m": 0.22,
+    "min_Rzz": 0.35,
+    "source": "deploy_mujoco.py/deploy_quiet_landing.py existing defaults"
+  },
+  "sampling": {
+    "step_s": 0.005,
+    "min_air_time_s": 0.01,
+    "reset_grace_s": 0.1,
+    "contact_on_N": 5.0,
+    "contact_off_N": 2.0,
+    "tread_force_ratio": 0.5,
+    "window_steps": 8,
+    "window_s": 0.04,
+    "source": "QuietMujocoMetrics shared production sampler"
+  },
+  "inclusion": "primary landing comparison only complete no-fall no-boundary-exit traversals; failed cases retained separately; events incomplete 40ms excluded; domain base X[-1,38); report full course + upstairs/platform/downstairs",
+  "judgement": "report per-metric signed percentage relative to baseline and v1; all metrics plus traversal failures; no invented universal quietness percentage; 3 initial cases are sensitivity probes, not random independent significance tests"
+}

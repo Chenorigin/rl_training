@@ -16,6 +16,19 @@ cd /home/ubuntu/cyq_shixi_projects/rl_training
 /home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml
 ```
 
+训练代码沿用三个职责位置：`velocity/mdp/` 放环境、命令和奖励实现，
+`velocity/config/wheeled/deeprobotics_m20/` 放环境配置，其 `agents/` 放 PPO、runner 和训练配置。
+
+| 版本 | 环境与奖励（mdp） | 环境配置 | PPO 配置（agents） |
+|---|---|---|---|
+| teacher | `stair_teacher.py` | `stair_teacher_env_cfg.py` | `stair_teacher_ppo_cfg.py` |
+| quiet_landing v1 / v1.5 | `quiet_landing_traversal.py` | `quiet_landing_env_cfg.py` | `quiet_landing_ppo_cfg.py` |
+| gait_refinement v2 | `gait_refinement_v2_env.py` | `gait_refinement_v2_env_cfg.py` | `gait_refinement_v2_ppo_cfg.py` |
+
+v2 的环境和配置继承 quiet_landing；其 PPO 复用 teacher 的策略保留算法和 quiet_landing 的指标 runner。
+训练与 MuJoCo 共用的接触、落地和驻足运算集中在 `mdp/quiet_landing_signals.py`，不再使用独立的 `m20_quiet` 包。
+所有版本仍由原有 `scripts/reinforcement_learning/rsl_rl/train.py` 读取命令行并启动。
+
 ## 轮式预训练 pre_teacher
 
 先用平地与少量缓坡、云深处 M20 的基础速度跟踪和稳定性奖励训练轮式运动。该任务关闭原始配置里会鼓励平地抬轮的转向腾空、对角接触步态奖励及纯转向滑移惩罚。actor、critic、动作维度与楼梯教师一致；预训练日志单独写入 `logs/rsl_rl/deeprobotics_m20_pre_teacher/`。
@@ -123,7 +136,7 @@ python scripts/reinforcement_learning/rsl_rl/play.py \
 | `--keyboard` | 用 Isaac Lab 键盘控制速度命令；需要图形窗口。 |
 | `--real-time` | 尽可能按实际时间运行。 |
 | `--headless` | 无图形窗口回放；不适合键盘控制。 |
-| `--video --video_length N` | 录制指定步数的视频。 |
+| `--viconfiguredeo --video_length N` | 录制指定步数的视频。 |
 | `--seed N`、`--device cuda:0` | 覆盖随机种子与仿真设备。 |
 
 ## MuJoCo 部署 deploy_mujoco

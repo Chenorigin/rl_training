@@ -1,0 +1,1196 @@
+{
+  "schema_version": 1,
+  "round": 4,
+  "reviewer": "/root/idle_stop_review",
+  "actual_harness_family": "Codex",
+  "heterogeneous_family_status": "missing; independent reviewer is same Codex family",
+  "scope": "Read-only final two-layer supervised distillation, evaluated checkpoint and physical archive review. No reviewer-started physical replay/training, GPU or Isaac.",
+  "reviewed_files_sha256": {
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/fit_policy.py": "33dd580b06f7a7a73d3816badc6e08f0022695c007e51a716c4c33d519410150",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/scripts/tools/finetune_idle_stop_wheels.py": "b0da5799bc474eb060e0b875b349b2a549afef00976c5b0191be22f1098cf5dc",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/source/rl_training/m20_quiet/idle_stop.py": "971e31424e970be87488f2d36390050e25a9cba7144f5a6abdb0d359eddcdf0e",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/collect_inputs.py": "4d82da81caa9d39267f98a6eb68a7f63d0a804263a7e0b15e1d8b9801dfddffa",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/run_case.py": "42c7db92158ad28f57aaf57c26e60ab31dc070b2b345fedc45806fc53f814ff2",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/judge.py": "c94d2950f2345c84922b9470d329daf4d2cb8b785725c5be9ed00db4c34a9abf",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/run_extra.py": "23dd49cc735f3c2bc4406d3acb1ccf470f0d40f5b6bb8e363271e2fddd1a2a3c",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/judge_extra.py": "66d1d749eb8c7b31e60f416f68721dbb62831c942980772de00fcfbceb2a4789",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/criteria.json": "401d9a2a1d0d9dd0d75f4e3343fd8ea055d04fe075385f9d419ab8d601201b89",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/instrument_sources.json": "0e57b99d2026ae40a9a401e400a2085afb4a8fa77ed8681b93f0a54db1ebbb8d",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/docs/m20_idle_stop_257100_20261012/judge.py": "c94d2950f2345c84922b9470d329daf4d2cb8b785725c5be9ed00db4c34a9abf"
+  },
+  "candidate_sha256": "0e6d0c93560b5a3f7ce9219c7b6a0cea84bd4a2d3f5dba33c02d79f7d4eb5f34",
+  "baseline_sha256": "368fa6287d3fc5e999b4ad596ad9f84be23f25d72bbd861236ec535a66b51c1c",
+  "resources": {
+    "CPU_threads": 1,
+    "max_RSS_MiB": 927.84765625,
+    "limit_MiB": 2048,
+    "new_GPU_Isaac_training_or_physical_rollout": false
+  },
+  "code_review_verdict": "passed for pinned final candidate and current fitter",
+  "primary_behavior_review_verdict": "passed; current fixed zero/forward-release/stairs regression has no remaining blocker",
+  "additional_behavior_review_verdict": "failed for lateral stopping yaw; slow/reverse/turn passed",
+  "overall_scope_verdict": "Fixed primary regression accepted with explicit additional lateral yaw limitation; no all-command or whole-terrain claim",
+  "passed": [
+    {
+      "name": "actual checkpoint change scope",
+      "evidence": "mlp.0/2 and log_std tensors bitwise unchanged; only mlp.4/6 changed; original critic unchanged; original 244->512->256->128->16 ELU actor loads strictly with Identity normalization",
+      "tensor_changes": {
+        "distribution.log_std_param": {
+          "equal": true,
+          "changed_elements": 0,
+          "max_abs_change": 0
+        },
+        "mlp.0.weight": {
+          "equal": true,
+          "changed_elements": 0,
+          "max_abs_change": 0
+        },
+        "mlp.0.bias": {
+          "equal": true,
+          "changed_elements": 0,
+          "max_abs_change": 0
+        },
+        "mlp.2.weight": {
+          "equal": true,
+          "changed_elements": 0,
+          "max_abs_change": 0
+        },
+        "mlp.2.bias": {
+          "equal": true,
+          "changed_elements": 0,
+          "max_abs_change": 0
+        },
+        "mlp.4.weight": {
+          "equal": false,
+          "changed_elements": 25175,
+          "max_abs_change": 0.5277081727981567
+        },
+        "mlp.4.bias": {
+          "equal": false,
+          "changed_elements": 97,
+          "max_abs_change": 0.019838452339172363
+        },
+        "mlp.6.weight": {
+          "equal": false,
+          "changed_elements": 2048,
+          "max_abs_change": 0.2009185403585434
+        },
+        "mlp.6.bias": {
+          "equal": false,
+          "changed_elements": 16,
+          "max_abs_change": 0.0027311593294143677
+        }
+      }
+    },
+    {
+      "name": "correct ordered feature sequence",
+      "evidence": "first four _modules entries retain both uses of shared ELU; frozen 256D features are bitwise equal for every recorded/augmented sample; remaining Linear128/ELU/Linear16 trainable"
+    },
+    {
+      "name": "mask and augmentation boundaries",
+      "evidence": "Actual 12 boundary probes passed: strict command<.05; flat span<=.025; finite all244; abs(scan)<1. Reject saturated±1 and NaN/Inf. Observed velocity and previous wheel action do not disable target. Fitter uses wheel prev_action53:57, wheel qvel37:41, angular0:3. Masks used only during fitting.",
+      "probe": {
+        "expected": [
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true
+        ],
+        "actual": [
+          true,
+          true,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          true,
+          true
+        ]
+      }
+    },
+    {
+      "name": "real labels and preservation loss",
+      "evidence": "targets recomputed from original257100 actor at every real or supervised augmented input; only idle wheel target becomes0. Idle leg loss20 and nonidle all16 loss100; first512idle/last512preservation batch ordering correct. Changed command/scans are explicitly augmentation, not claimed physics.",
+      "stats_recomputed": {
+        "samples": 78465,
+        "idle_samples": 59261,
+        "moving_samples": 19204,
+        "idle_wheel_rms": 0.04075215756893158,
+        "idle_leg_rms_delta": 0.006687491666525602,
+        "moving_all_rms_delta": 0.009422811679542065
+      }
+    },
+    {
+      "name": "actual twelve fitting archives match deployment",
+      "evidence": "12x1499 real observations; time/command/prev_action match recorded physical actions. All named joint qpos/qvel match full-state archives. Actor for each archive re-infers actual applied action post-startup blend within8.4043e-6.",
+      "inputs": [
+        {
+          "path": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distill_reference/零命令_inputs.npz",
+          "sha256": "1b781aefd613625f90b9ff1b15ecb81446de40eaa13172ffca508d0062f8a46e",
+          "rows": 1499,
+          "time_command_previous_action_match": true
+        },
+        {
+          "path": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distill_reference/平地启停_inputs.npz",
+          "sha256": "010015f40c61b180c5861f43d544defc9ab9c5eb49661f7a144460ca0d60aae3",
+          "rows": 1499,
+          "time_command_previous_action_match": true
+        },
+        {
+          "path": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distill_reference/仅w_inputs.npz",
+          "sha256": "92ba23bb3b22312c64be73bb68db3ce47b5abf2fbb6ee4d6731769c503aa1b4d",
+          "rows": 1499,
+          "time_command_previous_action_match": true
+        },
+        {
+          "path": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/wheel_feedback/零命令_inputs.npz",
+          "sha256": "34af584f22a2c16e5c3dccd2eea79e75cafea39828971d60a4c75a8e8b2e0fff",
+          "rows": 1499,
+          "time_command_previous_action_match": true
+        },
+        {
+          "path": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/wheel_feedback/平地启停_inputs.npz",
+          "sha256": "d609650ee906088586cb25216ecd405b3646e38da2a52814b283c35702fe7f6b",
+          "rows": 1499,
+          "time_command_previous_action_match": true
+        },
+        {
+          "path": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/wheel_feedback/仅w_inputs.npz",
+          "sha256": "27d00bf3ffed92067086f58518cb2de51a57e304230a0d49635678eed44e97f6",
+          "rows": 1499,
+          "time_command_previous_action_match": true
+        },
+        {
+          "path": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/wheel_head_round3/零命令_inputs.npz",
+          "sha256": "85251776072e904e67358b5b3a50f8cf3cc99df83fe3aef37b1046469287bccd",
+          "rows": 1499,
+          "time_command_previous_action_match": true
+        },
+        {
+          "path": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/wheel_head_round3/平地启停_inputs.npz",
+          "sha256": "f361af668d15f3da40a8bef1edd5f94e7f8b28870d439e3ae37045b9bc254cdf",
+          "rows": 1499,
+          "time_command_previous_action_match": true
+        },
+        {
+          "path": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/wheel_head_round3/仅w_inputs.npz",
+          "sha256": "e2557861b9fd02974cf47386591a1ff935660a9028a0e3118512fafda7ebb85e",
+          "rows": 1499,
+          "time_command_previous_action_match": true
+        },
+        {
+          "path": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round4/零命令_inputs.npz",
+          "sha256": "2fd2d273e7da94ff0cfb80b799dcf132c98df4c24d3404a0b4a675b712535b4f",
+          "rows": 1499,
+          "time_command_previous_action_match": true
+        },
+        {
+          "path": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round4/平地启停_inputs.npz",
+          "sha256": "bd8a4c054d6c6fce0187659c8d1b83df95be2cd92f229943af1c12ec4c69b0d1",
+          "rows": 1499,
+          "time_command_previous_action_match": true
+        },
+        {
+          "path": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round4/仅w_inputs.npz",
+          "sha256": "ca946a8aa0b037fe01d831439b4e0bf172f26e7051bad3b96336522fdf5c6b17",
+          "rows": 1499,
+          "time_command_previous_action_match": true
+        }
+      ]
+    },
+    {
+      "name": "actual final candidate has no runtime stop clamp",
+      "evidence": "Frozen deploy source still calls standard actor then existing startup blend/safety clip for all16 actions; training mask is imported only by fitter. Three current primary saved observation archives re-infer actual final actor applied action within5.7221e-6. No zero-command action branch added.",
+      "physical_observation_checks": {
+        "distill_reference/零命令": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 2.086162567138672e-06,
+          "checkpoint_sha256": "368fa6287d3fc5e999b4ad596ad9f84be23f25d72bbd861236ec535a66b51c1c",
+          "inputs_sha256": "1b781aefd613625f90b9ff1b15ecb81446de40eaa13172ffca508d0062f8a46e"
+        },
+        "distill_reference/平地启停": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 2.7418136596679688e-06,
+          "checkpoint_sha256": "368fa6287d3fc5e999b4ad596ad9f84be23f25d72bbd861236ec535a66b51c1c",
+          "inputs_sha256": "010015f40c61b180c5861f43d544defc9ab9c5eb49661f7a144460ca0d60aae3"
+        },
+        "distill_reference/仅w": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 6.4373016357421875e-06,
+          "checkpoint_sha256": "368fa6287d3fc5e999b4ad596ad9f84be23f25d72bbd861236ec535a66b51c1c",
+          "inputs_sha256": "92ba23bb3b22312c64be73bb68db3ce47b5abf2fbb6ee4d6731769c503aa1b4d"
+        },
+        "wheel_feedback/零命令": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 7.212162017822266e-06,
+          "checkpoint_sha256": "dbe713e84e435afc7863ab38832433ff3952f0b0b37b615ecfe3ac3be8c74f51",
+          "inputs_sha256": "34af584f22a2c16e5c3dccd2eea79e75cafea39828971d60a4c75a8e8b2e0fff"
+        },
+        "wheel_feedback/平地启停": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 8.404254913330078e-06,
+          "checkpoint_sha256": "dbe713e84e435afc7863ab38832433ff3952f0b0b37b615ecfe3ac3be8c74f51",
+          "inputs_sha256": "d609650ee906088586cb25216ecd405b3646e38da2a52814b283c35702fe7f6b"
+        },
+        "wheel_feedback/仅w": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 7.62939453125e-06,
+          "checkpoint_sha256": "dbe713e84e435afc7863ab38832433ff3952f0b0b37b615ecfe3ac3be8c74f51",
+          "inputs_sha256": "27d00bf3ffed92067086f58518cb2de51a57e304230a0d49635678eed44e97f6"
+        },
+        "wheel_head_round3/零命令": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 2.6226043701171875e-06,
+          "checkpoint_sha256": "0f7b79f71bcf227c10d21cef5fa16a5ff42f872fd5899d1fc861e4b75fad68c9",
+          "inputs_sha256": "85251776072e904e67358b5b3a50f8cf3cc99df83fe3aef37b1046469287bccd"
+        },
+        "wheel_head_round3/平地启停": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 2.6226043701171875e-06,
+          "checkpoint_sha256": "0f7b79f71bcf227c10d21cef5fa16a5ff42f872fd5899d1fc861e4b75fad68c9",
+          "inputs_sha256": "f361af668d15f3da40a8bef1edd5f94e7f8b28870d439e3ae37045b9bc254cdf"
+        },
+        "wheel_head_round3/仅w": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 5.7220458984375e-06,
+          "checkpoint_sha256": "0f7b79f71bcf227c10d21cef5fa16a5ff42f872fd5899d1fc861e4b75fad68c9",
+          "inputs_sha256": "e2557861b9fd02974cf47386591a1ff935660a9028a0e3118512fafda7ebb85e"
+        },
+        "distilled_round4/零命令": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 2.384185791015625e-06,
+          "checkpoint_sha256": "984be0289421fded47abd6e19613a2e1f1c453a9953306dc9893e562c8fe5aa7",
+          "inputs_sha256": "2fd2d273e7da94ff0cfb80b799dcf132c98df4c24d3404a0b4a675b712535b4f"
+        },
+        "distilled_round4/平地启停": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 2.384185791015625e-06,
+          "checkpoint_sha256": "984be0289421fded47abd6e19613a2e1f1c453a9953306dc9893e562c8fe5aa7",
+          "inputs_sha256": "bd8a4c054d6c6fce0187659c8d1b83df95be2cd92f229943af1c12ec4c69b0d1"
+        },
+        "distilled_round4/仅w": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 6.4373016357421875e-06,
+          "checkpoint_sha256": "984be0289421fded47abd6e19613a2e1f1c453a9953306dc9893e562c8fe5aa7",
+          "inputs_sha256": "ca946a8aa0b037fe01d831439b4e0bf172f26e7051bad3b96336522fdf5c6b17"
+        },
+        "distilled_round5/零命令": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 4.0531158447265625e-06,
+          "checkpoint_sha256": "0e6d0c93560b5a3f7ce9219c7b6a0cea84bd4a2d3f5dba33c02d79f7d4eb5f34",
+          "inputs_sha256": "b34ef962685c087536c2c109ee7edf786f6b377d1859142542072031cbe0c3e6"
+        },
+        "distilled_round5/平地启停": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 4.0531158447265625e-06,
+          "checkpoint_sha256": "0e6d0c93560b5a3f7ce9219c7b6a0cea84bd4a2d3f5dba33c02d79f7d4eb5f34",
+          "inputs_sha256": "0b3c9f3412db5362a001082c47dbf9fb4c7b440cb4fee08542361b9b0187d317"
+        },
+        "distilled_round5/仅w": {
+          "physical_joint_qpos_qvel_matches": true,
+          "actor_raw_vs_applied_action_max_abs_delta_after_startup_blend": 5.7220458984375e-06,
+          "checkpoint_sha256": "0e6d0c93560b5a3f7ce9219c7b6a0cea84bd4a2d3f5dba33c02d79f7d4eb5f34",
+          "inputs_sha256": "8c0370b252879b1fb562303d98371af2a5bca2dd7a661d8cd8e362735f27cd9e"
+        }
+      }
+    },
+    {
+      "name": "optimizer reset and reproduction",
+      "evidence": "Saved optimizer moment state empty and original groups unchanged. Actual completed main-script reproduction actor tensors all bitwise equal to evaluated final artifact. Delivered checkpoint file SHA equals evaluated checkpoint; twelve copied docs inputs match originals.",
+      "details": {
+        "main_script_reproduction_actor_bitwise_equal": true,
+        "reproduced_checkpoint_sha256": "0fda924d1f0ede5c89f85626cd408cc527b9c3d6a4f01b14e84057ae99a9e9a9",
+        "delivered_file_equals_evaluated_checkpoint": true,
+        "delivered_checkpoint_sha256": "0e6d0c93560b5a3f7ce9219c7b6a0cea84bd4a2d3f5dba33c02d79f7d4eb5f34",
+        "copied_twelve_inputs_sha_match": true,
+        "gate_closed_exact_relative_5deg": {
+          "passed": false,
+          "stop_yaw": false,
+          "yaw_excursion_deg": 5
+        },
+        "reviewed_source_sha256": {
+          "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/fit_policy.py": "33dd580b06f7a7a73d3816badc6e08f0022695c007e51a716c4c33d519410150",
+          "/home/ubuntu/cyq_shixi_projects/rl_training/scripts/tools/finetune_idle_stop_wheels.py": "b0da5799bc474eb060e0b875b349b2a549afef00976c5b0191be22f1098cf5dc",
+          "/home/ubuntu/cyq_shixi_projects/rl_training/source/rl_training/m20_quiet/idle_stop.py": "971e31424e970be87488f2d36390050e25a9cba7144f5a6abdb0d359eddcdf0e",
+          "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/collect_inputs.py": "4d82da81caa9d39267f98a6eb68a7f63d0a804263a7e0b15e1d8b9801dfddffa",
+          "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/run_case.py": "42c7db92158ad28f57aaf57c26e60ab31dc070b2b345fedc45806fc53f814ff2",
+          "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/judge.py": "c94d2950f2345c84922b9470d329daf4d2cb8b785725c5be9ed00db4c34a9abf",
+          "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/run_extra.py": "23dd49cc735f3c2bc4406d3acb1ccf470f0d40f5b6bb8e363271e2fddd1a2a3c",
+          "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/judge_extra.py": "66d1d749eb8c7b31e60f416f68721dbb62831c942980772de00fcfbceb2a4789",
+          "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/criteria.json": "401d9a2a1d0d9dd0d75f4e3343fd8ea055d04fe075385f9d419ab8d601201b89",
+          "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/instrument_sources.json": "0e57b99d2026ae40a9a401e400a2085afb4a8fa77ed8681b93f0a54db1ebbb8d",
+          "/home/ubuntu/cyq_shixi_projects/rl_training/docs/m20_idle_stop_257100_20261012/judge.py": "c94d2950f2345c84922b9470d329daf4d2cb8b785725c5be9ed00db4c34a9abf"
+        }
+      }
+    },
+    {
+      "name": "frozen physical instrumentation and current arrays",
+      "evidence": "Actual judges verify baseline/candidate metadata, checkpoint/source/model/terrain identity, full actual command/mode schedule. Review independently checks all primary plus8 additional physical archives have1800frames/36s, .02 state/.005 physics grids,16actions, unit quaternions, finite qpos/qvel/action/force, recomputed energy/force. Stationary last10s four-wheel support100%, ~338.7N summed vertical force; cannot explain success by lifting wheels.",
+      "quality": {
+        "distilled_round5/零命令": {
+          "archive_fields_full": [
+            "time",
+            "qpos",
+            "qvel"
+          ],
+          "time_grid_action_dim_energy_force_verified": true,
+          "last10_min_contacts": 4,
+          "last10_fraction_four_support": 1,
+          "last10_mean_summed_vertical_force_N": 338.6986467578659,
+          "last10_base_height_minmax_m": [
+            0.5646690370917447,
+            0.5646697765220962
+          ]
+        },
+        "distilled_round5/平地启停": {
+          "archive_fields_full": [
+            "time",
+            "qpos",
+            "qvel"
+          ],
+          "time_grid_action_dim_energy_force_verified": true,
+          "last10_min_contacts": 4,
+          "last10_fraction_four_support": 1,
+          "last10_mean_summed_vertical_force_N": 338.69866097186144,
+          "last10_base_height_minmax_m": [
+            0.5646702490117115,
+            0.5646869164896308
+          ]
+        },
+        "distilled_round5/仅w": {
+          "archive_fields_full": [
+            "time",
+            "qpos",
+            "qvel"
+          ],
+          "time_grid_action_dim_energy_force_verified": true,
+          "last10_min_contacts": 1,
+          "last10_fraction_four_support": 0.907,
+          "last10_mean_summed_vertical_force_N": 338.7181469439101,
+          "last10_base_height_minmax_m": [
+            0.564021428947612,
+            1.20451786955402
+          ]
+        },
+        "extra_round5/slow": {
+          "archive_fields_full": [
+            "time",
+            "qpos",
+            "qvel"
+          ],
+          "time_grid_action_dim_energy_force_verified": true,
+          "last10_min_contacts": 4,
+          "last10_fraction_four_support": 1,
+          "last10_mean_summed_vertical_force_N": 338.6986597296294,
+          "last10_base_height_minmax_m": [
+            0.5646702157237196,
+            0.5646856202346929
+          ]
+        },
+        "extra_round5/reverse": {
+          "archive_fields_full": [
+            "time",
+            "qpos",
+            "qvel"
+          ],
+          "time_grid_action_dim_energy_force_verified": true,
+          "last10_min_contacts": 4,
+          "last10_fraction_four_support": 1,
+          "last10_mean_summed_vertical_force_N": 338.6986701441406,
+          "last10_base_height_minmax_m": [
+            0.5646705811688582,
+            0.5646990776341169
+          ]
+        },
+        "extra_round5/turn": {
+          "archive_fields_full": [
+            "time",
+            "qpos",
+            "qvel"
+          ],
+          "time_grid_action_dim_energy_force_verified": true,
+          "last10_min_contacts": 4,
+          "last10_fraction_four_support": 1,
+          "last10_mean_summed_vertical_force_N": 338.6986529721049,
+          "last10_base_height_minmax_m": [
+            0.5646699876022963,
+            0.5646770029286906
+          ]
+        },
+        "extra_round5/lateral": {
+          "archive_fields_full": [
+            "time",
+            "qpos",
+            "qvel"
+          ],
+          "time_grid_action_dim_energy_force_verified": true,
+          "last10_min_contacts": 4,
+          "last10_fraction_four_support": 1,
+          "last10_mean_summed_vertical_force_N": 338.6986915353503,
+          "last10_base_height_minmax_m": [
+            0.5646713304306871,
+            0.5647266730300943
+          ]
+        },
+        "extra_baseline/slow": {
+          "archive_fields_full": [
+            "time",
+            "qpos",
+            "qvel"
+          ],
+          "time_grid_action_dim_energy_force_verified": true,
+          "last10_min_contacts": 4,
+          "last10_fraction_four_support": 1,
+          "last10_mean_summed_vertical_force_N": 338.6986491847119,
+          "last10_base_height_minmax_m": [
+            0.5631183410327559,
+            0.5631201909840605
+          ]
+        },
+        "extra_baseline/reverse": {
+          "archive_fields_full": [
+            "time",
+            "qpos",
+            "qvel"
+          ],
+          "time_grid_action_dim_energy_force_verified": true,
+          "last10_min_contacts": 4,
+          "last10_fraction_four_support": 1,
+          "last10_mean_summed_vertical_force_N": 338.6986498263789,
+          "last10_base_height_minmax_m": [
+            0.5631183438055714,
+            0.5631208164762015
+          ]
+        },
+        "extra_baseline/turn": {
+          "archive_fields_full": [
+            "time",
+            "qpos",
+            "qvel"
+          ],
+          "time_grid_action_dim_energy_force_verified": true,
+          "last10_min_contacts": 4,
+          "last10_fraction_four_support": 1,
+          "last10_mean_summed_vertical_force_N": 338.69864796050393,
+          "last10_base_height_minmax_m": [
+            0.5631183382794855,
+            0.5631190896306942
+          ]
+        },
+        "extra_baseline/lateral": {
+          "archive_fields_full": [
+            "time",
+            "qpos",
+            "qvel"
+          ],
+          "time_grid_action_dim_energy_force_verified": true,
+          "last10_min_contacts": 4,
+          "last10_fraction_four_support": 1,
+          "last10_mean_summed_vertical_force_N": 338.69865966926596,
+          "last10_base_height_minmax_m": [
+            0.5631183888658307,
+            0.563130258825518
+          ]
+        }
+      }
+    },
+    {
+      "name": "fixed primary judges re-executed",
+      "evidence": "Executed actual judge via runpy with writes intercepted in memory; recorded real candidate all11 checks passed after stopping-yaw gate added.",
+      "result": {
+        "candidate": "distilled_round5",
+        "passed": true,
+        "checks": {
+          "no_fall": true,
+          "full_duration": true,
+          "stationary_drift": true,
+          "stationary_yaw": true,
+          "stop_displacement": true,
+          "stop_yaw": true,
+          "prestop_moving": true,
+          "residual_speed": true,
+          "stairs_exit": true,
+          "quiet_peak": true,
+          "quiet_cumulative_energy": true
+        },
+        "result": {
+          "零命令": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "actor_action_dimension": 16,
+            "no_runtime_stop_clamp": true,
+            "drift_m": 0.021335733272148653,
+            "net_displacement_m": 0.021335733272148653,
+            "window_path_m": 0.021336287355046654,
+            "residual_last10_m_s": 0.0006319187128333084,
+            "yaw_excursion_deg": 0.34268733845386334,
+            "final_wheel_actions": [
+              0.004312962293624878,
+              0.004594773054122925,
+              -0.024126175791025162,
+              0.00962691567838192
+            ]
+          },
+          "平地启停": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "actor_action_dimension": 16,
+            "no_runtime_stop_clamp": true,
+            "drift_m": 0.0732306272341555,
+            "net_displacement_m": 0.06128799127597651,
+            "window_path_m": 0.10237530133979905,
+            "residual_last10_m_s": 0.0006092430576228916,
+            "yaw_excursion_deg": 0.6243377848634926,
+            "final_wheel_actions": [
+              0.004305928945541382,
+              0.004621595144271851,
+              -0.024143312126398087,
+              0.009638478979468346
+            ],
+            "prestop_forward_progress_m": 3.5953298101401874
+          },
+          "仅w": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "actor_action_dimension": 16,
+            "no_runtime_stop_clamp": true,
+            "stairs_exit_time_s": 18.680000000000568,
+            "stairs_events": 85,
+            "stairs_40ms_mean_peak_N": 444.5665227166075,
+            "stairs_specific_energy_per_forward_m": 9.193470391097078,
+            "stairs_max_abs_y_m": 0.2105193316881393
+          }
+        },
+        "baseline": {
+          "零命令": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "actor_action_dimension": 16,
+            "no_runtime_stop_clamp": true,
+            "drift_m": 0.8615137144913466,
+            "net_displacement_m": 0.8615137144913466,
+            "window_path_m": 0.8616214995946923,
+            "residual_last10_m_s": 0.03310529348379041,
+            "yaw_excursion_deg": 3.1378152711671277,
+            "final_wheel_actions": [
+              -0.22970865666866302,
+              -0.5536505579948425,
+              0.2235236018896103,
+              0.26447176933288574
+            ]
+          },
+          "平地启停": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "actor_action_dimension": 16,
+            "no_runtime_stop_clamp": true,
+            "drift_m": 0.7672898201697123,
+            "net_displacement_m": 0.7672898201697123,
+            "window_path_m": 0.7688891830352254,
+            "residual_last10_m_s": 0.03310799326159031,
+            "yaw_excursion_deg": 2.8615978223142102,
+            "final_wheel_actions": [
+              -0.22971211373806,
+              -0.5536518692970276,
+              0.22352446615695953,
+              0.26447421312332153
+            ],
+            "prestop_forward_progress_m": 3.6574533174242254
+          },
+          "仅w": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "actor_action_dimension": 16,
+            "no_runtime_stop_clamp": true,
+            "stairs_exit_time_s": 18.560000000000592,
+            "stairs_events": 97,
+            "stairs_40ms_mean_peak_N": 402.10734382985885,
+            "stairs_specific_energy_per_forward_m": 9.149163244798544,
+            "stairs_max_abs_y_m": 0.2495380323856255
+          }
+        },
+        "criteria": "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/criteria.json"
+      },
+      "quiet_peak_ratio": 1.1055916524238218,
+      "quiet_energy_ratio": 1.0048427539342162
+    },
+    {
+      "name": "judge counterexamples forced red",
+      "evidence": "Actual in-memory probes rejected1m out/back excursion, missing pre-stop motion, fall, no landing events, wrong SHA; extra no-moving-command/fall rejected. Initial missing parking-yaw check was observed falsely green and repaired by parent; actual EXACT5deg relative parking-yaw probe now red and nominal still passes.",
+      "initial_probe_results": {
+        "nominal": {
+          "executed": true,
+          "passed": true,
+          "checks": {
+            "no_fall": true,
+            "full_duration": true,
+            "stationary_drift": true,
+            "stationary_yaw": true,
+            "stop_displacement": true,
+            "prestop_moving": true,
+            "residual_speed": true,
+            "stairs_exit": true,
+            "quiet_peak": true,
+            "quiet_cumulative_energy": true
+          }
+        },
+        "stop_out_and_back_1m": {
+          "executed": true,
+          "passed": false,
+          "checks": {
+            "no_fall": true,
+            "full_duration": true,
+            "stationary_drift": true,
+            "stationary_yaw": true,
+            "stop_displacement": false,
+            "prestop_moving": true,
+            "residual_speed": true,
+            "stairs_exit": true,
+            "quiet_peak": true,
+            "quiet_cumulative_energy": true
+          }
+        },
+        "no_prestop_motion": {
+          "executed": true,
+          "passed": false,
+          "checks": {
+            "no_fall": true,
+            "full_duration": true,
+            "stationary_drift": true,
+            "stationary_yaw": true,
+            "stop_displacement": true,
+            "prestop_moving": false,
+            "residual_speed": true,
+            "stairs_exit": true,
+            "quiet_peak": true,
+            "quiet_cumulative_energy": true
+          }
+        },
+        "no_landing_events": {
+          "executed": true,
+          "rejected": "AssertionError",
+          "message": ""
+        },
+        "policy_fall": {
+          "executed": true,
+          "passed": false,
+          "checks": {
+            "no_fall": false,
+            "full_duration": true,
+            "stationary_drift": true,
+            "stationary_yaw": true,
+            "stop_displacement": true,
+            "prestop_moving": true,
+            "residual_speed": true,
+            "stairs_exit": true,
+            "quiet_peak": true,
+            "quiet_cumulative_energy": true
+          }
+        },
+        "wrong_checkpoint_sha": {
+          "executed": true,
+          "rejected": "AssertionError",
+          "message": ""
+        },
+        "parking_5deg_yaw": {
+          "executed": true,
+          "passed": true,
+          "checks": {
+            "no_fall": true,
+            "full_duration": true,
+            "stationary_drift": true,
+            "stationary_yaw": true,
+            "stop_displacement": true,
+            "prestop_moving": true,
+            "residual_speed": true,
+            "stairs_exit": true,
+            "quiet_peak": true,
+            "quiet_cumulative_energy": true
+          }
+        },
+        "extra_no_moving_command": {
+          "executed": true,
+          "rejected": "AssertionError",
+          "message": ""
+        },
+        "extra_policy_fall": {
+          "executed": true,
+          "passed": false,
+          "checks": {
+            "slow": {
+              "no_fall": false,
+              "full_duration": true,
+              "stop_displacement": true,
+              "residual_speed": true,
+              "stop_yaw": true,
+              "prestop_motion": true
+            },
+            "reverse": {
+              "no_fall": false,
+              "full_duration": true,
+              "stop_displacement": true,
+              "residual_speed": true,
+              "stop_yaw": true,
+              "prestop_motion": true
+            },
+            "turn": {
+              "no_fall": false,
+              "full_duration": true,
+              "stop_displacement": true,
+              "residual_speed": true,
+              "stop_yaw": true,
+              "prestop_motion": true
+            },
+            "lateral": {
+              "no_fall": false,
+              "full_duration": true,
+              "stop_displacement": true,
+              "residual_speed": true,
+              "stop_yaw": false,
+              "prestop_motion": true
+            }
+          }
+        }
+      },
+      "final_gate_probe": {
+        "passed": false,
+        "stop_yaw": false,
+        "yaw_excursion_deg": 5
+      },
+      "final_judge_sha256": "c94d2950f2345c84922b9470d329daf4d2cb8b785725c5be9ed00db4c34a9abf"
+    },
+    {
+      "name": "additional real physical cases re-executed",
+      "evidence": "Actual judge_extra over saved baseline andcandidate runs reproduces saved verdict exactly: slow/reverse/turn all checks pass; lateral yaw sole failure.",
+      "result": {
+        "baseline": {
+          "slow": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "stop_max_excursion_m": 0.7400809807149469,
+            "residual_last10_m_s": 0.03310747627718852,
+            "stop_yaw_excursion_deg": 2.6174623800411085,
+            "prestop_translation_m": 1.6468798506253477,
+            "prestop_turn_deg": 0.2873493904807619
+          },
+          "reverse": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "stop_max_excursion_m": 0.6189773798436016,
+            "residual_last10_m_s": 0.03310834936950893,
+            "stop_yaw_excursion_deg": 2.247468064954607,
+            "prestop_translation_m": 3.684895658511547,
+            "prestop_turn_deg": 1.833545672658641
+          },
+          "turn": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "stop_max_excursion_m": 0.7234291776119395,
+            "residual_last10_m_s": 0.033106034260097145,
+            "stop_yaw_excursion_deg": 3.268548256303405,
+            "prestop_translation_m": 0.019933061503310347,
+            "prestop_turn_deg": 231.30529523847343
+          },
+          "lateral": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "stop_max_excursion_m": 0.5816584508143898,
+            "residual_last10_m_s": 0.03311888953563265,
+            "stop_yaw_excursion_deg": 4.401997491488562,
+            "prestop_translation_m": 2.2193697559727537,
+            "prestop_turn_deg": 2.2072018585571564
+          }
+        },
+        "candidate": {
+          "slow": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "stop_max_excursion_m": 0.04152604814189579,
+            "residual_last10_m_s": 0.00061098662730992,
+            "stop_yaw_excursion_deg": 0.583227135320064,
+            "prestop_translation_m": 1.611757384521611,
+            "prestop_turn_deg": 1.4841643200343946
+          },
+          "reverse": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "stop_max_excursion_m": 0.07657645624151425,
+            "residual_last10_m_s": 0.0005934263946520739,
+            "stop_yaw_excursion_deg": 0.8043194404086177,
+            "prestop_translation_m": 3.290296465812898,
+            "prestop_turn_deg": 1.6028972618630821
+          },
+          "turn": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "stop_max_excursion_m": 0.019355708142785016,
+            "residual_last10_m_s": 0.0006217389949715315,
+            "stop_yaw_excursion_deg": 0.6415543267444362,
+            "prestop_translation_m": 0.09586053346604217,
+            "prestop_turn_deg": 222.55076957482692
+          },
+          "lateral": {
+            "fell": false,
+            "duration_s": 35.999999999999964,
+            "stop_max_excursion_m": 0.04920074160939887,
+            "residual_last10_m_s": 0.0005580011518018594,
+            "stop_yaw_excursion_deg": 3.045328386553509,
+            "prestop_translation_m": 2.0812065652528577,
+            "prestop_turn_deg": 5.17448831470705
+          }
+        },
+        "checks": {
+          "slow": {
+            "no_fall": true,
+            "full_duration": true,
+            "stop_displacement": true,
+            "residual_speed": true,
+            "stop_yaw": true,
+            "prestop_motion": true
+          },
+          "reverse": {
+            "no_fall": true,
+            "full_duration": true,
+            "stop_displacement": true,
+            "residual_speed": true,
+            "stop_yaw": true,
+            "prestop_motion": true
+          },
+          "turn": {
+            "no_fall": true,
+            "full_duration": true,
+            "stop_displacement": true,
+            "residual_speed": true,
+            "stop_yaw": true,
+            "prestop_motion": true
+          },
+          "lateral": {
+            "no_fall": true,
+            "full_duration": true,
+            "stop_displacement": true,
+            "residual_speed": true,
+            "stop_yaw": false,
+            "prestop_motion": true
+          }
+        },
+        "passed": false,
+        "note": "Additional flat-terrain stopping cases; same displacement/residual/yaw limits; movement >=80% baseline and nontrivial. No gait/turn-quality optimization claimed."
+      }
+    }
+  ],
+  "failed": [
+    {
+      "id": "B4",
+      "type": "additional physical behavior limitation",
+      "name": "lateral stop yaw",
+      "actual_peak_deg": 3.045328386553509,
+      "maximum_deg": 1,
+      "peak_time_s": 14.360000000000845,
+      "stop_reference_s": 14.020000000000792,
+      "final_offset_deg": 2.4334274430988074,
+      "last10_yaw_delta_deg": -0.16661681772478332,
+      "last10_yaw_slope_deg_s": -0.01652848283182497,
+      "stop_max_excursion_m": 0.04920074160939887,
+      "last10_residual_m_s": 0.0005580011518018594,
+      "evidence": "Peak arrives0.34s afterstop, dominated by transient braking yaw. Later slight reverse yaw drift remains; not ongoing same-direction turning, and not zero yaw. Baseline tail increases1.21077deg at.12159deg/s. This blocks all-command stopping success claim, not measured primary zero/forward suite."
+    }
+  ],
+  "lateral_yaw_time_series": {
+    "extra_baseline": {
+      "start_time": 14.020000000000792,
+      "peak_time": 35.999999999999964,
+      "peak_signed_deg": 4.401997491488561,
+      "final_signed_deg": 4.401997491488561,
+      "intervals": [
+        {
+          "start": 14.02,
+          "end": 14.5,
+          "yaw_start_relative_deg": 0,
+          "yaw_end_relative_deg": 2.591625463056533,
+          "net_yaw_deg": 2.591625463056533,
+          "max_excursion_from_stop_deg": 2.591625463056533,
+          "yaw_slope_deg_s": 6.076311609171415,
+          "max_abs_root_qvel_z_rad_s": 0.27929382752625026
+        },
+        {
+          "start": 14.5,
+          "end": 15,
+          "yaw_start_relative_deg": 2.589229614736536,
+          "yaw_end_relative_deg": 2.470932835693911,
+          "net_yaw_deg": -0.11829677904262503,
+          "max_excursion_from_stop_deg": 2.589229614736536,
+          "yaw_slope_deg_s": -0.20329799639341542,
+          "max_abs_root_qvel_z_rad_s": 0.012734395387901038
+        },
+        {
+          "start": 15,
+          "end": 16,
+          "yaw_start_relative_deg": 2.4683659028852665,
+          "yaw_end_relative_deg": 2.474575433222401,
+          "net_yaw_deg": 0.006209530337134339,
+          "max_excursion_from_stop_deg": 2.5088722907744083,
+          "yaw_slope_deg_s": 0.05758558423512876,
+          "max_abs_root_qvel_z_rad_s": 0.010086733721734213
+        },
+        {
+          "start": 16,
+          "end": 20,
+          "yaw_start_relative_deg": 2.4743025571022494,
+          "yaw_end_relative_deg": 2.608291418071654,
+          "net_yaw_deg": 0.13398886096940466,
+          "max_excursion_from_stop_deg": 2.608291418071654,
+          "yaw_slope_deg_s": 0.04082321875282777,
+          "max_abs_root_qvel_z_rad_s": 0.006905061026551435
+        },
+        {
+          "start": 20,
+          "end": 26,
+          "yaw_start_relative_deg": 2.6095759735186794,
+          "yaw_end_relative_deg": 3.18888595363632,
+          "net_yaw_deg": 0.5793099801176407,
+          "max_excursion_from_stop_deg": 3.18888595363632,
+          "yaw_slope_deg_s": 0.09781267549569002,
+          "max_abs_root_qvel_z_rad_s": 0.002045561109034231
+        },
+        {
+          "start": 26,
+          "end": 36,
+          "yaw_start_relative_deg": 3.1912305530501905,
+          "yaw_end_relative_deg": 4.401997491488561,
+          "net_yaw_deg": 1.2107669384383701,
+          "max_excursion_from_stop_deg": 4.401997491488561,
+          "yaw_slope_deg_s": 0.12158593489470379,
+          "max_abs_root_qvel_z_rad_s": 0.0021332082277221126
+        }
+      ],
+      "minmax_base_height_m": [
+        0.5631183888658307,
+        0.5725696697620128
+      ]
+    },
+    "extra_round5": {
+      "start_time": 14.020000000000792,
+      "peak_time": 14.360000000000845,
+      "peak_signed_deg": 3.045328386553509,
+      "final_signed_deg": 2.4334274430988074,
+      "intervals": [
+        {
+          "start": 14.02,
+          "end": 14.5,
+          "yaw_start_relative_deg": 0,
+          "yaw_end_relative_deg": 3.0210941528831903,
+          "net_yaw_deg": 3.0210941528831903,
+          "max_excursion_from_stop_deg": 3.045328386553509,
+          "yaw_slope_deg_s": 7.256438003181523,
+          "max_abs_root_qvel_z_rad_s": 0.3309306746438033
+        },
+        {
+          "start": 14.5,
+          "end": 15,
+          "yaw_start_relative_deg": 3.0025032229972464,
+          "yaw_end_relative_deg": 2.8623178276174066,
+          "net_yaw_deg": -0.14018539537983976,
+          "max_excursion_from_stop_deg": 3.0025032229972464,
+          "yaw_slope_deg_s": -0.18242076499677584,
+          "max_abs_root_qvel_z_rad_s": 0.019808957607800663
+        },
+        {
+          "start": 15,
+          "end": 16,
+          "yaw_start_relative_deg": 2.860013819828101,
+          "yaw_end_relative_deg": 2.8736856056486904,
+          "net_yaw_deg": 0.013671785820589477,
+          "max_excursion_from_stop_deg": 2.8736856056486904,
+          "yaw_slope_deg_s": 0.01815492587521661,
+          "max_abs_root_qvel_z_rad_s": 0.003945467589538429
+        },
+        {
+          "start": 16,
+          "end": 20,
+          "yaw_start_relative_deg": 2.873974957826256,
+          "yaw_end_relative_deg": 2.7512579838414357,
+          "net_yaw_deg": -0.1227169739848204,
+          "max_excursion_from_stop_deg": 2.8745627515603065,
+          "yaw_slope_deg_s": -0.0328743955529386,
+          "max_abs_root_qvel_z_rad_s": 0.0018479037887718913
+        },
+        {
+          "start": 20,
+          "end": 26,
+          "yaw_start_relative_deg": 2.7506366957799457,
+          "yaw_end_relative_deg": 2.6004335202603936,
+          "net_yaw_deg": -0.1502031755195521,
+          "max_excursion_from_stop_deg": 2.7506366957799457,
+          "yaw_slope_deg_s": -0.024959823067870462,
+          "max_abs_root_qvel_z_rad_s": 0.0005438641103144848
+        },
+        {
+          "start": 26,
+          "end": 36,
+          "yaw_start_relative_deg": 2.6000442608235907,
+          "yaw_end_relative_deg": 2.4334274430988074,
+          "net_yaw_deg": -0.16661681772478332,
+          "max_excursion_from_stop_deg": 2.6000442608235907,
+          "yaw_slope_deg_s": -0.01652848283182497,
+          "max_abs_root_qvel_z_rad_s": 0.00033977934827117
+        }
+      ],
+      "minmax_base_height_m": [
+        0.5646713304306871,
+        0.5716655264303098
+      ]
+    }
+  },
+  "resolved_findings": [
+    {
+      "id": "F6",
+      "finding": "primary parking yaw was measured but not gated",
+      "actual_counterexample": "absolute5deg yaw in parking post-stop arrays returned passed:true",
+      "closure": "parent adds stop_yaw using frozen1deg criterion; exact relative5deg now returns passed:false/stop_yaw:false; real candidate .624338deg passes",
+      "status": "closed"
+    }
+  ],
+  "important_limits": [
+    "Leg outputs are supervised preservation targets, not bitwise invariants: shared third hidden layer and all final rows change. Measured idle leg RMSdelta.00668749 and nonidle output RMSdelta.00942281; physics regression provides practical fixed-state evidence only.",
+    "Global final-two-layer changes can affect unmeasured observations. Masks do not create runtime guarantees. Commands below abs.05 intentionally treated as nearzero for supervision.",
+    "Four extra motion commands run only one heading/flat geometry for36s; lateral still fails yaw. No all-command/all-heading claim.",
+    "Moving stairs peak impact rises10.56% vsbaseline, within frozen15% allowance. Cumulative event energy per meter rises.48%; neither metric proves whole-gait equality.",
+    "Checkpoint keeps original critic/preservation_reference_actor/preservation_updates/iter257100. Cleared optimizer moments and actor fitting do not certify fresh PPO resume. Future train should explicitly init/preserve selectedactor.",
+    "Fitting metadata has paths rather than original filehashes; independent receipt freezes all12 hashes and delivered reproduction manifest records hashes.",
+    "Read-only reviewer independently re-executed inference/array judgments and injected counterexamples; did not rerun physical simulation."
+  ],
+  "untested": [
+    {
+      "name": "future candidate edits or refits",
+      "reason": "receipt applies only to pinned actor/SHA and current reviewed scripts"
+    },
+    {
+      "name": "randomized headings/terrain/friction or slope stopping",
+      "reason": "outside fixed and four extra physical cases"
+    },
+    {
+      "name": "full all_terrain completion and all moving gait defects",
+      "reason": "outside current requested stationary/parking scope"
+    },
+    {
+      "name": "real robot/GPU/Isaac training",
+      "reason": "not reviewer authorization"
+    },
+    {
+      "name": "fresh reviewer physical replay",
+      "reason": "used actual saved full physical records with real judge and independent checks"
+    }
+  ],
+  "commands": [
+    "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 PYTHONDONTWRITEBYTECODE=1 CUDA_VISIBLE_DEVICES='' /home/ubuntu/miniconda3/envs/m20_wzh/bin/python scripts/tools/finetune_idle_stop_wheels.py --help",
+    "Same single-thread Python via stdin: torch.load baseline/final, compare all state tensors/optimizer, rebuild78465real+augmentation samples and recompute three error RMS; mask12boundary probes",
+    "Same CPU Python via stdin: read15real observation+action+full archives; map XMLnamedjoint order; verifyphysical qpos/qvel and actual actor outputs afterstartup blend",
+    "Same CPU Python via stdin: execute actual judge.py distilled_round5 and judge_extra.py via runpy, redirect stdout and intercept Path.write_text in memory; compare saved judgments",
+    "Same CPU Python via stdin: force9negative/nominal actual-judge counterexamples in memory; assert each acceptance/rejection",
+    "Same CPU Python via stdin: re-execute patched stopping-yaw judge onnominal and exact5deg relative-yaw negative; assert nominalgreen/negative red",
+    "Same CPU Python via stdin: unwrap actual lateral freejoint quaternion yaw and compute14.02–14.5,14.5–15,15–16,16–20,20–26,26–36 segmentnet/slopes",
+    "Same CPU Python via stdin: actual main-script reproduced actor vs evaluated actor bitwise tensor comparison; deliveredfile SHA and12copiedinputhash comparison"
+  ],
+  "verification_harness_issues": [
+    {
+      "finding": "initial lateral yaw diagnostic one-line expression had unmatched parenthesis",
+      "classification": "review probe syntaxerror; fixed/re-executed successfully before conclusions; no product defect"
+    }
+  ],
+  "counts": {
+    "passed": 11,
+    "failed": 1,
+    "skipped": 5,
+    "empty_run": 0,
+    "cannot_decide": 0
+  },
+  "mutations": "only review_round4.json; no source/evaluation edits, installs, GPU/Isaac/physics or training startup",
+  "reviewed_at_CST": "2026-10-12T13:02:52.333537+08:00",
+  "reviewed_physical_archive_sha256": {
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/baseline_仅w_原部署回放.npz": "4eed9224f51fb5cbdd60196000d6a4ded88d6d73ab59451af685515d18544a81",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/baseline_仅w_操作条件.json": "ef7ec666e3f82fb339b935a8c07a039fe8ebb298804d6292da9a696098958066",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/baseline_平地启停_原部署回放_quiet.npz": "1b133b9f8431cbb16c9308740885130d0050f04633c89647d308db6dac6f82cb",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/baseline_平地启停_姿态.npz": "26044e17e9cd73d5ee5f133ef6b299ff8fdd4e43cc06fdbba6c07a2c27716548",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/平地启停_full.npz": "cacce6d19f49cc7a4dbebd154ff5d1072cfba2b0f1626d86d250e5de1f876275",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/零命令_full.npz": "70d910c60157262de1c30721bc89af1f1f5edd11fc478f05dc3b889e1255489f",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/baseline_零命令_姿态.npz": "0881e4622d6a81b7c4563ae1031e73c7cb13971d4c87aef9ed107550fd3f432d",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/仅w_full.npz": "48f8b1853063e7cc73479bc2d5687fd103ee303e4aed2f5ec2bec42ba54f084d",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/baseline_仅w_原部署回放_quiet.npz": "7cc4ba2c6aab50f6c901b8f1b1152626ea21df10c1ae69ed793e28952ba78313",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/baseline_零命令_操作条件.json": "70ed7653c60d86c0e98314e52adde4f393fd7ea061ef79e8fdacf5817942865b",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/baseline_零命令_原部署回放_quiet.npz": "af89258683e23c7cbbc9b15bd5e9a6e4fa6d503b02253a4c54fe93d8c6b53b52",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/baseline_平地启停_操作条件.json": "58507d76f3f9f8984643ea7913f8c7b04c93bb2a6141f788a70a71de1d1439a8",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/baseline_零命令_原部署回放.npz": "8232cd513ddc29b70d2add059aae3244bfb10ea1ab723e62d568d807ece3afa2",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/baseline_平地启停_原部署回放.npz": "1b390f9cf624514c9973972f5ed8ec0cc47b247a479b80c5c68034d8a27a96fd",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/baseline/baseline_仅w_姿态.npz": "4662054b94a2062ff788a776e17fc5634a5d0162bdd5e02c1c9734a8663e3e8f",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/distilled_round5_零命令_原部署回放_quiet.npz": "058f1b1f8ee903be188e8d2ba763c085bdead8c9c8639f42b676f2bf35e04019",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/distilled_round5_平地启停_原部署回放_quiet.npz": "bfa172c8a11ae5827a1d4b84e230633968b85c5c59add5e1cdf0ec2686cecf3f",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/零命令_inputs.npz": "b34ef962685c087536c2c109ee7edf786f6b377d1859142542072031cbe0c3e6",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/仅w_inputs.npz": "8c0370b252879b1fb562303d98371af2a5bca2dd7a661d8cd8e362735f27cd9e",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/distilled_round5_平地启停_姿态.npz": "a2655ed944a59d1a2b38feba269cffb18dcb5f00c7e58034f6633decbf882372",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/distilled_round5_零命令_原部署回放.npz": "2f8ee422f4e287651ac4fc50288b56607d8fdc05cde4ded1788ef2d42e8f5fe7",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/distilled_round5_仅w_姿态.npz": "ca5ffb81d2cf0ba95a0ddf03c330283bc6b98e520ac0dcb292a6a5f0bd2c2449",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/distilled_round5_平地启停_操作条件.json": "03403cde3f18eec77b0eb598826533c89cb9b9d62422b11d8c7042bb42d6ee92",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/distilled_round5_仅w_原部署回放.npz": "85b480edd680020b7e054d073887b21a4542267235c7e104b59a60249c210ec6",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/distilled_round5_零命令_操作条件.json": "3dc82cbf2860473113856b9b4226d56a3a04d5dcd2a6b794ff79f720bd295852",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/平地启停_full.npz": "73c10d54f30c13b88bc5f49c86aa08c80eee45854ec4fa7f37d0a93e2caa1ad5",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/零命令_full.npz": "650d4dbb8fdd12a0e4ba0ba75d6ac3043a9a990399f70e53e8b69178b8549d4d",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/distilled_round5_平地启停_原部署回放.npz": "c0a38e2d2f383592c2156eb5d1acbe88de0a8b0a7d0ecf4891d932fa43a06ea5",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/仅w_full.npz": "f7f9077f61f996a2c92c9190bb59cd8a2ee932c007094c9f5db79d9d37dd1d6d",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/平地启停_inputs.npz": "0b3c9f3412db5362a001082c47dbf9fb4c7b440cb4fee08542361b9b0187d317",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/distilled_round5_零命令_姿态.npz": "129f1930b0e4c8ec17ca905255d9dec0f3fe83c7fe1d6e94553652149f5b417a",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/distilled_round5_仅w_原部署回放_quiet.npz": "cc38b024b05ef1cc48358b1ea97a56645e73ffaeabfa2c8a2ed1f841acb59af2",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/distilled_round5/distilled_round5_仅w_操作条件.json": "9518fb8d254c57ace34f0c0f34440671337fd79c81487608a9c636392637733b",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_turn_原部署回放.npz": "3e221b27be0282949b67a534be29238af0e6ba510d333ee02c071142df9e3960",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_lateral_原部署回放.npz": "a52deb28baa5ff605e456a877b527d24c31cb683f892d48c90d936c11c2f99f7",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_slow_原部署回放_quiet.npz": "626480081ccde8a46f9f5d9d9b23071d7e19a1d011cb4734f53ad098f5734a19",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_turn_原部署回放_quiet.npz": "97dc8bcb1abd01e5e3aaf2ee7c51e4141fd57b5c83ad04f0ec061e26f2b1652e",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_lateral_姿态.npz": "1b3b0a7b9913094ade6f71b8cc03f1ffbc3bf3d6fe81f381856206034bee42fc",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_slow_原部署回放.npz": "ebeaa47b3d2b4f970e18e9255f76f97b3713b14a0e27c286c8fdcb69280786ab",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/slow_full.npz": "3af273e3bdf4dafcc8cd532a16507537b66e363fb5716a79f9fb80d6ac6d41f8",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_slow_操作条件.json": "df6e115611002a292f165f72a24a28bb5a736a07193a0fa8f0cc8f5562ee7a68",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_reverse_原部署回放_quiet.npz": "69a495df0ca7cae5cae47068dded75bd1af031ecdc1f06540f66c2bd41fc661e",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_reverse_原部署回放.npz": "93f47517eb84a721457825e3d526ddf9b1c12aef94a8de77c1c78bada1bb8fb3",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_reverse_姿态.npz": "3098fea97e234d5bd432e11e3672e8ba83f1bea8adf25e7dda415af9415c245c",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_reverse_操作条件.json": "99bc1759c63bc2621b55dba52a3ff518c85fb7a9105ca8215d0a2928357d1856",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/reverse_full.npz": "ebc5f863c05e09f64b0258cedd36089070735252b2b4519f28e67a1a2ea42daf",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/lateral_full.npz": "b846d222bd02119ab093ff29cb5cbbceeab7701d4776df50a0ece1dd6fad9aea",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_turn_操作条件.json": "23a3b5ebaf2d18a13f610de08c4092526c4063e3351562d88f2d2770d3ffe186",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_lateral_原部署回放_quiet.npz": "efe76b5a7290c651efb93429da8c8dbc1fd50e4ffa735cb6419acc0e4b119b7b",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/turn_full.npz": "e2431af1c28b84a92b8252bbc93128e0fc30dfc7d787cd91e21a6b30eaee8d9d",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_turn_姿态.npz": "5f4b49eac81186de5666bf1c6e11f41f9cef274053ef97bd0b1814d6eae5f718",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_slow_姿态.npz": "d13adf263aaab3fb0e5979f50771c884d4c70f0f6bd51fa0b11fa62472501b36",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_baseline/extra_baseline_lateral_操作条件.json": "cea3d5da97e5d1d9240af93c15be745656d4aa6ef087cdc6dc2652ae4c93eb86",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_lateral_操作条件.json": "80902a41cf1a9fbc0e57eef4a5e8a7bd767399d4a776de5232e73f70a03c9b45",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_turn_原部署回放_quiet.npz": "ebcca1d92a2dcfeda9384a3374e2e2eba0782c30a2d10d5fa0273733490195d7",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_turn_原部署回放.npz": "1c4bb76eef7c89bd632456b5e362d66c82dd459290416afb738c266f566bf827",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/slow_full.npz": "af962052b390f70cdbae68c72787d156261fe8a6964cbce2e2f72b278a105068",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_reverse_原部署回放_quiet.npz": "e68be96ea54ee15f588a7cfc6178153ab1f4def12d682cb728bbbdfb302d202f",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_turn_姿态.npz": "2ec47129cac5eefe5c1e7d003df9a0331fd72aa2aa5cfb95121e408f402d1a6f",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_reverse_姿态.npz": "773be577faf401e8fb59387689cfdc1fc71b36ca6b078bc89d6ab982dcb2aa6f",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_reverse_操作条件.json": "17ecbee6bd6770f1e6d7e570ec49c0408152306615118cbaf9fbdb057b238c6b",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_turn_操作条件.json": "6c52ac4be9ae0440f1c58ca7541794a11b5c242dff73730a26be19800f61ea3a",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/reverse_full.npz": "f7df72a2401f3f8439a37283dfae1190171b78d0d65cb30113c9013dff33b6a3",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_lateral_原部署回放.npz": "b2000f83115b1bf1c0dbdc0f5a4b381edd8b590919e5cbeb18134b11f0ee950e",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/lateral_full.npz": "d530799d9bf1b7f1fab30733296ca6cf7683a96a2698740e85237a121e1d546a",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_lateral_原部署回放_quiet.npz": "fa6b989187ff7595d0d46d057e506575a955e06ea6b565babc88d1e9064140f8",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/turn_full.npz": "605b0972077896485a9cfa1c366e1dbaac816ce998b653b1202f2fdc12942976",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_slow_原部署回放.npz": "e5bad27b0ea89a4570e2057a18236b416c5a8855c4149b1853a822919f42074b",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_slow_姿态.npz": "117bcc99d8b52adb5ee3f7fa328f3f55a11b5d191772678df4c8a67d6dbc6a9f",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_slow_原部署回放_quiet.npz": "dd41fd4358d7159345d43948f9799bd17d667e41b40ba022c5fefa09617bdf6f",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_lateral_姿态.npz": "ab816985956f178c26666f3b14ae1e36319be6361d4486eb3cf74db6518bed8d",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_slow_操作条件.json": "54b8f9f00233d0dbb9846662950dfdfeadfe9315032bb46b6ce1127cd9d13825",
+    "/home/ubuntu/cyq_shixi_projects/rl_training/.scratch/idle_stop_20261012/evaluations/extra_round5/extra_round5_reverse_原部署回放.npz": "be0c3474f3dca0c0a6ad84cfbd976fa4ebb5ed910cdcb06a5e94d44f444f48f4"
+  }
+}

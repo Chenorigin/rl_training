@@ -19,7 +19,7 @@
     <!-- start_x：第一段地形起点的世界 X 坐标。 -->
     <numeric name="start_x" data="0.25"/>
     <!-- step_height：单级台阶高度；测试训练范围可改 0.10 至 0.25。 -->
-    <numeric name="step_height" data="0.15"/>
+    <numeric name="step_height" data="0.17"/>
     <!-- tread_depth：水平踏面深度；step_count：级数，正整数。 -->
     <numeric name="tread_depth" data="0.30"/>
     <numeric name="step_count" data="20"/>

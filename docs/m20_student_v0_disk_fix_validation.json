@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-12",
+  "problem": "TensorBoard ENOSPC during user-started v0 training; startup-only free-space check missed later disk consumption",
+  "user_released_file_gb": 56,
+  "root_free_bytes_at_delivery": 40550203392,
+  "original_run_preflight_free_bytes": 13075963904,
+  "original_run_total_bytes_approx": 167772160,
+  "complete_checkpoint": "logs/rsl_rl/deeprobotics_m20_student_v0/2026-10-12_22-02-56_675354_student_v0_stage_a/model_400.pt",
+  "completed_updates": 401,
+  "checkpoint_cpu_load_finite": true,
+  "cpu_tests_passed": 18,
+  "cpu_tests_scope": "Synthetic tensor-only unit fixtures, including real TensorBoard writes, atomic checkpoint failure, low-space recovery and exception cleanup; no robot-policy formal training",
+  "isaac_resume_inference": {
+    "task": "Rough-Deeprobotics-M20-Student-v0",
+    "num_envs": 64,
+    "steps": 4,
+    "observation_shapes": {
+      "policy": [
+        64,
+        618
+      ],
+      "critic": [
+        64,
+        618
+      ],
+      "teacher": [
+        64,
+        244
+      ]
+    },
+    "clean_warm_start_max_error": null,
+    "weights_unchanged": true,
+    "optimizer_updates": 401,
+    "teacher_requires_grad": false,
+    "optimizer_updates_this_validation": 0,
+    "max_map_age_s": 0.07999999821186066,
+    "valid_fraction_range": [
+      0.8206885457038879,
+      0.8465909361839294
+    ],
+    "trained": false,
+    "cuda_peak_allocated_bytes": 105199616
+  },
+  "preflight_low_disk_negative_exit_code": 1,
+  "preflight_failed_before_cuda_isaac_or_output_directory_creation": true,
+  "independent_review": {
+    "family": "Codex",
+    "same_family": true,
+    "resolved": "Generic exception cleanup including ValueError/RuntimeError/KeyboardInterrupt; independent 18-test rerun passed"
+  },
+  "changed_files_sha256": {
+    "docs/m20_student_v0.md": "05300f39267daf62a7edb8620703e456cbc87547fc7cfa629d0a43de9f367974",
+    "scripts/reinforcement_learning/rsl_rl/distill_student.py": "2e967d4da56517f2de10a7f44b994c5de21029a8a939b4b5128c68f8db97ce72",
+    "source/rl_training/m20_student_v0/disk_runner.py": "1da6757890779453b1fce80143714b27e97c5ea683664eae2057758f81877db6",
+    "source/rl_training/m20_student_v0/output_storage.py": "f00c7f2331a5fd790a96cbba73ab1da8b7507be695be6ca86b4fcc61bb780bea",
+    "tests/test_student_v0_output.py": "4e30d73a7f53ee805a628645c198c7faadf4ee0c7f065fa029a9eb31c879d3d4"
+  },
+  "original_files_backed_up": ".scratch/student_v0_disk_fix_20261013/baseline",
+  "formal_training_or_resume_started_by_agent": false,
+  "existing_training_outputs_deleted_or_moved": false,
+  "further_runtime_tests_stopped_at_user_request": true,
+  "not_performed": [
+    "Formal training restart/resume",
+    "Root-cause attribution of other disk consumers",
+    "Repair of secondary disk reporting directory I/O error"
+  ]
+}

@@ -13,11 +13,17 @@ from rsl_rl.storage import RolloutStorage
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT/'source/rl_training'))
-import importlib.util
-spec = importlib.util.spec_from_file_location("stair_guarded_ppo", ROOT/"source/rl_training/rl_training/stair_guarded_ppo.py")
-module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(module)
-StairGuardedPPO = module.StairGuardedPPO
+import ast
+import math
+from torch import nn
+from rsl_rl.algorithms import PPO
+source = ROOT / "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/agents/stair_teacher_ppo_cfg.py"
+nodes = [node for node in ast.parse(source.read_text()).body
+         if isinstance(node, ast.ClassDef) and node.name == "StairGuardedPPO"]
+assert len(nodes) == 1
+scope = {"copy": copy, "math": math, "torch": torch, "nn": nn, "PPO": PPO}
+exec(compile(ast.Module(body=nodes, type_ignores=[]), str(source), "exec"), scope)
+StairGuardedPPO = scope["StairGuardedPPO"]
 from check_gait_safety import load
 
 
@@ -97,6 +103,34 @@ def main():
          'actual_ppo_losses':losses,'reference_frozen':True,'checkpoint_auxiliary_state_restored':True,
          'std_growth_capped':True,'crossing_no_repeat_bypass_retreat_front_only_collapse_or_inversion':True}
     out['legacy_resume_restores_guards_and_honors_fixed_lr']=True
+    tagged = obs.clone()
+    tagged['descent_entry_mask'] = torch.tensor([[1.], [0.], [1.], [0.], [0.], [0.], [0.], [0.]])
+    a4,c4=models(tagged)
+    scoped=StairGuardedPPO(a4,c4,RolloutStorage('rl',8,4,tagged,[16]),
+        actor_update_mask_key='descent_entry_mask',entropy_coef=0.,critic_warmup_iterations=0)
+    scoped.set_reference(copy.deepcopy(a4.state_dict()))
+    per_sample=torch.arange(8.).requires_grad_()
+    scoped._surrogate_mean(per_sample,tagged).backward()
+    assert torch.equal(per_sample.grad,torch.tensor([.5,0.,.5,0.,0.,0.,0.,0.]))
+    tagged['descent_entry_mask'].zero_()
+    all_off=torch.ones(8,requires_grad=True)
+    scoped._surrogate_mean(all_off,tagged).backward()
+    assert torch.equal(all_off.grad,torch.zeros(8))
+    for bad in (torch.full((8,1),float('nan')),torch.ones(8),torch.full((8,1),.5)):
+        tagged['descent_entry_mask']=bad
+        try:scoped._actor_update_mask(tagged)
+        except ValueError:pass
+        else:raise AssertionError('Invalid actor update mask accepted')
+    out['entry_only_task_gradient']=True
+    out['empty_entry_batch_zero_task_gradient']=True
+    out['invalid_entry_masks_rejected']=True
+    tagged['descent_entry_mask']=torch.zeros(8,1)
+    with torch.no_grad():scoped.actor.mlp[-1].bias.add_(.1)
+    outside_anchor=float(scoped._anchor_loss(tagged))
+    tagged['descent_entry_mask'].fill_(1.)
+    inside_anchor=float(scoped._anchor_loss(tagged))
+    assert abs(outside_anchor/inside_anchor-10.) < 1e-4
+    out['outside_entry_anchor_not_relaxed_on_other_stairs']=True
     args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(out))
 
 

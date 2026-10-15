@@ -1,0 +1,140 @@
+{
+  "policy_path": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/models/student_v0_21000/student_v0.pt",
+  "policy_sha256": "8d98d2d623555bdf0f86f3445da261b4c72383c0c99e17d8e6dd4c9ae907a97b",
+  "policy_source_state_key": "torchscript",
+  "model_path": "/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+  "model_xml_sha256": "98ac70602d930dac0f0b65124309c59c9c98cca9186f071262981e0e32bceb7a",
+  "mujoco_version": "3.10.0",
+  "terrain": {
+    "terrain": "flat",
+    "terrain_xml": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/flat.xml",
+    "terrain_parameters": {
+      "width": [
+        4.0
+      ],
+      "friction": [
+        1.0,
+        0.01,
+        0.01
+      ],
+      "spawn_xy": [
+        -1.0,
+        0.0
+      ],
+      "spawn_yaw_deg": [
+        0.0
+      ],
+      "goal_x": [
+        5.0
+      ]
+    },
+    "goal_x": 5.0,
+    "course_width": 4.0
+  },
+  "model_physics_summary": {
+    "total_mass_kg": 34.525856000000005,
+    "actuators": 16,
+    "robot_collision_geoms": 27,
+    "joint_order": [
+      "fl_hipx_joint",
+      "fl_hipy_joint",
+      "fl_knee_joint",
+      "fr_hipx_joint",
+      "fr_hipy_joint",
+      "fr_knee_joint",
+      "hl_hipx_joint",
+      "hl_hipy_joint",
+      "hl_knee_joint",
+      "hr_hipx_joint",
+      "hr_hipy_joint",
+      "hr_knee_joint",
+      "fl_wheel_joint",
+      "fr_wheel_joint",
+      "hl_wheel_joint",
+      "hr_wheel_joint"
+    ]
+  },
+  "noise_profile": "train",
+  "perception": {
+    "level": 0.25,
+    "height_noise_std": 0.02,
+    "height_bias_std": 0.015,
+    "xy_bias_std": 0.015,
+    "yaw_bias_std": 0.01,
+    "point_dropout": 0.03,
+    "occlusion_probability": 0.3,
+    "occlusion_width_m": 0.4,
+    "occlusion_height_m": 0.3,
+    "occlusion_hold_s": 0.5,
+    "map_update_period_s": 0.1,
+    "max_delay_s": 0.06,
+    "packet_dropout": 0.05,
+    "max_map_age_s": 0.3,
+    "variance_growth_per_s": 0.001,
+    "confidence_reference_std": 0.05,
+    "confidence_age_tau_s": 0.5
+  },
+  "sensor_extras": {
+    "lidar_visibility": false,
+    "sensor_offset_body_m": [
+      0.1,
+      0.0,
+      0.15
+    ],
+    "gyro_std_rad_s": 0.0,
+    "gravity_tilt_std_rad": 0.0,
+    "joint_position_std_rad": 0.0,
+    "joint_velocity_std_rad_s": 0.0,
+    "action_delay_steps": 0,
+    "blackout_start_s": 3.0,
+    "blackout_period_s": 8.0,
+    "blackout_duration_s": 0.0
+  },
+  "confidence_pose_covariance_included": false,
+  "map_model": "training synthetic delayed patches + optional geometric terrain visibility; no beam scan, self-shadow or multi-frame fusion",
+  "seed": 42,
+  "controller": "student_only",
+  "teacher_executed_fraction": 0.0,
+  "weights_updated": false,
+  "physics": "closed loop mj_step",
+  "physics_dt_s": 0.005,
+  "policy_dt_s": 0.02,
+  "friction_scale": 1.0,
+  "command": [
+    0.5,
+    0.0,
+    0.0
+  ],
+  "warmup_s": 0.0,
+  "track_course": false,
+  "duration_s": 0.10000000000000002,
+  "control_steps": 5,
+  "wall_time_s": 0.009188398020341992,
+  "fell": false,
+  "first_fall_time_s": null,
+  "ever_outside_course": false,
+  "end_base_position": [
+    -0.9996128311448981,
+    -0.000837321818772408,
+    0.5672648421334259
+  ],
+  "end_tilt_deg": 0.3854839360704592,
+  "end_base_ground_clearance_m": 0.5672648421334259,
+  "net_xy_distance_m": 0.0009225007049066522,
+  "velocity_xy_rmse_m_s": 0.5023839394458208,
+  "velocity_yaw_rmse_rad_s": 0.03544027499731556,
+  "tilt_p95_deg": 0.24709380398170813,
+  "valid_fraction_mean": 0.8385026737967914,
+  "all_unknown_frames": 0,
+  "confidence_valid_mean": 0.942112386226654,
+  "lidar_visible_fraction_mean": 1.0,
+  "blackout_frames": 0,
+  "action_abs_max": 1.2458007335662842,
+  "action_clipped_fraction": 0.0,
+  "evaluation_limit": "single seed fixed-command episode; crossing does not prove obstacle traversal or real-world capability",
+  "crossed_finish": false,
+  "inside_course": true,
+  "cleared_terrain": false,
+  "cleared_stairs": false,
+  "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked"
+}

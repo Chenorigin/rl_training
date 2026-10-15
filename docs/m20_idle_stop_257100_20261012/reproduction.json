@@ -1,0 +1,6 @@
+{
+  "actor_every_tensor_bitwise_equal": true,
+  "script": "scripts/tools/finetune_idle_stop_wheels.py",
+  "trained_steps": 8000,
+  "seed": 42
+}

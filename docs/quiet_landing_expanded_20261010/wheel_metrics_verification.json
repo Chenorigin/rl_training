@@ -1,0 +1,13 @@
+{
+  "physical_samples": 600,
+  "trajectory_max_differences": {
+    "root_pos": 0.0,
+    "root_quat": 0.0,
+    "observation": 0.0,
+    "action": 0.0
+  },
+  "distance_m": 1.39057457447052,
+  "energy_definition": "0.5 * wheel_body_mass * post_step_center_speed_squared; translation only",
+  "desktop_manual_verification": false,
+  "rk4_supported": false
+}

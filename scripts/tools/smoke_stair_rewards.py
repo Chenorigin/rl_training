@@ -65,13 +65,14 @@ def main():
                      'stair_descent_rear_fold_cost', 'stair_ascent_front_fold_cost',
                      'stair_ascent_direction_cost',
                      'stair_rear_wheel_lift', 'stair_descent_rear_forward_cost',
+                     'stair_descent_interleg_clearance_cost',
                      'stair_ascent_front_body_clearance_cost',
                      'turn_swing_size_cost', 'rotation_gait_status', 'feet_air_time_ang_z_M20')
     unified_bindings = {name: base.reward_manager.get_term_cfg(name).func.__module__ for name in unified_names}
     assert all(module == canonical_module for module in unified_bindings.values()), unified_bindings
     term_peak = torch.zeros(len(base.reward_manager.active_terms), device=base.device)
     binding = {}
-    for name in ('stair_descent_rear_fold_cost', 'stair_ascent_front_fold_cost', 'stair_ascent_direction_cost', 'stair_rear_wheel_lift', 'stair_descent_rear_forward_cost', 'stair_ascent_front_body_clearance_cost', 'turn_swing_size_cost', 'rotation_gait_status', 'track_lin_vel_xy_exp'):
+    for name in ('stair_descent_rear_fold_cost', 'stair_ascent_front_fold_cost', 'stair_ascent_direction_cost', 'stair_rear_wheel_lift', 'stair_descent_rear_forward_cost', 'stair_descent_interleg_clearance_cost', 'stair_ascent_front_body_clearance_cost', 'turn_swing_size_cost', 'rotation_gait_status', 'track_lin_vel_xy_exp'):
         term = base.reward_manager.get_term_cfg(name)
         binding[name] = {}
         for key, entity in term.params.items():
@@ -88,7 +89,9 @@ def main():
             expected = ({'asset_cfg':[f'{x}_wheel' for x in legs],
                          'hip_cfg':[f'{x}_hipy' for x in legs],
                          'knee_cfg':[f'{x}_knee_joint' for x in legs],
-                         'contact_sensor_cfg':[f'{x}_wheel' for x in legs]}).get(key)
+                         'contact_sensor_cfg':[f'{x}_wheel' for x in legs],
+                         'clearance_cfg':['fl_hipy','fr_hipy','fl_knee','fr_knee',
+                                          'fl_wheel','fr_wheel','hl_wheel','hr_wheel']}).get(key)
             if expected is not None:
                 assert (joints if key == 'knee_cfg' else bodies) == expected, (name,key,binding[name][key])
     command_term = base.command_manager.get_term('base_velocity')
@@ -138,7 +141,9 @@ def main():
                 'up_front_same_tread_fraction','up_rear_same_tread_fraction',
                 'up_front_transition_successes','up_rear_transition_successes'):
         assert tag in result['step_metrics'],tag
-    for tag in ('front_loaded_a_low_fraction','rear_forward_excess_fraction','rear_entry_samples'):
+    for tag in ('front_loaded_a_low_fraction','rear_forward_excess_fraction','rear_entry_samples',
+                'descent_entry_left_interleg_clearance_min_m',
+                'descent_entry_right_interleg_clearance_min_m'):
         assert tag in result['gait_metrics'],tag
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2)+'\n')
