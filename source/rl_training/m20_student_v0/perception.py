@@ -31,7 +31,7 @@ class StudentV0PerceptionCfg:
     map_update_period_s: float = 0.10
     max_delay_s: float = 0.06
     packet_dropout: float = 0.05
-    max_map_age_s: float = 0.30
+    max_map_age_s: float = 1.00
     variance_growth_per_s: float = 0.001
     confidence_reference_std: float = 0.05
     confidence_age_tau_s: float = 0.50

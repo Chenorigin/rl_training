@@ -26,7 +26,7 @@ class StudentV1PerceptionCfg:
     map_update_period_s: float = 0.10
     update_jitter_s: float = 0.02
     max_delay_s: float = 0.06
-    max_map_age_s: float = 0.30
+    max_map_age_s: float = 1.00
     packet_dropout: float = 0.05
     burst_probability: float = 0.02
     burst_duration_s: float = 0.30
