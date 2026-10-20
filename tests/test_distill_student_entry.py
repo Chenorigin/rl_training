@@ -26,8 +26,12 @@ class EntryTests(unittest.TestCase):
             with self.subTest(task=task):
                 args = self.args('--task', task)
                 self.assertEqual(entry.configure_run(args, {}), version)
-                self.assertEqual(args.log_root.name, 'deeprobotics_m20_student_' + version)
-                self.assertEqual(args.run_name, 'student_' + version)
+                output_version = {
+                    'Rough-Deeprobotics-M20-Student-v3': 'v3',
+                    'Rough-Deeprobotics-M20-Student-v3.5': 'v3_5',
+                }.get(task, version)
+                self.assertEqual(args.log_root.name, 'deeprobotics_m20_student_' + output_version)
+                self.assertEqual(args.run_name, 'student_' + output_version)
 
     def test_fresh_default_preserves_v0(self):
         args = self.args()
@@ -40,7 +44,7 @@ class EntryTests(unittest.TestCase):
             self.assertEqual(args.task, f'Rough-Deeprobotics-M20-Student-{version}')
 
     def test_resume_rejects_wrong_task(self):
-        for task in ('Rough-Deeprobotics-M20-Student-v1', 'Rough-Deeprobotics-M20-StudentV15-v0'):
+        for task in ('Rough-Deeprobotics-M20-Student-v1', 'Rough-Deeprobotics-M20-Student-v3'):
             with self.subTest(task=task), self.assertRaisesRegex(ValueError, 'task differs'):
                 entry.configure_run(self.args('--task', task, resume=True), self.saved('v0'))
 

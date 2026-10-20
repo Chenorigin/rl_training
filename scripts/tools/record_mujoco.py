@@ -3,10 +3,10 @@
 
 Example:
     python scripts/tools/record_mujoco.py \
-      --output .scratch/mujoco_record/ascent.mp4 -- \
+      --output logs/evaluation/mujoco_record/ascent.mp4 -- \
       --model /path/to/M20.xml --checkpoint logs/run/model.pt \
       --terrain-xml deploy/deploy_mujoco/terrains/stairs_ascent.xml \
-      --viewer --output .scratch/mujoco_record/ascent.npz
+      --viewer --output logs/evaluation/mujoco_record/ascent.npz
 
 The deployment arguments follow ``--``. Recording starts only after the
 MuJoCo viewer belonging to the launched deployment process is found, and the
@@ -38,7 +38,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        help="MP4 destination; defaults to .scratch/mujoco_record/mujoco_<timestamp>.mp4",
+        help="MP4 destination; defaults to logs/evaluation/mujoco_record/mujoco_<timestamp>.mp4",
     )
     parser.add_argument(
         "deployment_args",
@@ -119,7 +119,7 @@ def main() -> int:
 
     display = os.environ["DISPLAY"]
     output = args.output or (
-        ROOT / ".scratch/mujoco_record" / f"mujoco_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4"
+        ROOT / "logs/evaluation/mujoco_record" / f"mujoco_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4"
     )
     output = output if output.is_absolute() else ROOT / output
     output.parent.mkdir(parents=True, exist_ok=True)

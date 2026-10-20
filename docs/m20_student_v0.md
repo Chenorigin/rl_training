@@ -5,15 +5,14 @@
 ## 已实现的接口
 
 - 默认任务 `Rough-Deeprobotics-M20-Student-v0` 继承现有 Quiet Landing V1 的机器人、动作、地形、终止条件和物理步进。
-- `Rough-Deeprobotics-M20-StudentV15-v0` 使用现有 V1.5 的物理任务配置。选择与教师训练任务匹配的版本；两者具有相同的观测和动作接口。
-- 教师输入为原有本体状态与干净高程扫描；学生输入为本体状态、高程、有效性、置信度。维度、切片、网格顺序、高度参考和未知值定义统一记录在 `source/rl_training/m20_student_v0/contract.py`，每次运行都会写出 `observation_contract.json`。
+- 教师输入为原有本体状态与干净高程扫描；学生输入为本体状态、高程、有效性、置信度。维度、切片、网格顺序、高度参考和未知值定义统一记录在 `source/rl_training/task_support/student_v0/contract.py`，每次运行都会写出 `observation_contract.json`。
 - 学生是前馈 MLP，保持教师网络布局。第一层原有输入列复制教师权重，新增质量通道权重初始化为零；干净地图下可复现教师动作。
 - 教师冻结、使用确定性动作作为标签。每个 episode 选择教师或学生控制，整组动作只由一个控制器执行；教师始终在当前真实执行状态上生成标签。标签与执行前的学生观测成对保存。
 - 原生 RSL-RL 5 蒸馏 runner 使用动作 MSE 和有界 replay；一半采样来自当前 rollout，一半来自整个缓存。记录整体、腿部和轮部误差，以及教师实际执行比例。不使用 PPO 或价值网络。
 
 ## 感知退化
 
-参数的唯一配置文件是 `source/rl_training/m20_student_v0/perception.py` 中的 `StudentV0PerceptionCfg`。训练参数在 `source/rl_training/m20_student_v0/configuration.py`；任务注册通过 `agents/student_v0_distillation_cfg.py` 引用同一份配置。
+参数的唯一配置文件是 `source/rl_training/task_support/student_v0/perception.py` 中的 `StudentV0PerceptionCfg`。训练参数在 `source/rl_training/task_support/student_v0/configuration.py`；任务注册通过 `agents/student_v0_ppo_cfg.py` 引用同一份配置。
 
 当前在仿真高程扫描上模拟高度噪声、每个 episode 的持续高度/平面/偏航偏置、连续区域遮挡、点缺测、地图更新周期、传输延迟和丢包。旧地图保留采集时的世界高度及坐标，按当前机器人位置和偏航重投影；地图外和过期区域变为未知。reset 会清空旧 episode 的地图。高程、有效性和置信度共享同一张快照。
 
@@ -79,25 +78,16 @@ python scripts/reinforcement_learning/rsl_rl/distill_student.py \
 
 `OSError: [Errno 28] No space left on device` 表示输出文件系统无法继续写入。TensorBoard 报错的位置不说明模型或蒸馏 loss 有问题。释放空间后，可以从最后一个完整 checkpoint 继续；不必重新从教师初始化。
 
-现已增加运行期间的磁盘保护：每次迭代写日志前、每次保存 checkpoint 前都检查目标盘余量。保留量通过 `--min-free-disk-gb` 设置，其默认值及预算估计统一定义在 `source/rl_training/m20_student_v0/output_storage.py`。低于保留量时停止训练，并尝试在剩余空间中原子写入 `model_disk_stop_<已完成更新数>.pt`；若成功，报错消息会给出恢复路径。空间已被其它进程耗尽时，恢复保存仍可能失败，应使用之前完整的 checkpoint。
+现已增加运行期间的磁盘保护：每次迭代写日志前、每次保存 checkpoint 前都检查目标盘余量。保留量通过 `--min-free-disk-gb` 设置，其默认值及预算估计统一定义在 `source/rl_training/task_support/student_v0/output_storage.py`。低于保留量时停止训练，并尝试在剩余空间中原子写入 `model_disk_stop_<已完成更新数>.pt`；若成功，报错消息会给出恢复路径。空间已被其它进程耗尽时，恢复保存仍可能失败，应使用之前完整的 checkpoint。
 
 Checkpoint 先写入同目录临时文件并 flush/fsync，成功后原子替换目标；中途失败不会覆盖旧 checkpoint。未增加自动删除旧运行、旧模型或其它项目文件的行为。TensorBoard 在正常结束和异常退出时均会关闭，确保后台写入线程结束。
 
-已检查本次用户失败运行留下的 `model_400.pt`，其学生、教师和 replay 数据均可读取，记录已完成 401 次更新。若要完成原定总共 5000 次更新，可执行：
+从最后一个完整 checkpoint 恢复，并设置本次追加的迭代数：
 
 ```bash
-cd /home/ubuntu/cyq_shixi_projects/rl_training
-/home/ubuntu/miniconda3/envs/m20_wzh/bin/python \
-  scripts/reinforcement_learning/rsl_rl/distill_student.py \
-  --resume logs/rsl_rl/deeprobotics_m20_student_v0/2026-10-12_22-02-56_675354_student_v0_stage_a/model_400.pt \
-  --max-iterations 4599 --run-name student_v0_stage_a_resume \
-  --headless --device cuda:0
+python scripts/reinforcement_learning/rsl_rl/distill_student.py \
+  --resume 'logs/rsl_rl/deeprobotics_m20_student_v0/<run>/model_N.pt' \
+  --max-iterations 3000 --headless --device cuda:0
 ```
 
-续训保留该 checkpoint 的环境数量、教师比例和感知配置，并写入一个新运行目录。本次修复使用真实 TensorBoard 的微型 CPU 单元 fixture、低空间故障注入和原 checkpoint 的 Isaac 无梯度推理验证；没有代用户重新启动正式训练。修复记录见 `m20_student_v0_disk_fix_validation.json`。
-
-## 验证记录与范围
-
-本次实施执行了 CPU 行为测试及真实 Isaac 小规模推理检查，具体结果见同目录 `m20_student_v0_validation.json`。CPU 测试包含一个微型合成数据优化 fixture，用于验证更新、冻结教师和 checkpoint 恢复；未执行机器人策略的正式训练。
-
-本次没有执行真实雷达接入、完整地形闭环评测、长时间训练或真机部署。训练后导出的模型仍需完成这些环节，才能判定可上机。
+续训保留 checkpoint 的环境数量、教师比例和感知配置，写入一个新运行目录。存储与恢复接口的回归测试位于 `tests/test_student_v0_output.py` 和 `tests/test_student_v0.py`。

@@ -17,7 +17,7 @@
 | `mixed.xml` | 上楼、下楼、方块、上下坡和障碍条组成的连续路线 | 各地形段参数、段间缓冲距离、平台长度 |
 | `all_terrain.xml` | 全地形长路线：上下楼、上下坡、粗糙方块、错位障碍、连续障碍条、横坡、低摩擦区 | 原生 `geom` 的位置、半尺寸、旋转、摩擦；各段参数及调参公式直接标在 XML |
 | `realistic_outdoor.xml` | 园区表面近似：路缘石、混凝土接缝、建筑楼梯、修补路面、连续起伏土路、固定圆石、缓坡、湿路低抓地 | 原生几何位置/尺寸/旋转/摩擦、内嵌高度场振幅；坐标及公式标在 XML |
-| `real_world_final.xml` | 生活场景与异形综合关卡：干湿瓷砖、门槛、盲道、格栅坑洼、树根木桥，以及变阶高楼梯、半圆扇形楼梯、错位踏步、屋脊/波浪坡、V 沟、多边形踏石、S 形窄桥 | 独立原生 XML，内嵌纹理、高度场和凸网格；几何和接触参数见 XML；[说明与近景预览](../../../docs/real_world_final_20261013/README_CN.md) |
+| `real_world_final.xml` | 生活场景与异形综合关卡：干湿瓷砖、门槛、盲道、格栅坑洼、树根木桥，以及变阶高楼梯、半圆扇形楼梯、错位踏步、屋脊/波浪坡、V 沟、多边形踏石、S 形窄桥 | 独立原生 XML，内嵌纹理、高度场和凸网格；几何和接触参数见 XML |
 | `custom.xml` | 原生 MJCF 障碍示例 | 直接编辑 `worldbody` 中的 `geom`，可复制增加更多几何 |
 
 每个文件均包含公共参数：`width`、`friction`、`spawn_xy`、`spawn_yaw_deg`，并在注释中说明单位与用途。具体数值以 XML 为准。
@@ -53,8 +53,8 @@
 ```bash
 conda activate m20_wzh
 python deploy/deploy_mujoco/deploy_mujoco.py \
-  --model "/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml" \
-  --checkpoint logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-06_22-06-56_stair_resume/model_156300.pt \
+  --model /path/to/M20.xml \
+  --checkpoint /path/to/teacher/model_N.pt \
   --terrain-xml deploy/deploy_mujoco/terrains/all_terrain.xml \
   --viewer
 ```
@@ -64,7 +64,7 @@ python deploy/deploy_mujoco/deploy_mujoco.py \
 实际表面摩擦在该 XML 的命名 `default` 和局部 `geom` 中设置。
 单类楼梯的 `--stair-height/--tread-depth/--stair-count/--stair-start` 不能覆盖此综合地形。
 
-几何、高程及部署加载检查见 [全地形检查记录](../../../docs/all_terrain_20261007/README_CN.md)。
+使用上方部署命令和实际机器人 XML、checkpoint 检查地形加载。
 
 ## 园区户外测试路线
 
@@ -77,8 +77,7 @@ python deploy/deploy_mujoco/deploy_mujoco.py \
 --terrain-xml deploy/deploy_mujoco/terrains/realistic_outdoor.xml
 ```
 
-完整命令、预览和本轮加载/高程/碰撞检查见 [步态与新地形评测](../../../docs/gait_quality_20261007/README_CN.md)。
-该检查包括部署入口短时运行，尚未验证模型全路线通行能力。
+策略能否通过完整路线，需要对所选 checkpoint 单独评测。
 
 ## 控制与输出
 

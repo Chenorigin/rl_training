@@ -2,7 +2,7 @@
 
 入口是 `deploy/deploy_mujoco/deploy_student_v0.py`。使用 CPU 进行确定性学生推理，以 `mj_step` 执行物理闭环；输入 `[1,618]`，输出 `[1,16]`。不需要教师参与控制，也不会更新策略权重。
 
-本轮固定使用蒸馏运行 `2026-10-12_23-24-52_380795_student_v0_stage_a/model_21000.pt`，已将其学生网络导出到 `deploy/models/student_v0_21000/student_v0.pt`。训练继续产生的新 checkpoint 不会自动替换这份评测模型。
+本轮固定使用蒸馏运行 `2026-10-12_23-24-52_380795_student_v0_stage_a/model_21000.pt`，保留的完整模型位于 `deploy/models/student_v0/model_21000.pt`，可通过 `--checkpoint` 直接加载。训练继续产生的新 checkpoint 不会自动替换这份评测模型。
 
 ## 自己操控户外组合场景
 
@@ -10,10 +10,10 @@
 
 ```bash
 cd /home/ubuntu/cyq_shixi_projects/rl_training
-CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
 /home/ubuntu/miniconda3/envs/m20_wzh/bin/python \
   deploy/deploy_mujoco/deploy_student_v0.py \
-  --policy-jit deploy/models/student_v0_21000/student_v0.pt \
+  --checkpoint deploy/models/student_v0/model_21000.pt \
   --model '/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml' \
   --terrain-xml deploy/deploy_mujoco/terrains/realistic_outdoor.xml \
   --noise-profile student-v0 --viewer
@@ -77,23 +77,23 @@ Ubuntu X11 的 MuJoCo 窗口支持按住持续移动、松开或失焦后速度�
 
 ## 保存轨迹和批量评测
 
-在上述单回合命令后加 `--output-dir docs/my_student_test_001`，退出时保存会话摘要和压缩轨迹。输出目录必须不存在，避免覆盖前一次结果。键盘会话轨迹另含 `mode` 字段，区分趴下、起立、就绪、学生控制和阻尼阶段；`student_policy_steps` 记录实际学生控制步数。默认不指定输出目录时，不积累整段轨迹。
+在上述单回合命令后加 `--output-dir logs/evaluation/my_student_test_001`，退出时保存会话摘要和压缩轨迹。输出目录必须不存在，避免覆盖前一次结果。键盘会话轨迹另含 `mode` 字段，区分趴下、起立、就绪、学生控制和阻尼阶段；`student_policy_steps` 记录实际学生控制步数。默认不指定输出目录时，不积累整段轨迹。
 
 删除 `--viewer` 即为快速无窗口固定命令闭环；没有显式 `--steps` 时运行 1000 个控制步。窗口中的自动评测需要同时加 `--viewer --autoplay`。
 
 以下命令串行比较不同地形和观测条件。所有回合只执行学生策略：
 
 ```bash
-CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
 /home/ubuntu/miniconda3/envs/m20_wzh/bin/python \
   deploy/deploy_mujoco/deploy_student_v0.py \
-  --policy-jit deploy/models/student_v0_21000/student_v0.pt \
+  --checkpoint deploy/models/student_v0/model_21000.pt \
   --model '/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml' \
   --suite --track-course --steps 1000 \
   --suite-profiles teacher student-v1 student-v0 stress \
   --suite-terrains flat ascent descent rough \
   --suite-seeds 42 43 44 \
-  --output-dir docs/my_student_suite_001
+  --output-dir logs/evaluation/my_student_suite_001
 ```
 
 种子改变感知噪声，初始姿态和地形保持固定；clean 条件下不同种子并不产生不同的初始状态。进一步验证应覆盖不同速度、转弯、初始姿态、地形参数和物理条件。
@@ -106,28 +106,25 @@ CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
 
 ## 使用后续 checkpoint
 
-无需结束训练即可直接指定一个已经完整保存的模型：将 `--policy-jit ...` 换成 `--checkpoint logs/.../model_N.pt`。入口会拒绝 244 维教师 checkpoint。
+无需结束训练即可直接指定一个已经完整保存的模型：将上述 `--checkpoint deploy/models/student_v0/model_21000.pt` 换成 `--checkpoint logs/.../model_N.pt`。入口会拒绝 244 维教师 checkpoint。
 
 也可以只导出网络后再部署：
 
 ```bash
 /home/ubuntu/miniconda3/envs/m20_wzh/bin/python \
   deploy/deploy_mujoco/deploy_student_v0.py \
-  --checkpoint logs/你的学生运行/model_N.pt \
-  --export-only --export-dir deploy/models/student_v0_N
+  --checkpoint deploy/models/student_v0/model_21000.pt \
+  --export-only --export-dir logs/evaluation/student_v0_21000_export
 ```
 
 导出只读取学生权重并检查重载输出一致性，不创建训练 runner 或优化器。保持 TorchScript、`observation_contract.json`、`deployment.json` 同目录；后者让 `student-v1` profile 能恢复训练时的感知参数。
 
-此前自动回放的实测与限制见 [评测报告](student_v0_sim2sim_20261013/report.md)。本次键盘操控修改按用户要求没有运行仿真、训练或测试，交互行为尚未实际验证。
-
-本次双雷达视野修改仅做离线观测检查：角度边界、坐标变换、传感器原点与视线遮挡配对、实际适配器的输入形状/盲区三通道、地图缓存及过期处理、配置加载和命令行选项。未创建 MuJoCo 模型、未加载策略、未执行物理步进或训练，闭环行走效果和窗口交互跳过，留给你启动。
-
 离线检查入口（不启动仿真）：
 
 ```bash
-CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
-/home/ubuntu/miniconda3/envs/m20_wzh/bin/python tests/test_student_v0_fov.py
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 \
+/home/ubuntu/miniconda3/envs/m20_wzh/bin/python -m pytest -q -p no:cacheprovider \
+  tests/test_student_v0_deployment.py -k FovTests
 ```
 
 主配置名称映射：`teacher` 对应旧 `clean`，`student-v0` 对应旧 `realistic`，`student-v1` 对应旧 `train`。这些名称只选择感知配置，模型仍由 checkpoint 决定；旧名称和旧自定义 profile 文件保持兼容。

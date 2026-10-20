@@ -1,8 +1,0 @@
-{
-  "started_at": 1791865176.333107,
-  "script_sha256": "7dac383c6a7a838e068cd5dfcbb1167062626e23992598141591f47ae9225c6e",
-  "mujoco_version": "3.10.0",
-  "torch_version": "2.7.0+cu128",
-  "criteria_sha256": "7e609ba20c8e6a1be8c0601050ec776f454b5f9f14431fc86a98e512f0ead94b",
-  "cuda_visible": false
-}

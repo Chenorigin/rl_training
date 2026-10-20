@@ -1,0 +1,3 @@
+from m20_student_v1.v3_5_configuration import DeeproboticsM20StudentV35DistillationCfg
+
+__all__ = ['DeeproboticsM20StudentV35DistillationCfg']

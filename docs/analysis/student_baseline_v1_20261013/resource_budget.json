@@ -1,8 +1,0 @@
-{
-  "basis": "prior CPU MuJoCo sampler/student loader peak about 770 MiB; add up to 24000 frames times about 1KB numeric+Python allocation overhead within 2GiB; 11 serial runs, numeric uncompressed<=264MB, reserve output<=1GiB",
-  "limits": "single CPU process; torch/BLAS/OMP1; CUDA disabled; per-run120s simulated, total11 episodes; process wall timeout1200s",
-  "memory_available_kib": 86023580,
-  "loadavg": "3.20 3.78 3.49 6/3598 2315817",
-  "disk_available_bytes": 21620985856,
-  "gpu_memory_allocated": 0
-}

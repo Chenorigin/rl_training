@@ -15,7 +15,6 @@ from gait_metrics import GaitMetrics
 import mujoco
 import numpy as np
 import torch
-from tensordict import TensorDict
 
 
 def main():
@@ -50,6 +49,7 @@ def main():
         contract = deploy.M20Contract(model, cfg.terrain_config)
         data = mujoco.MjData(model)
         contract.reset(data)
+        heading_hold = deploy.heading_controller(contract, actor)
         metrics = GaitMetrics(contract, min_extension=args.min_extension)
         command = np.array([args.command_vx, 0, 0] if case not in {"turn_left", "turn_right"}
                            else [0, 0, 0.6 if case == "turn_left" else -0.6], dtype=np.float32)
@@ -57,9 +57,10 @@ def main():
         records = {k: [] for k in ("time", "root_pos", "root_quat", "joint_pos", "joint_vel", "command", "action", "policy_obs", "wheel_pos", "hip_pos", "wheel_ground", "contact_force")}
         fell = False
         for _ in range(args.steps):
-            obs = contract.observe(data, command, previous)
+            effective_command = heading_hold.update(data, command) if heading_hold else command
+            obs = contract.observe(data, effective_command, previous)
             with torch.inference_mode():
-                action = actor(TensorDict({"policy": torch.from_numpy(obs)[None]}, batch_size=[1])).squeeze(0).numpy()
+                action = actor(deploy.policy_inputs(obs, command, actor)).squeeze(0).numpy()
             if not np.isfinite(action).all():
                 raise RuntimeError("Nonfinite actor output")
             action = np.clip(action, -100, 100)

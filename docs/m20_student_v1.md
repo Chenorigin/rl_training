@@ -8,7 +8,7 @@ v1 使用独立环境和蒸馏算法，与 v0 共用 `distill_student.py` 入口
 
 | 改进 | 已接入的行为 | 实现位置 |
 |---|---|---|
-| 观测对齐 | Isaac 与 MuJoCo 共用 `StudentObservationState`；固定网格顺序、高度基准、坐标系、时间和上一步下发动作的定义；checkpoint/JIT 带版本化契约 | `m20_student_v1/contract.py`、`perception.py`、`environment.py`、`student_v1_adapter.py` |
+| 观测对齐 | Isaac 与 MuJoCo 共用 `StudentObservationState`；固定网格顺序、高度基准、坐标系、时间和上一步下发动作的定义；checkpoint/JIT 带版本化契约 | `task_support/student_v1/contract.py`、`perception.py`、`environment.py`、`student_v1_adapter.py` |
 | 真实视场与历史地图 | 前、后雷达分别判断视场、距离、垂直范围及高程地形遮挡；每格选最新已送达有效观测，当前盲区可保留过去观测，按各格原始时间过期 | `perception.py` |
 | 时序与噪声 | 噪声等级改变误差强度，地图周期、延迟和固定视场独立；空间相关高度、整图偏置、相对位置/航向偏置及连续漂移、成块和连续缺测、本体误差、动作延迟 | `configuration.py`、`perception.py`、`student_v1_env_cfg.py` |
 | 一致的姿态误差 | 同一 roll/pitch 估计误差同时影响投影重力和地图坡度；地图与动作队列在单环境 reset 时一起清空，其他环境历史保持 | `perception.py`、`environment.py` |
@@ -23,7 +23,7 @@ v1 使用独立环境和蒸馏算法，与 v0 共用 `distill_student.py` 入口
 
 ## 训练命令
 
-统一入口支持 `Rough-Deeprobotics-M20-Student-v0/v1` 及对应的 `StudentV15-v0/v1` task。新训练省略 task 时保留 v0 默认；续训省略 task 时读取 checkpoint 的 task，显式指定不同 task 会报错。v0 不接受 v1 专用的配置、历史、学生初始化及教师比例结束值参数，并保留原有的 512 环境上限。
+统一入口支持 `Rough-Deeprobotics-M20-Student-v0/v1` 任务。新训练省略 task 时保留 v0 默认；续训省略 task 时读取 checkpoint 的 task，显式指定不同 task 会报错。v0 不接受 v1 专用的配置、历史、学生初始化及教师比例结束值参数，并保留原有的 512 环境上限。
 
 在项目根目录和原来的训练环境中执行：
 
@@ -40,23 +40,23 @@ python scripts/reinforcement_learning/rsl_rl/distill_student.py \
   --run-name student_v1_history4
 ```
 
-`--init-student` 接受具体 checkpoint 或 run 目录。目录会在启动时固定为最新完整的 `model_N.pt`，记录路径和 SHA256。只加载模型权重，重新建立优化器、回放和课程状态。省略该选项时从教师 actor 权重扩展初始化。当前实际检查使用了 v0 的 `model_29999.pt`。
+`--init-student` 接受具体 checkpoint 或 run 目录。目录会在启动时固定为最新完整的 `model_N.pt`，记录路径和 SHA256。只加载模型权重，重新建立优化器、回放和课程状态。省略该选项时从教师 actor 权重扩展初始化。
 
 输出目录为 `logs/rsl_rl/deeprobotics_m20_student_v1/<时间>_<run-name>/`，包含资源预算、观测契约、配置、来源记录、源代码快照、TensorBoard 和 v1 checkpoint。正常结束后导出 `exported/student_v1.pt` 及配套契约。
 
 环境数可显式设置为 `--num-envs 4096`；入口不再设固定的 512 环境上限。实际启动仍检查整机内存、GPU 余量和输出盘空间。新训练默认 `algorithm.save_replay=false`：checkpoint 保存模型、教师、优化器、课程计数与来源，不重复落盘普通/关键回放；训练内存中的回放容量和采样方法保持原配置。预算由 `output_budget()` 根据实际保存策略计算。省略 `--init-student` 会从教师 actor 扩展初始化，新增有效性、置信度及历史输入列零初始化，并非随机初始化。
 
-改变环境数会增加每轮采样数和优化 minibatch 数；教师与噪声课程仍按迭代计数，不能把不同环境数下的相同 iteration 当作相同采样预算。此修改未启动训练或测量 4096 环境的实际仿真峰值。
+改变环境数会增加每轮采样数和优化 minibatch 数；教师与噪声课程仍按迭代计数，不能把不同环境数下的相同 iteration 当作相同采样预算。实际仿真峰值需按运行资源记录确认。
 
 入口先检查实际模型、资源和磁盘，再启动 Isaac。磁盘预留不足会停止并报告，不会自动删除旧文件。使用 `--log-root` 可指定另一个日志盘。资源预算是工程预留，扩大环境数前应以实际峰值校准。
 
 只想先做 CPU 权重/契约检查，可在上述命令中将 device 改为 `cpu` 并加 `--preflight-only`。它不启动仿真、不收集 rollout、不更新优化器。
 
-首次启动前也可由你添加 `--validate-only --num-envs 4` 做 Isaac 推理接线检查；此模式会物理步进和写验证记录，但不训练。此次交付未运行这个模式。
+首次启动前也可由你添加 `--validate-only --num-envs 4` 做 Isaac 推理接线检查；此模式会物理步进和写验证记录，但不训练。
 
 ## 配置、历史和续训
 
-所有噪声与课程数值的权威默认台账为 `source/rl_training/m20_student_v1/configuration.py`。`--config <JSON>` 支持 `perception`、`training`、`history_steps` 三个顶层字段；只填写需要覆盖的字段。未知字段会报错。传感器位置、垂直视场、延迟等默认值是待实测校准的工程值。
+所有噪声与课程数值的权威默认台账为 `source/rl_training/task_support/student_v1/configuration.py`。`--config <JSON>` 支持 `perception`、`training`、`history_steps` 三个顶层字段；只填写需要覆盖的字段。未知字段会报错。传感器位置、垂直视场、延迟等默认值是待实测校准的工程值。
 
 配置结构示例，不改变默认值：
 
@@ -117,6 +117,10 @@ python deploy/deploy_mujoco/deploy_student_v1.py \
 
 `student-v1` 使用 checkpoint 当时的感知参数与混合分布；`student-v0` 使用完整名义扰动；`teacher` 是理想完整观测参考，不代表真实雷达。`quality_reference` 与 `confidence` 具有相同的高度/位姿扰动，只在置信度估计误差上不同，用于成对归因。
 
+新增 `--noise-profile front_only`：以 `student-v1` 为基础，继承 checkpoint 的前方视角、噪声、延迟、混合分布和置信度参数，前雷达位置采用当前部署安装配置（参数台账见 `profiles.py`，来源为相邻项目 `m20_heightmap_ws/deploy/site.json` 的原厂安装候选，尚未独立重新标定）。扇区顶点是前雷达的 XY 位置，朝机身 yaw 对齐的 +X；仅保留前方扇形，扇形外的高度、有效性、置信度全部置零。用户已纠正：原先的近距裁剪只是为了近似雷达安装位置，故本版不额外挖掉近距区域。保留区域仍受原有缺测、遮挡、距离、过期和置信度规则约束，不强制有效。遮罩在延迟包重投影之后应用，因此转弯、移动也不会让缓存填回禁区。原有 profile 默认行为不变。旧名称 `front_only_30cm` 保持可用，执行相同的无额外盲区行为；新命令使用 `front_only`。
+
+在上面的 V1 部署命令中把 `--noise-profile student-v0` 替换为 `--noise-profile front_only` 即可。若实际安装位置不同，可用 `--profile-file` 覆盖 `front_sensor_offset_m`，部署时传入该配置文件。
+
 ## 同条件对照评测
 
 默认只生成计划，不运行物理仿真：
@@ -145,10 +149,10 @@ python scripts/tools/evaluate_student_v1.py --run-plan /实际路径/新评测�
 
 计划检查主模型 XML、地形 XML、checkpoint 和已登记代码的哈希，模型引用的外部 mesh/include 资产未递归冻结。默认初始位姿样本是种子索引的敏感性偏移，不是统计显著性的独立随机实验。原始记录应与完成率、命令跟踪及每米指标一起分析。
 
-## 已验证与尚未验证
+## 检查与适用范围
 
-25 项 v1 离线检查及 8 项既有 v0 视场回归通过。检查包括共享训练/部署观测对拍、视场/坐标变换、时序解耦、固定采集坐标重投影、逐格历史/过期、单环境 reset、本体历史、动作延迟、相对位姿质量、倾斜姿态的误差传播、置信度成对对照、分层抽样、分组/阶段损失、冻结教师、标签所有权、续训拒绝错误状态、实际 checkpoint 初始化与 JIT 对拍。验证记录见 `m20_student_v1_validation.json`。
+观测、蒸馏和部署接口的回归测试位于 `tests/test_student_v1.py`、`tests/test_student_v1_handover.py` 和 `tests/test_student_profiles.py`。接口检查不能证明全地形通行或轻盈落地性能改善，仍需用冻结配置的闭环评测判断。
 
-**此次没有启动训练，没有进行 Isaac 或 MuJoCo 闭环物理测试。** 因此不宣称 v1 的通行或轻盈落地性能已经改善。共享感知是高程图层面的 2.5D 近似，没有模拟逐束扫描、反射率、悬空结构或机身自身遮挡；真实传感器参数和质量标定仍待实测。
+共享感知是高程图层面的 2.5D 近似，没有模拟逐束扫描、反射率、悬空结构或机身自身遮挡；真实传感器参数和质量标定仍待实测。
 
 主配置名称映射：`teacher` 对应旧 `clean`，`student-v0` 对应旧 `realistic`，`student-v1` 对应旧 `train`。这些名称只选择感知配置，模型仍由 checkpoint 决定；旧名称和旧自定义 profile 文件保持兼容。

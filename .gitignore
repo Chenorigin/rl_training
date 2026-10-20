@@ -30,7 +30,7 @@ exported/
 docker/artifacts/
 *.tmp
 
-# Training checkpoints (keep local, never commit)
+# Training outputs remain local; only curated deploy/models weights are published
 **/checkpoint/
 **/checkpoints/
 *.pt
@@ -39,6 +39,7 @@ docker/artifacts/
 *.safetensors
 *.onnx
 *.jit
+!deploy/models/**/*.pt
 
 # Local worktrees and machine-specific files
 .scratch/

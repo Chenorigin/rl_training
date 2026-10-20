@@ -81,7 +81,9 @@ def freeze_plan(args):
                                   "y_offset_m": ((seed % 3)-1)*.03, "yaw_offset_rad": ((seed % 3)-1)*.03})
     source_paths = [Path(__file__), ROOT/"deploy/deploy_mujoco/deploy_mujoco.py",
                     ROOT/"deploy/deploy_mujoco/student_v1_adapter.py", ROOT/"deploy/deploy_mujoco/quiet_landing_metrics.py",
-                    *sorted((ROOT/"source/rl_training/m20_student_v1").glob("*.py"))]
+                    ROOT/"source/rl_training/m20_student_v0/__init__.py",
+                    ROOT/"source/rl_training/m20_student_v1/__init__.py",
+                    *sorted((ROOT/"source/rl_training/task_support").rglob("*.py"))]
     plan = {"version": "v1", "checkpoints": paths, "checkpoint_sha256": {name: file_hash(path) for name, path in paths.items()},
             "model": str(args.model.resolve()), "model_sha256": file_hash(args.model),
             "terrain_xml": str(terrain), "terrain_sha256": file_hash(terrain),

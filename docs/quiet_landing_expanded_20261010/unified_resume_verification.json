@@ -1,7 +1,0 @@
-{
-  "run": "logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-45-48_quiet_landing_v1_unified_resume_smoke",
-  "checkpoint": "logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-45-48_quiet_landing_v1_unified_resume_smoke/model_214701.pt",
-  "anchor_error_to_baseline": 0.0,
-  "guard_updates": 3,
-  "formal_training": false
-}

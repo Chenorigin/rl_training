@@ -6,7 +6,7 @@ from dataclasses import MISSING
 from isaaclab.managers import EventTermCfg, ObservationGroupCfg, ObservationTermCfg, SceneEntityCfg
 from isaaclab.utils import configclass
 
-from rl_training.tasks.manager_based.locomotion.velocity.mdp import stair_student
+from task_support.stair_student import perception as stair_student
 from .stair_teacher_env_cfg import DeeproboticsM20StairTeacherEnvCfg
 
 

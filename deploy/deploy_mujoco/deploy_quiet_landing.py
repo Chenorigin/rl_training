@@ -12,7 +12,6 @@ from pathlib import Path
 import mujoco
 import numpy as np
 import torch
-from tensordict import TensorDict
 
 import deploy_mujoco as baseline
 from quiet_landing_metrics import QuietMujocoMetrics, LiveSignals
@@ -53,6 +52,7 @@ def main(args):
     contract.height_scan(data)
     metrics = QuietMujocoMetrics(model, contract)
     command = np.array([args.command_x, args.command_y, args.command_yaw], dtype=np.float32)
+    heading_hold = baseline.heading_controller(contract, actor)
     metrics.command_xy = command[:2]
     previous_action = np.zeros(baseline.ACTION_DIM, dtype=np.float32)
     viewer, threads = (None, [])
@@ -68,9 +68,10 @@ def main(args):
     try:
         for step in range(args.steps):
             started = time.perf_counter()
-            observation = contract.observe(data, command, previous_action)
+            effective_command = heading_hold.update(data, command) if heading_hold else command
+            observation = contract.observe(data, effective_command, previous_action)
             with torch.inference_mode():
-                action = actor(TensorDict({"policy": torch.from_numpy(observation)[None]}, batch_size=[1]))[0].numpy()
+                action = actor(baseline.policy_inputs(observation, command, actor))[0].numpy()
             if action.shape != (16,) or not np.isfinite(action).all():
                 raise RuntimeError("Invalid quiet actor action")
             action = np.clip(action, -100., 100.)

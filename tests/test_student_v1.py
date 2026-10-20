@@ -1,4 +1,4 @@
-"""CPU-only v1 contracts. No simulator, runner.learn or optimizer.step calls."""
+"""CPU-only v1 contracts and small optimization checks; no simulator or runner.learn."""
 from copy import deepcopy
 from dataclasses import asdict
 import importlib.util
@@ -24,6 +24,7 @@ from m20_student_v1.perception import (StudentObservationState, ActionDelayQueue
 from m20_student_v1.distillation import StudentV1Distillation, grouped_loss, stratified_indices, stratum_keys
 from m20_student_v1.model_io import initialize_student, actor_from_state
 from m20_student_v1.profiles import profile_config, PROFILE_NAMES
+from m20_student_v1.symmetry import mirror_actions, mirror_observations
 from m20_student_v1.output_storage import output_budget
 from m20_student_v1 import environment as glue
 from student_v1_adapter import StudentMapAdapter, SensorExtras, load_student
@@ -524,6 +525,42 @@ class IntegrationTests(unittest.TestCase):
         del cfg["algorithm"]["save_replay"]
         legacy = output_budget(cfg, 4096, 10000, StudentV1PerceptionCfg())
         self.assertEqual(legacy["checkpoint_estimate_bytes"], full["checkpoint_estimate_bytes"])
+
+
+class SymmetryTests(unittest.TestCase):
+    def test_reflection_involution_and_map_axis(self):
+        for dim in (244, 618, 789):
+            x = torch.arange(dim, dtype=torch.float32)[None]
+            self.assertTrue(torch.equal(mirror_observations(mirror_observations(x)), x))
+            y = mirror_observations(x)
+            self.assertEqual(y[0, 57], x[0, 57+170])
+            self.assertEqual(y[0, 6], x[0, 6])
+            self.assertEqual(y[0, 7], -x[0, 7])
+            self.assertEqual(y[0, 8], -x[0, 8])
+        a = torch.randn(5, 16)
+        self.assertTrue(torch.equal(mirror_actions(mirror_actions(a)), a))
+
+    def test_actual_update_uses_mirror_gradient(self):
+        def run(weight):
+            torch.manual_seed(23)
+            obs = TensorDict({"policy": torch.randn(4,789), "teacher": torch.randn(4,244)}, batch_size=[4])
+            cfg = DeeproboticsM20StudentV1DistillationCfg().to_dict()
+            models=[]
+            for key in ("student", "teacher"):
+                m = dict(cfg[key]);m.pop("class_name");m["hidden_dims"]=[16,8]
+                models.append(MLPModel(obs, cfg["obs_groups"], key, 16, **m))
+            alg = StudentV1Distillation(*models, RolloutStorage("distillation",4,1,obs,[16],"cpu"),
+                  num_learning_epochs=1, batch_size=4, replay_rollouts=1, hard_replay_rollouts=1,
+                  symmetry_loss_weight=weight)
+            alg._append("replay",obs["policy"],torch.randn(4,16),torch.zeros(4,4,dtype=torch.long),torch.zeros(4,dtype=torch.bool))
+            alg.rollout_samples=4;alg.executed_total=4
+            stats=alg.update()
+            return stats,torch.cat([p.detach().flatten() for p in alg.student.mlp.parameters()])
+        off,a=run(0);on,b=run(.1)
+        self.assertEqual(off["mirror_mse"],0)
+        self.assertGreater(on["mirror_mse"],0)
+        self.assertFalse(torch.equal(a,b), "Mirror loss must change the optimizer update")
+
 
 
 if __name__ == "__main__":

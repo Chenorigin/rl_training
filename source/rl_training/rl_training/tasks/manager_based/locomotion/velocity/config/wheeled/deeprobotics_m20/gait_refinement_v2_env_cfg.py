@@ -9,7 +9,7 @@ import math
 
 from isaaclab.managers import RewardTermCfg
 from isaaclab.utils import configclass
-from rl_training.tasks.manager_based.locomotion.velocity.mdp.quiet_landing_signals import idle_stance_cost
+from task_support.quiet_landing.signals import idle_stance_cost
 from rl_training.tasks.manager_based.locomotion.velocity.mdp.gait_refinement_v2_env import (
     GaitRefinementV2VelocityCommand, idle_wheel_target_cost, stair_heading_cost,
 )
@@ -151,4 +151,3 @@ class DeeproboticsM20GaitRefinementV2EnvCfg(DeeproboticsM20QuietLandingEnvCfg):
             baseline = DeeproboticsM20QuietLandingEnvCfg()
             self.rewards.stair_ascent_direction_cost = deepcopy(baseline.rewards.stair_ascent_direction_cost)
             self.rewards.track_ang_vel_z_exp = deepcopy(baseline.rewards.track_ang_vel_z_exp)
-

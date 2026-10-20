@@ -1,7 +1,0 @@
-{
-  "source_sha256": {
-    "deploy/deploy_mujoco/terrains/flat.xml": "c666ac27dde7fb49ef016901beb952588d451fc4068c0b88db8836079c2a876c",
-    "deploy/deploy_mujoco/terrain_loader.py": "52fc8a6fb1f75a9d3f1e22f647f21898f1cf02d2bc7c03d5ff759b2f9afe56dc"
-  },
-  "origin": "matched private runtime source snapshot copied before training; numeric criteria unchanged"
-}

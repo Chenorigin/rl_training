@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""M20 v0/v1 distillation selected by --task. --preflight-only never launches Isaac or optimization.
+"""M20 v0/v1/v3/v3.5 distillation. --preflight-only never launches Isaac or optimization.
 
 --task selects the environment and v0/v1 algorithm. --resume restores the
 matching version; --init-student and --history-steps are available for v1.
@@ -22,6 +22,8 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT/"source/rl_training"))
 
 from m20_student_v1.configuration import DeeproboticsM20StudentV1DistillationCfg, StudentV1PerceptionCfg
+from m20_student_v1.v3_configuration import V3_CONFIG_PATH
+from m20_student_v1.v3_5_configuration import V3_5_CONFIG_PATH
 from m20_student_v1.contract import observation_contract, student_dim, validate_contract
 from m20_student_v1.model_io import file_hash, resolve_checkpoint, initialize_student, actor_from_state
 from m20_student_v1.output_storage import output_budget
@@ -32,9 +34,10 @@ from m20_student_v0.perception import StudentV0PerceptionCfg
 
 TASK_VERSIONS = {
     "Rough-Deeprobotics-M20-Student-v0": "v0",
-    "Rough-Deeprobotics-M20-StudentV15-v0": "v0",
     "Rough-Deeprobotics-M20-Student-v1": "v1",
-    "Rough-Deeprobotics-M20-StudentV15-v1": "v1",
+    # V3 retains the v1 checkpoint/observation format and distillation backend.
+    "Rough-Deeprobotics-M20-Student-v3": "v1",
+    "Rough-Deeprobotics-M20-Student-v3.5": "v1",
 }
 
 
@@ -138,11 +141,22 @@ def settings_v1(args, saved):
     cfg = StudentV1PerceptionCfg(**perception)
     cfg.validate()
     student_dim(training["history_steps"])
-    if training["obs_groups"] != {"student": ["policy"], "teacher": ["teacher"]}:
+    teacher_groups = ['teacher', 'motion_control'] if args.resume and args.task == 'Rough-Deeprobotics-M20-Student-v3.5' else ['teacher']
+    if training["obs_groups"] != {"student": ["policy"], "teacher": teacher_groups}:
         raise ValueError("V1 actor may only consume the sensor policy observation")
     if training["algorithm"]["class_name"] != "m20_student_v1.distillation.StudentV1Distillation":
         raise ValueError("Unexpected v1 algorithm")
     task = args.task or meta.get("task", "Rough-Deeprobotics-M20-Student-v1")
+    if task == "Rough-Deeprobotics-M20-Student-v3.5":
+        from m20_student_v1.v3_5_teacher import teacher_manifest, teacher_config
+        if training['history_steps'] != 4:
+            raise ValueError('V3.5 preserves the 789D student input: history_steps must be 4')
+        manifest = teacher_manifest(saved, bool(args.resume))
+        expected = teacher_config(manifest)
+        if args.resume and training['teacher'] != expected:
+            raise ValueError('V3.5 resume teacher configuration differs from its manifest')
+        training['teacher'] = expected
+        training['obs_groups']['teacher'] = ['teacher', 'motion_control']
     n = args.num_envs or meta.get("num_envs", 4 if args.validate_only else 64)
     # Environment count is governed by the measured resource preflight, not an
     # arbitrary fixed ceiling. Full resume keeps replay capacities unchanged.
@@ -166,12 +180,22 @@ def preflight_v1(args, saved, training, perception, n, source_path):
     torch.manual_seed(training["seed"])
     dim = student_dim(training["history_steps"])
     obs = TensorDict({"policy": torch.zeros(2, dim), "teacher": torch.zeros(2, 244)}, batch_size=[2])
+    motion = args.task == 'Rough-Deeprobotics-M20-Student-v3.5'
     model_cfg = deepcopy(training)
-    for name in ("student", "teacher"):
-        if model_cfg[name].pop("class_name") != "rsl_rl.models.MLPModel":
-            raise ValueError("V1 currently supports MLPModel with explicit optional history")
+    if model_cfg['student'].pop('class_name') != 'rsl_rl.models.MLPModel':
+        raise ValueError('Student must remain MLPModel with explicit optional history')
     student = MLPModel(obs, training["obs_groups"], "student", 16, **model_cfg["student"])
-    teacher = MLPModel(obs, training["obs_groups"], "teacher", 16, **model_cfg["teacher"])
+    teacher_class = MLPModel
+    teacher_name = model_cfg['teacher'].pop('class_name')
+    if motion:
+        from m20_student_v1.v3_5_teacher import MotionTeacherModel, TEACHER_CLASS
+        if teacher_name != TEACHER_CLASS:
+            raise ValueError('V3.5 requires the complete motion residual teacher')
+        teacher_class = MotionTeacherModel
+        obs['motion_control'] = torch.zeros(2, 3)
+    elif teacher_name != 'rsl_rl.models.MLPModel':
+        raise ValueError('Legacy distillation requires the ordinary MLP teacher')
+    teacher = teacher_class(obs, training["obs_groups"], "teacher", 16, **deepcopy(model_cfg["teacher"]))
     # Tiny storage validates actual installed algorithm arguments, without act/update/learn.
     algorithm_cfg = deepcopy(training["algorithm"])
     algorithm_cfg.pop("class_name")
@@ -189,7 +213,12 @@ def preflight_v1(args, saved, training, perception, n, source_path):
         initialization_source = saved
         if args.init_student:
             initialization_source = torch.load(resolve_checkpoint(args.init_student), map_location="cpu", weights_only=True)
+        if motion:
+            from m20_student_v1.v3_5_teacher import initialization_source as motion_initialization
+            initialization_source = motion_initialization(saved, initialization_source if args.init_student else None)
         initialization = initialize_student(student, initialization_source)
+        if motion and not args.init_student:
+            initialization['mode'] = 'frozen_teacher_base_only; labels use complete residual teacher'
         state = initialization_source.get("student_state_dict", initialization_source.get("actor_state_dict"))
         source_dim = state["mlp.0.weight"].shape[1]
         reference = actor_from_state(state, source_dim, training["student"])
@@ -221,6 +250,21 @@ def preflight_v1(args, saved, training, perception, n, source_path):
         error = float((exported(samples)-student(TensorDict({"policy": samples}, batch_size=[16]))).abs().max())
     if error > 1e-6:
         raise RuntimeError("TorchScript parity failed")
+    teacher_check = {}
+    if motion:
+        from m20_student_v1.v3_5_teacher import _module
+        packed = TensorDict({'policy': torch.randn(4, 244),
+                             'motion_control': torch.tensor([[0., 0., 0.], [.5, 0., 0.], [0., 0., .6], [-.5, 0., 0.]])}, [4])
+        reference = _module.MotionResidualMLPModel(packed, {'actor': ['policy']}, 'actor', 16, **model_cfg['teacher'])
+        reference.load_state_dict(teacher.state_dict(), strict=True)
+        with torch.inference_mode():
+            actual = teacher(TensorDict({'teacher': packed['policy'], 'motion_control': packed['motion_control']}, [4]))
+            reference_error = float((actual-reference(packed)).abs().max())
+        if reference_error != 0.:
+            raise RuntimeError('V3.5 teacher adapter differs from the original residual actor')
+        teacher_check = {'teacher_kind': 'idle_stop_motion_v1', 'motion_control_dim': 3,
+                         'teacher_reference_max_action_error': reference_error,
+                         'teacher_frozen': not any(p.requires_grad for p in teacher.parameters())}
     start = saved.get("student_v1", {}).get("num_updates", 0) if args.resume else 0
     iterations = args.max_iterations or training["max_iterations"]
     budget = output_budget(training, n, iterations, perception, start, args.min_free_disk_gb)
@@ -228,7 +272,8 @@ def preflight_v1(args, saved, training, perception, n, source_path):
     free_disk = require_disk_space(args.log_root, required)
     allowance = 8*1024**3+n*4*1024**2+budget["sample_buffer_bytes"]
     host = psutil.virtual_memory()
-    report = {"version": "v1", "source_path": str(source_path), "source_sha256": file_hash(source_path),
+    report = {"version": "v1", "task_version": 'v3.5' if motion else 'legacy', **teacher_check,
+              "source_path": str(source_path), "source_sha256": file_hash(source_path),
               "initialization": initialization, "actor_dim": dim, "teacher_dim": 244,
               "export_max_action_error": error, "num_envs": n, "device": args.device,
               "host_available_bytes": host.available, "host_total_bytes": host.total,
@@ -267,6 +312,12 @@ def train_or_validate_v1(args, saved, training, perception, task, n, old_meta, s
         cfg.student_perception = perception
         cfg.student_history_steps = training["history_steps"]
         cfg.seed = training["seed"]
+        motion = task == 'Rough-Deeprobotics-M20-Student-v3.5'
+        manifest = None
+        if motion:
+            from m20_student_v1.v3_5_teacher import teacher_manifest
+            manifest = teacher_manifest(saved, bool(args.resume))
+            cfg.motion_teacher_tuning = deepcopy(manifest['stair_tuning'])
         if args.validate_only:
             cfg.scene.terrain.terrain_generator.num_rows = 2
             cfg.scene.terrain.terrain_generator.num_cols = 2
@@ -283,6 +334,9 @@ def train_or_validate_v1(args, saved, training, perception, task, n, old_meta, s
             dim = student_dim(training["history_steps"])
             if obs["policy"].shape != (n, dim) or obs["teacher"].shape != (n, 244):
                 raise RuntimeError("V1 observation shape mismatch")
+            if motion and (obs['motion_control'].shape != (n, 3) or not torch.equal(
+                    obs['motion_control'], env.unwrapped.command_manager.get_command('base_velocity'))):
+                raise RuntimeError('V3.5 raw command group differs from the requested command')
             if not torch.equal(obs["policy"][:, 6:9], obs["teacher"][:, 6:9]) or not torch.equal(obs["policy"][:, 41:57], obs["teacher"][:, 41:57]):
                 raise RuntimeError("Student/teacher command or issued-action semantics differ")
             budget = report["budget"]
@@ -296,6 +350,9 @@ def train_or_validate_v1(args, saved, training, perception, task, n, old_meta, s
                 initialization_source = saved
                 if args.init_student:
                     initialization_source = torch.load(resolve_checkpoint(args.init_student), map_location="cpu", weights_only=True)
+                if motion:
+                    from m20_student_v1.v3_5_teacher import initialization_source as motion_initialization
+                    initialization_source = motion_initialization(saved, initialization_source if args.init_student else None)
                 initialize_student(runner.alg.student, initialization_source)
             provenance = {"version": "v1", "task": task, "num_envs": n, "seed": cfg.seed,
                           "teacher_checkpoint": old_meta.get("teacher_checkpoint", str(source_path)),
@@ -308,6 +365,11 @@ def train_or_validate_v1(args, saved, training, perception, task, n, old_meta, s
                           "rsl_rl_version": importlib.metadata.version("rsl-rl-lib"),
                           "sensor_parameters_calibrated_on_hardware": False,
                           "critic": "sensor placeholder only; no value network or reward optimization in distillation"}
+            if motion:
+                provenance.update(task_version='v3.5', teacher_manifest=manifest,
+                                  command_feedback={'version': 'legacy_v1_v3_5', 'tuning': manifest['stair_tuning']},
+                                  teacher_action_target='complete frozen base + raw-command-gated residual',
+                                  student_initialization='explicit student' if args.init_student else old_meta.get('student_initialization', 'frozen teacher base'))
             runner.alg.provenance = provenance
             (run_dir/"provenance.json").write_text(json.dumps(provenance, indent=2)+"\n")
             (run_dir/"observation_contract.json").write_text(json.dumps(provenance["contract"], indent=2)+"\n")
@@ -316,9 +378,13 @@ def train_or_validate_v1(args, saved, training, perception, task, n, old_meta, s
             print(f"STUDENT_V1_RUN_DIR={run_dir}", flush=True)
             if args.validate_only:
                 before = {key: value.clone() for key, value in runner.alg.student.state_dict().items()}
+                teacher_before = {key: value.clone() for key, value in runner.alg.teacher.state_dict().items()}
                 updates_before = runner.alg.num_updates
                 for _ in range(args.validation_steps):
                     with torch.inference_mode():
+                        teacher_action = runner.alg.teacher(obs)
+                        if teacher_action.shape != (n, 16) or not torch.isfinite(teacher_action).all():
+                            raise RuntimeError('Invalid frozen teacher action during inference validation')
                         obs, reward, done, extras = env.step(runner.alg.student(obs))
                     if not all(torch.isfinite(value).all() for value in obs.values()) or not torch.isfinite(reward).all():
                         raise RuntimeError("Nonfinite inference rollout")
@@ -326,19 +392,23 @@ def train_or_validate_v1(args, saved, training, perception, task, n, old_meta, s
                         raise RuntimeError("Student/placeholder critic snapshots differ")
                 unchanged = all(torch.equal(value, runner.alg.student.state_dict()[key]) for key, value in before.items())
                 validation = {"version": "v1", "steps": args.validation_steps, "weights_unchanged": unchanged,
+                              "teacher_weights_unchanged": all(torch.equal(v, runner.alg.teacher.state_dict()[k]) for k, v in teacher_before.items()),
                               "observation_shapes": {key: list(value.shape) for key, value in obs.items()},
                               "optimizer_updates_this_validation": runner.alg.num_updates-updates_before,
                               "teacher_frozen": not any(p.requires_grad for p in runner.alg.teacher.parameters()), "trained": False}
-                if not unchanged or validation["optimizer_updates_this_validation"]:
+                if not unchanged or not validation['teacher_weights_unchanged'] or validation["optimizer_updates_this_validation"]:
                     raise RuntimeError("Inference validation unexpectedly updated weights")
                 (run_dir/"validation.json").write_text(json.dumps(validation, indent=2)+"\n")
                 print("STUDENT_V1_VALIDATION="+json.dumps(validation), flush=True)
                 return
             # Small, scoped source receipt; no datasets or previous run logs.
-            for relative in ("source/rl_training/m20_student_v1", "source/rl_training/m20_student_v0",
-                             "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20"):
+            for relative in ("source/rl_training/task_support", "source/rl_training/m20_student_v1", "source/rl_training/m20_student_v0",
+                             "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20",
+                             "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp"):
                 shutil.copytree(ROOT/relative, run_dir/"source_snapshot"/relative, ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
             shutil.copy2(__file__, run_dir/"source_snapshot"/Path(__file__).name)
+            if motion:
+                shutil.copy2(V3_5_CONFIG_PATH, run_dir/'source_snapshot/student_v3_5.json')
             runner.add_git_repo_to_log(__file__)
             runner.learn(args.max_iterations or training["max_iterations"], init_at_random_ep_len=False)
             if not args.no_export:
@@ -415,8 +485,15 @@ def configure_run(args, saved, default_task="Rough-Deeprobotics-M20-Student-v0")
                 raise ValueError(f"--{name.replace('_', '-')} is only supported for v1 tasks")
     elif args.xr:
         raise ValueError("V1 sensor timing requires XR disabled")
-    args.log_root = args.log_root or ROOT/"logs/rsl_rl"/("deeprobotics_m20_student_"+version)
-    args.run_name = args.run_name or "student_"+version
+    task_version = "v3" if args.task == "Rough-Deeprobotics-M20-Student-v3" else version
+    if args.task == 'Rough-Deeprobotics-M20-Student-v3.5':
+        task_version = 'v3_5'
+        if not args.resume and args.config is None:
+            args.config = V3_5_CONFIG_PATH
+    if task_version == "v3" and not args.resume and args.config is None:
+        args.config = V3_CONFIG_PATH
+    args.log_root = args.log_root or ROOT/"logs/rsl_rl"/("deeprobotics_m20_student_"+task_version)
+    args.run_name = args.run_name or "student_"+task_version
     args.livestream = args.livestream if args.livestream is not None else (0 if version == "v1" else -1)
     return version
 
@@ -549,7 +626,7 @@ def train_or_validate_v0(args, saved, training, perception, task, n, meta, sourc
         from isaaclab_rl.rsl_rl import RslRlVecEnvWrapper
         from isaaclab_tasks.utils import load_cfg_from_registry, parse_env_cfg
         import rl_training.tasks
-        from rl_training.tasks.manager_based.locomotion.velocity.mdp.stair_student import initialize_student_actor
+        from task_support.stair_student.perception import initialize_student_actor
         from m20_student_v0.contract import observation_contract, STUDENT_OBS_DIM, TEACHER_OBS_DIM
         num_envs, device, path = n, args.device, source_path
         log_root = args.log_root.expanduser().resolve()

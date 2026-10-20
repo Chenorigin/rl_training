@@ -9,6 +9,8 @@ The checkpoint was trained with asymmetric PPO: actor=57D proprioception +
 187D ground height scan, critic=actor information plus privileged signals.
 Only actor_state_dict is loaded here. This script reproduces the actor input
 and the saved action contract; it never reads critic-only observations.
+idle_stop_motion_v1 checkpoints additionally receive their original raw command
+in a separate 3D motion_control group and use their recorded legacy yaw feedback.
 
 The observation/action constants below come from the checkpoint run's
 params/env.yaml (2026-09-29_19-34-19), not from mutable current config.
@@ -36,6 +38,7 @@ from tensordict import TensorDict
 
 from keyboard_input import X11WindowKeys
 from terrain_loader import PRESETS, STAIR_OVERRIDES, Terrain, attach_terrain, select_terrain
+from motion_residual_adapter import heading_controller, load_motion_actor, policy_inputs
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -78,11 +81,11 @@ PRE_STAND_JOINT_POS = np.array(
 STAND_PHASE_DURATION = 2.5
 TELEOP_KEY_TIMEOUT = 0.5
 TELEOP_VELOCITIES = {"w": (0.7, 0.0, 0.0), "s": (-0.7, 0.0, 0.0),
-                      "a": (0.0, 0.5, 0.0), "d": (0.0, -0.5, 0.0),
-                      "q": (0.0, 0.0, 0.6), "e": (0.0, 0.0, -0.6)}
-# TELEOP_VELOCITIES = {"w": (2.0, 0.0, 0.0), "s": (-2.0, 0.0, 0.0),
-#                      "a": (0.0, 1.0, 0.0), "d": (0.0, -1.0, 0.0),
-#                      "q": (0.0, 0.0, 2.0), "e": (0.0, 0.0, -2.0)}
+                     "a": (0.0, 0.5, 0.0), "d": (0.0, -0.5, 0.0),
+                     "q": (0.0, 0.0, 0.6), "e": (0.0, 0.0, -0.6)}
+# TELEOP_VELOCITIES = {"w": (1.2, 0.0, 0.0), "s": (-1.2, 0.0, 0.0),
+#                      "a": (0.0, 0.7, 0.0), "d": (0.0, -0.7, 0.0),
+#                      "q": (0.0, 0.0, 1.0), "e": (0.0, 0.0, -1.0)}
 
 
 def scan_grid() -> np.ndarray:
@@ -109,6 +112,9 @@ def load_actor(checkpoint: Path) -> MLPModel:
     if first is None or last is None or tuple(first.shape) != (512, ACTOR_OBS_DIM) or tuple(last.shape) != (ACTION_DIM, 128):
         raise ValueError("Checkpoint actor architecture does not match this 244D -> 16D contract")
     obs = TensorDict({"policy": torch.zeros((1, ACTOR_OBS_DIM), dtype=torch.float32)}, batch_size=[1])
+    manifest = saved.get("m20_training_manifest") or {}
+    if any(key.startswith("residual_mlp.") for key in state) or manifest.get("m20_profile") == "idle_stop_motion_v1":
+        return load_motion_actor(obs, state, manifest)
     actor = MLPModel(
         obs,
         {"actor": ["policy"]},
@@ -354,7 +360,7 @@ class TeleopKeyboard:
         for key in pressed:
             command += TELEOP_VELOCITIES[key]
         return np.clip(command, [-0.7, -0.5, -0.6], [0.7, 0.5, 0.6]).astype(np.float32)
-        # return np.clip(command, [-2.0, -1.0, -2.0], [2.0, 1.0, 2.0]).astype(np.float32)
+        # return np.clip(command, [-1.2, -0.7, -1.0], [1.2, 0.7, 1.0]).astype(np.float32)
 
 
 class TerminalInput:
@@ -456,6 +462,7 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
     contract = M20Contract(model, args.terrain_config)
     data = mujoco.MjData(model)
     contract.reset(data, prone=True)
+    heading_hold = heading_controller(contract, actor, getattr(args, "disable_heading_hold", False))
     metrics = live = None
     if getattr(args, "quiet_landing", False):
         from quiet_landing_metrics import QuietMujocoMetrics, LiveSignals
@@ -496,7 +503,7 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
     pending_policy = False
     show_height_scan = True
     previous_action = np.zeros(ACTION_DIM, dtype=np.float32)
-    records = {"time": [], "root_pos": [], "command": [], "mode": [], "action": []} if args.output else None
+    records = {"time": [], "root_pos": [], "command": [], "requested_command": [], "mode": [], "action": []} if args.output else None
     transitions = [{"time": 0.0, "mode": "prone"}]
     start_x = float(data.xpos[contract.base_id, 0])
     max_x = start_x
@@ -508,6 +515,8 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
     def enter(new_mode: str) -> None:
         nonlocal mode
         mode = new_mode
+        if heading_hold is not None:
+            heading_hold.reset()
         transitions.append({"time": round(float(data.time), 3), "mode": new_mode})
         print(f"[MODE] {new_mode} t={data.time:.2f}s", flush=True)
 
@@ -568,7 +577,8 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
             if mode == "lying" and data.time - lie_start >= STAND_PHASE_DURATION:
                 enter("prone")
 
-            command = keys.velocity_command() if mode == "policy" else np.zeros(3, dtype=np.float32)
+            requested_command = keys.velocity_command() if mode == "policy" else np.zeros(3, dtype=np.float32)
+            command = heading_hold.update(data, requested_command) if mode == "policy" and heading_hold is not None else requested_command.copy()
             if metrics is not None:
                 metrics.command_xy = command[:2]
                 metrics.tracker.begin_step()
@@ -578,7 +588,7 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
             if mode == "policy":
                 obs = contract.observe(data, command, previous_action)
                 with torch.inference_mode():
-                    tensor_obs = TensorDict({"policy": torch.from_numpy(obs).unsqueeze(0)}, batch_size=[1])
+                    tensor_obs = policy_inputs(obs, requested_command, actor)
                     raw_action = actor(tensor_obs).squeeze(0).cpu().numpy()
                 if raw_action.shape != (ACTION_DIM,) or not np.isfinite(raw_action).all():
                     raise RuntimeError(f"Invalid actor action at step {step}: {raw_action}")
@@ -605,6 +615,7 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
                 records["time"].append(float(data.time))
                 records["root_pos"].append(data.xpos[contract.base_id].copy())
                 records["command"].append(command.copy())
+                records["requested_command"].append(requested_command.copy())
                 records["mode"].append(mode)
                 records["action"].append(applied_action.copy())
             for _ in range(substeps):
@@ -700,6 +711,7 @@ def rollout(args: argparse.Namespace) -> dict:
     contract = M20Contract(model, args.terrain_config)
     data = mujoco.MjData(model)
     contract.reset(data)
+    heading_hold = heading_controller(contract, actor, getattr(args, "disable_heading_hold", False) or getattr(args, "track_course", False))
     metrics = live = None
     if getattr(args, "quiet_landing", False):
         from quiet_landing_metrics import QuietMujocoMetrics, LiveSignals
@@ -707,12 +719,13 @@ def rollout(args: argparse.Namespace) -> dict:
         metrics = QuietMujocoMetrics(model, contract)
         live = LiveSignals() if args.live_plot else None
     print("[TERRAIN] " + json.dumps(args.terrain_config.summary()), flush=True)
-    command = np.array([args.command_x, args.command_y, args.command_yaw], dtype=np.float32)
+    requested_command = np.array([args.command_x, args.command_y, args.command_yaw], dtype=np.float32)
+    command = requested_command.copy()
     previous_action = np.zeros(ACTION_DIM, dtype=np.float32)
     substeps = round(POLICY_DT / PHYSICS_DT)
     if not math.isclose(substeps * PHYSICS_DT, POLICY_DT):
         raise RuntimeError("Policy period is not an integer number of physics steps")
-    records = {"time": [], "root_pos": [], "root_quat": [], "observation": [], "action": [], "command": []}
+    records = {"time": [], "root_pos": [], "root_quat": [], "observation": [], "action": [], "command": [], "requested_command": []}
     start_x = float(data.xpos[contract.base_id, 0])
     fell = False
     fell_ever = False
@@ -725,6 +738,8 @@ def rollout(args: argparse.Namespace) -> dict:
     try:
         for step in range(args.steps if args.steps is not None else 1000):
             tic = time.perf_counter()
+            if heading_hold is not None:
+                command = heading_hold.update(data, requested_command)
             if getattr(args, "track_course", False):
                 # Same external command generator for every policy. Keep the
                 # course heading/center rather than requesting zero yaw rate.
@@ -740,9 +755,7 @@ def rollout(args: argparse.Namespace) -> dict:
                 command[2] = np.clip(0.5*heading_error, -0.5, 0.5)
             obs = contract.observe(data, command, previous_action)
             with torch.inference_mode():
-                tensor_obs = TensorDict(
-                    {"policy": torch.from_numpy(obs).unsqueeze(0)}, batch_size=[1]
-                )
+                tensor_obs = policy_inputs(obs, requested_command, actor)
                 action = actor(tensor_obs).squeeze(0).cpu().numpy()
             if action.shape != (ACTION_DIM,) or not np.isfinite(action).all():
                 raise RuntimeError(f"Invalid actor action at step {step}: {action}")
@@ -758,6 +771,7 @@ def rollout(args: argparse.Namespace) -> dict:
             records["observation"].append(obs)
             records["action"].append(action.copy())
             records["command"].append(command.copy())
+            records["requested_command"].append(requested_command.copy())
             for _ in range(substeps):
                 contract.apply_pd(data, action)
                 if metrics is None:
@@ -861,6 +875,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--stop-on-fall", action="store_true")
     parser.add_argument("--track-course", action="store_true",
                         help="Autoplay only: shared heading/center-line velocity command feedback")
+    parser.add_argument("--disable-heading-hold", action="store_true",
+                        help="Disable checkpoint-specific legacy_v1 yaw feedback for residual models")
     parser.add_argument("--stop-at-goal", action="store_true",
                         help="Autoplay only: stop once all wheels cross the goal inside the course without falling")
     parser.add_argument("--viewer", action="store_true", help="Open interactive keyboard teleop")

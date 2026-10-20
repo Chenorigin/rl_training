@@ -7,8 +7,8 @@ import math
 from pathlib import Path
 import torch
 
-from .quiet_landing_traversal import M20QuietLandingEnv
-from .quiet_landing_traversal import StairTeacherVelocityCommand
+from .quiet_landing_env import M20QuietLandingEnv
+from .quiet_landing_env import StairTeacherVelocityCommand
 
 PROJECT_ROOT = Path(__file__).resolve().parents[8]
 
@@ -236,4 +236,3 @@ class M20GaitRefinementV2Env(M20QuietLandingEnv):
         self.extras["log"].update(metrics)
         if tracker is not None:
             tracker.reset(env_ids)
-

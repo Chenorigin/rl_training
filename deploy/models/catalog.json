@@ -1,0 +1,274 @@
+{
+  "format_version": 2,
+  "selected_on": "2026-10-20",
+  "storage": "full training checkpoints copied byte-for-byte; no hardlinks or symlinks to logs",
+  "selection_policy": "关键基线、阶段末次保存点、有固定评测或已有部署来源的中间点；不声明最新或入选即最佳",
+  "checkpoints": [
+    {
+      "task": "pre_teacher",
+      "path": "pre_teacher/model_19999.pt",
+      "source_checkpoint": "logs/rsl_rl/deeprobotics_m20_pre_teacher/2026-09-30_18-24-38/model_19999.pt",
+      "selection_reason": "前置训练基线",
+      "bytes": 7251391,
+      "sha256": "e0a67a3d49ffe943ce7fdaf1ec7143cc318519bb021089927e01843b35249842",
+      "input_dim": 244,
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "batch_size": 32,
+        "finite_outputs": true,
+        "source_copy_outputs_bit_identical": true
+      }
+    },
+    {
+      "task": "stair_teacher",
+      "path": "stair_teacher/model_214700.pt",
+      "source_checkpoint": "logs/rsl_rl/deeprobotics_m20_stair_teacher/2026-10-09_01-55-35_gait_fix_descent_entry/model_214700.pt",
+      "selection_reason": "后续教师共同来源、固定评测基线",
+      "bytes": 8421595,
+      "sha256": "19743a46229a2ba138716adb7f02dafa318684a2500d13c8107661279c217dd5",
+      "input_dim": 244,
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "batch_size": 32,
+        "finite_outputs": true,
+        "source_copy_outputs_bit_identical": true
+      }
+    },
+    {
+      "task": "quiet_landing_v1",
+      "path": "quiet_landing_v1/model_257100.pt",
+      "source_checkpoint": "logs/rsl_rl/deeprobotics_m20_quiet_landing_v1/2026-10-10_00-48-58_quiet_landing_v1/model_257100.pt",
+      "selection_reason": "学生及驻足修复分支的教师基线",
+      "bytes": 8421595,
+      "sha256": "368fa6287d3fc5e999b4ad596ad9f84be23f25d72bbd861236ec535a66b51c1c",
+      "input_dim": 244,
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "batch_size": 32,
+        "finite_outputs": true,
+        "source_copy_outputs_bit_identical": true
+      }
+    },
+    {
+      "task": "idle_stop_v1",
+      "path": "idle_stop_v1/model_257100_idle_stop.pt",
+      "source_checkpoint": "logs/rsl_rl/deeprobotics_m20_idle_stop_v1/2026-10-12_idle_stop_distilled_257100/model_257100_idle_stop.pt",
+      "selection_reason": "独立CPU驻足修复产物、v3教师",
+      "bytes": 3589365,
+      "sha256": "0e6d0c93560b5a3f7ce9219c7b6a0cea84bd4a2d3f5dba33c02d79f7d4eb5f34",
+      "input_dim": 244,
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "batch_size": 32,
+        "finite_outputs": true,
+        "source_copy_outputs_bit_identical": true
+      }
+    },
+    {
+      "task": "gait_refinement_v2",
+      "path": "gait_refinement_v2/model_2400.pt",
+      "source_checkpoint": "logs/rsl_rl/deeprobotics_m20_gait_refinement_v2/2026-10-12_16-16-02_v2_idle_stop_stair_heading/model_2400.pt",
+      "selection_reason": "固定三模型MuJoCo对照点",
+      "bytes": 6420661,
+      "sha256": "01df66926880c5cbe4d422640fe38ba1a65aea41e91e85bf24d45cf24e057ab1",
+      "input_dim": 244,
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "batch_size": 32,
+        "finite_outputs": true,
+        "source_copy_outputs_bit_identical": true
+      }
+    },
+    {
+      "task": "gait_refinement_v2",
+      "path": "gait_refinement_v2/model_4999.pt",
+      "source_checkpoint": "logs/rsl_rl/deeprobotics_m20_gait_refinement_v2/2026-10-12_16-16-02_v2_idle_stop_stair_heading/model_4999.pt",
+      "selection_reason": "该阶段末次保存状态，未据此宣称性能最优",
+      "bytes": 6420661,
+      "sha256": "85869271a253ec7397e0ae7b4ad600be26a1a21fee0dbe163fc22e7cc059dd54",
+      "input_dim": 244,
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "batch_size": 32,
+        "finite_outputs": true,
+        "source_copy_outputs_bit_identical": true
+      }
+    },
+    {
+      "task": "student_v0",
+      "path": "student_v0/model_21000.pt",
+      "source_checkpoint": "logs/rsl_rl/deeprobotics_m20_student_v0/2026-10-12_23-24-52_380795_student_v0_stage_a/model_21000.pt",
+      "selection_reason": "固定 sim2sim 评测的原 checkpoint，保留完整状态以便回放和重新导出",
+      "bytes": 27757855,
+      "sha256": "e3c08b47f6aba6898a34add1aacd29f547679668da4a03e4ded5d4576fd754d9",
+      "input_dim": 618,
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "batch_size": 32,
+        "finite_outputs": true,
+        "source_copy_outputs_bit_identical": true
+      }
+    },
+    {
+      "task": "student_v0",
+      "path": "student_v0/model_29999.pt",
+      "source_checkpoint": "logs/rsl_rl/deeprobotics_m20_student_v0/2026-10-12_23-24-52_380795_student_v0_stage_a/model_29999.pt",
+      "selection_reason": "该阶段末次保存点、原生噪声楼梯对比使用点",
+      "bytes": 27757855,
+      "sha256": "96f720f4cf3da436f68fac7bcbfc22d6c17bf17f81716dfd030dc645c64a0b95",
+      "input_dim": 618,
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "batch_size": 32,
+        "finite_outputs": true,
+        "source_copy_outputs_bit_identical": true
+      }
+    },
+    {
+      "task": "student_v1",
+      "path": "student_v1/model_25000.pt",
+      "source_checkpoint": "logs/rsl_rl/deeprobotics_m20_student_v1/2026-10-15_19-03-49_704428_student_v1_history4/model_25000.pt",
+      "selection_reason": "新版地图有效期的末次保存点、固定原生噪声楼梯对比使用点",
+      "bytes": 8038282,
+      "sha256": "21c3eea6900a5a21299f18020809e3e54dd8ac965ecb9c53bcbe19c955dbe900",
+      "input_dim": 789,
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "batch_size": 32,
+        "finite_outputs": true,
+        "source_copy_outputs_bit_identical": true
+      }
+    },
+    {
+      "task": "student_v3",
+      "path": "student_v3/model_11500.pt",
+      "source_checkpoint": "logs/rsl_rl/deeprobotics_m20_student_v3/2026-10-16_23-37-33_804395_student_v3_front_only_history4/model_11500.pt",
+      "selection_reason": "固定同噪声及原生噪声楼梯对比使用点",
+      "bytes": 8038410,
+      "sha256": "7716fb291f371dc8ac7616a8dd53d22119e99496f8dc31c8c4e03339ab479d78",
+      "input_dim": 789,
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "batch_size": 32,
+        "finite_outputs": true,
+        "source_copy_outputs_bit_identical": true
+      }
+    },
+    {
+      "task": "student_v3",
+      "path": "student_v3/model_20000.pt",
+      "source_checkpoint": "logs/rsl_rl/deeprobotics_m20_student_v3/2026-10-16_23-37-33_804395_student_v3_front_only_history4/model_20000.pt",
+      "selection_reason": "该阶段末次保存状态，未据此宣称性能最优",
+      "bytes": 8038410,
+      "sha256": "e0b8bca4163d15770baec1d718d7118468edf7612102aabd37c5d4b372f2f520",
+      "input_dim": 789,
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "batch_size": 32,
+        "finite_outputs": true,
+        "source_copy_outputs_bit_identical": true
+      }
+    },
+    {
+      "task": "student_v3_5",
+      "path": "student_v3_5/model_20000.pt",
+      "source_checkpoint": "logs/rsl_rl/deeprobotics_m20_student_v3_5/2026-10-19_12-12-39_599339_student_v3_5/model_20000.pt",
+      "selection_reason": "已有导出及SDK初始化来源；不代表行走、楼梯或真机通过",
+      "bytes": 8223032,
+      "sha256": "e32f28e710276ccc3860f8551838c8ef22708e571b9c06bebe140f93965c2bc6",
+      "input_dim": 789,
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "batch_size": 32,
+        "finite_outputs": true,
+        "source_copy_outputs_bit_identical": true
+      }
+    },
+    {
+      "task": "student_v3_5",
+      "path": "student_v3_5/model_21000.pt",
+      "source_checkpoint": "logs/rsl_rl/deeprobotics_m20_student_v3_5/2026-10-19_12-12-39_599339_student_v3_5/model_21000.pt",
+      "selection_reason": "用户终止训练前的末次保存状态，未据此宣称性能最优",
+      "bytes": 8223032,
+      "sha256": "1f6f14857776b64200f6a2d4c81ad7af48e738604bbcec67acb8c7113a6dae73",
+      "input_dim": 789,
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "batch_size": 32,
+        "finite_outputs": true,
+        "source_copy_outputs_bit_identical": true
+      }
+    },
+    {
+      "task": "idle_stop_motion_v1",
+      "path": "idle_stop_motion_v1/idle_stop_motion_v1_46400.pt",
+      "original_path": "deploy/models/model_46400.pt/model_46400.pt",
+      "bytes": 5446076,
+      "sha256": "2326cd0aa65219334ed1e2fd7a63dbc880d351f61b512d34ebcaa24ed6bafe8c",
+      "selection_reason": "上游运动残差与楼梯航向修正教师；独立任务接入时从原46400目录原字节重命名",
+      "input_dim": 244,
+      "auxiliary_input": {
+        "motion_control": 3
+      },
+      "output_dim": 16,
+      "cpu_validation": {
+        "strict_load": true,
+        "actor_critic_optimizer_restored": true,
+        "batch_size": 4,
+        "finite_outputs": true,
+        "iteration": 46400,
+        "preservation_updates": 46402
+      },
+      "isaac_validation": {
+        "environments": 4,
+        "policy_steps": 8,
+        "optimizer_updates": 0,
+        "actor_state_unchanged": true
+      },
+      "upstream": {
+        "task": "idle_stop_motion_v1",
+        "gym_id": "Rough-Deeprobotics-M20-IdleStopMotion-v1",
+        "checkpoint": "idle_stop_motion_v1/idle_stop_motion_v1_46400.pt",
+        "repository": "https://github.com/frider635-beep/Deeprobotics_M20_stair",
+        "commit": "8fb5d9aa5809363dd9a2cccacf0b24ee6f542d81",
+        "checkpoint_source_hashes_match_upstream": 12
+      }
+    }
+  ],
+  "validation": {
+    "sha256_source_and_copy": "passed",
+    "cpu_load_and_inference": "13 original copies passed strict deployment load and source/copy output equality; upstream residual task checkpoint passed strict actor/critic/optimizer resume and real Isaac inference",
+    "closed_loop_or_real_robot": "not run by this selection task",
+    "cuda_initialized": false,
+    "physics_started": false,
+    "optimizer_updates": 0,
+    "peak_rss_kib": 942592
+  },
+  "upstream_task": {
+    "task": "idle_stop_motion_v1",
+    "gym_id": "Rough-Deeprobotics-M20-IdleStopMotion-v1",
+    "checkpoint": "idle_stop_motion_v1/idle_stop_motion_v1_46400.pt",
+    "repository": "https://github.com/frider635-beep/Deeprobotics_M20_stair",
+    "commit": "8fb5d9aa5809363dd9a2cccacf0b24ee6f542d81",
+    "checkpoint_source_hashes_match_upstream": 12
+  },
+  "initial_selection": {
+    "new_checkpoints": 13,
+    "new_bytes": 136602144
+  },
+  "total_checkpoints": 14,
+  "total_checkpoint_bytes": 142048220
+}

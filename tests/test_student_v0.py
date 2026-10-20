@@ -18,7 +18,7 @@ from m20_student_v0.perception import StudentV0PerceptionCfg, SyntheticMapState,
 from m20_student_v0.distillation import StudentV0Distillation
 from m20_student_v0.configuration import DeeproboticsM20StudentV0DistillationCfg
 
-helper_path = ROOT/"source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp/stair_student.py"
+helper_path = ROOT/"source/rl_training/task_support/stair_student/perception.py"
 spec = importlib.util.spec_from_file_location("stair_student_helpers", helper_path)
 helpers = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = helpers

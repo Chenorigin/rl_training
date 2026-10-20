@@ -238,29 +238,32 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         print(f"[INFO]: Loading model checkpoint from: {resume_path}")
         # load previously trained model
         runner.load(resume_path)
-    if args_cli.init_actor_from:
-        init_path = Path(args_cli.init_actor_from).expanduser().resolve()
-        if not init_path.is_file():
-            raise FileNotFoundError(f"Actor initialization checkpoint does not exist: {init_path}")
-        saved = torch.load(init_path, map_location="cpu", weights_only=True)
-        actor_state = saved.get("actor_state_dict")
-        if not isinstance(actor_state, dict):
-            raise ValueError(f"Checkpoint has no actor_state_dict: {init_path}")
-        runner.alg.actor.load_state_dict(actor_state, strict=True)
-        print(f"[INFO]: Initialized actor only from: {init_path}")
+    if hasattr(runner, "initialize_task"):
+        runner.initialize_task(vars(args_cli))
+    else:
+        if args_cli.init_actor_from:
+            init_path = Path(args_cli.init_actor_from).expanduser().resolve()
+            if not init_path.is_file():
+                raise FileNotFoundError(f"Actor initialization checkpoint does not exist: {init_path}")
+            saved = torch.load(init_path, map_location="cpu", weights_only=True)
+            actor_state = saved.get("actor_state_dict")
+            if not isinstance(actor_state, dict):
+                raise ValueError(f"Checkpoint has no actor_state_dict: {init_path}")
+            runner.alg.actor.load_state_dict(actor_state, strict=True)
+            print(f"[INFO]: Initialized actor only from: {init_path}")
 
-    if args_cli.init_critic_from:
-        init_path = Path(args_cli.init_critic_from).expanduser().resolve()
-        saved = torch.load(init_path, map_location="cpu", weights_only=True)
-        runner.alg.critic.load_state_dict(saved["critic_state_dict"], strict=True)
-        print(f"[INFO]: Initialized critic weights (fresh optimizer) from: {init_path}")
-    reference_path = args_cli.preserve_actor_from or args_cli.init_actor_from
-    if hasattr(runner.alg, "set_reference") and reference_path:
-        reference = torch.load(Path(reference_path).expanduser().resolve(), map_location="cpu", weights_only=True)
-        runner.alg.set_reference(reference["actor_state_dict"])
-        print(f"[INFO]: Frozen task preservation actor from: {reference_path}")
-    elif args_cli.preserve_actor_from:
-        raise ValueError("--preserve_actor_from requires the StairGuardedPPO algorithm")
+        if args_cli.init_critic_from:
+            init_path = Path(args_cli.init_critic_from).expanduser().resolve()
+            saved = torch.load(init_path, map_location="cpu", weights_only=True)
+            runner.alg.critic.load_state_dict(saved["critic_state_dict"], strict=True)
+            print(f"[INFO]: Initialized critic weights (fresh optimizer) from: {init_path}")
+        reference_path = args_cli.preserve_actor_from or args_cli.init_actor_from
+        if hasattr(runner.alg, "set_reference") and reference_path:
+            reference = torch.load(Path(reference_path).expanduser().resolve(), map_location="cpu", weights_only=True)
+            runner.alg.set_reference(reference["actor_state_dict"])
+            print(f"[INFO]: Frozen task preservation actor from: {reference_path}")
+        elif args_cli.preserve_actor_from:
+            raise ValueError("--preserve_actor_from requires the StairGuardedPPO algorithm")
 
     if hasattr(runner, "record_initialization"):
         runner.record_initialization(vars(args_cli))

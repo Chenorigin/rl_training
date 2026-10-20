@@ -6,9 +6,9 @@ import mujoco
 import numpy as np
 import torch
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/mdp"))
-from quiet_landing_signals import LEGS, QuietLandingSettings, TouchdownTracker, map_clearance
-from quiet_landing_signals import ExtendedQuietSettings, ExtendedQuietTracker, surface_normals
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "source/rl_training"))
+from task_support.quiet_landing.signals import LEGS, QuietLandingSettings, TouchdownTracker, map_clearance
+from task_support.quiet_landing.signals import ExtendedQuietSettings, ExtendedQuietTracker, surface_normals
 
 
 class QuietMujocoMetrics:

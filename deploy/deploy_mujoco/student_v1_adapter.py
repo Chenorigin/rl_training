@@ -48,11 +48,15 @@ def load_student(checkpoint, jit=False):
 class SensorExtras:
     action_delay_steps: int
     history_steps: int
+    command_feedback: dict | None = None
 
 
 def profile_config(name, provenance, profile_file=None, level=None):
     cfg = shared_profile_config(name, provenance, profile_file, level)
-    return cfg, SensorExtras(cfg.action_delay_steps, provenance.get("contract", {}).get("history_steps", 1))
+    feedback = provenance.get('command_feedback')
+    if provenance.get('task_version') == 'v3.5' and (not feedback or feedback.get('version') != 'legacy_v1_v3_5'):
+        raise ValueError('V3.5 deployment requires its saved command feedback contract')
+    return cfg, SensorExtras(cfg.action_delay_steps, provenance.get("contract", {}).get("history_steps", 1), feedback)
 
 
 class StudentMapAdapter:
@@ -62,6 +66,13 @@ class StudentMapAdapter:
         self.last_channels = None
         self.last_visibility = np.zeros(187, dtype=bool)
         self.last_blackout = False
+        self.heading_feedback = None
+        if extras.command_feedback:
+            from m20_student_v1.v3_5_feedback import SensorHeadingFeedback
+            if extras.command_feedback.get('version') != 'legacy_v1_v3_5':
+                raise ValueError('Unsupported student command feedback version')
+            self.heading_feedback = SensorHeadingFeedback(1, 'cpu', extras.command_feedback['tuning'])
+            self.map.command_transform = self.heading_feedback
         # The entrypoint seeds torch once for each rollout, including model loading.
 
     def observe(self, data, command, previous_action, step):
@@ -84,6 +95,8 @@ class StudentMapAdapter:
         self.last_channels = None
         self.last_visibility.fill(False)
         self.last_blackout = False
+        if self.heading_feedback is not None:
+            self.heading_feedback.reset()
 
     def reset_for_policy_handover(self):
         """Start a fresh sensor episode before the first manual policy action."""
@@ -91,6 +104,7 @@ class StudentMapAdapter:
 
     def summary(self):
         return {"perception": asdict(self.cfg), "history_steps": self.extras.history_steps,
+                "command_feedback": self.extras.command_feedback,
                 "confidence_pose_covariance_included": True,
                 "parameters_calibrated_on_hardware": False,
                 "map_model": "shared training 2.5D FOV/terrain visibility + fixed acquisition packets + per-cell history/age; no beam scan, reflectivity, overhangs or robot self-shadow"}

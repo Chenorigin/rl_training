@@ -7,8 +7,7 @@ from isaaclab.managers import EventTermCfg, ObservationGroupCfg, ObservationTerm
 from isaaclab.utils import configclass
 
 from m20_student_v0 import perception
-from m20_student_v0.contract import STUDENT_OBS_DIM, TEACHER_OBS_DIM
-from .quiet_landing_env_cfg import DeeproboticsM20QuietLandingEnvCfg, DeeproboticsM20QuietLandingV15EnvCfg
+from .quiet_landing_env_cfg import DeeproboticsM20QuietLandingEnvCfg
 
 
 @configclass
@@ -39,25 +38,3 @@ class DeeproboticsM20StudentV0EnvCfg(DeeproboticsM20QuietLandingEnvCfg):
     def __post_init__(self):
         super().__post_init__()
         install_student_observations(self)
-
-
-@configclass
-class DeeproboticsM20StudentV15V0EnvCfg(DeeproboticsM20QuietLandingV15EnvCfg):
-    student_perception: perception.StudentV0PerceptionCfg = perception.StudentV0PerceptionCfg()
-
-    def __post_init__(self):
-        super().__post_init__()
-        install_student_observations(self)
-
-
-# Keep the parent's integration, reward tracking and physical stepping path.
-from rl_training.tasks.manager_based.locomotion.velocity.mdp.quiet_landing_traversal import M20QuietLandingEnv
-
-
-class M20StudentV0Env(M20QuietLandingEnv):
-    POLICY_OBSERVATION_DIM = STUDENT_OBS_DIM
-
-    def __init__(self, cfg, **kwargs):
-        super().__init__(cfg, **kwargs)
-        if self.observation_manager.group_obs_dim["teacher"] != (TEACHER_OBS_DIM,):
-            raise RuntimeError("V0 distillation requires a clean 244D teacher observation")

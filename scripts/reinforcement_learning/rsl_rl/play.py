@@ -271,8 +271,11 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
     if version.parse(installed_version) >= version.parse("4.0.0"):
         # Use runner-native exporters for rsl-rl >= 4.0.0
-        ppo_runner.export_policy_to_jit(path=export_model_dir, filename="policy.pt")
-        ppo_runner.export_policy_to_onnx(path=export_model_dir, filename="policy.onnx")
+        if getattr(ppo_runner.alg.actor, "uses_motion_control", False):
+            print("[INFO] Skipping single-input JIT/ONNX export: this actor requires policy and raw motion_control.")
+        else:
+            ppo_runner.export_policy_to_jit(path=export_model_dir, filename="policy.pt")
+            ppo_runner.export_policy_to_onnx(path=export_model_dir, filename="policy.onnx")
         policy_nn = None
     else:
         # Fallback for rsl-rl < 4.0.0

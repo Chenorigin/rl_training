@@ -1,17 +1,17 @@
 [package]
 
 # Semantic Versioning is used: https://semver.org/
-version = "1.0.0"
+version = "0.1.0"
 
 # Description
 category = "isaaclab"
 readme  = "README.md"
 
-title = "RL Training Repo for DeepRobotics"
+title = "M20 RL Training"
 author = "Bo Peng"
 maintainer = "Bo Peng"
-description="RL Training Repo for DeepRobotic, Based on IsaacLab."
-repository = "https://github.com/DeepRoboticsLab/rl_training.git"
+description="Deep Robotics M20 policy training and MuJoCo evaluation, based on Isaac Lab."
+repository = "https://github.com/Chenorigin/rl_training.git"
 keywords = ["extension", "rl_training", "isaaclab"]
 
 [dependencies]

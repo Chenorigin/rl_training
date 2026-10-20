@@ -3,7 +3,7 @@
 from copy import deepcopy
 from isaaclab.utils import configclass
 
-from .rsl_rl_ppo_cfg import DeeproboticsM20RoughPPORunnerCfg
+from .rough_ppo_cfg import DeeproboticsM20RoughPPORunnerCfg
 
 
 @configclass

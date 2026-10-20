@@ -14,7 +14,7 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.terrains.trimesh import MeshPlaneTerrainCfg
 from isaaclab.utils import configclass
 
-from rl_training.tasks.manager_based.locomotion.velocity.mdp import stair_teacher
+from rl_training.tasks.manager_based.locomotion.velocity.mdp import stair_teacher_env as stair_teacher
 from rl_training.tasks.manager_based.locomotion.velocity.velocity_env_cfg import CurriculumCfg, ObservationsCfg
 
 from .rough_env_cfg import DeeproboticsM20RewardsCfg, DeeproboticsM20RoughEnvCfg
@@ -627,7 +627,7 @@ def configure_descent_entry_experiment(env_cfg, agent_cfg):
     from isaaclab.managers import ObservationGroupCfg, ObservationTermCfg
     from isaaclab.utils import configclass
     from rl_training.tasks.manager_based.locomotion.velocity.config.wheeled.deeprobotics_m20.stair_teacher_env_cfg import _gait_entities
-    from rl_training.tasks.manager_based.locomotion.velocity.mdp import stair_teacher
+    from rl_training.tasks.manager_based.locomotion.velocity.mdp import stair_teacher_env as stair_teacher
     from rl_training.tasks.manager_based.locomotion.velocity.mdp import rewards
 
     @configclass
