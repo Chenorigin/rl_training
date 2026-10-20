@@ -206,6 +206,10 @@ python -m pytest -q -p no:cacheprovider \
   tests/test_student_v3_5.py
 ```
 
+## Real-robot deployment retrospective
+
+The [M20 Pro deployment retrospective (Chinese, October 2026)](logs/evaluation/m20_real_deployment_20261020/README.md) covers sensor transport, control mapping, timing, dynamic terrain inputs, ARM numerical validation, and release management. It distinguishes verified fixes from mitigations and unresolved issues. This curated report is tracked separately from local run outputs; it does not certify long-term stability or stair-climbing performance.
+
 ## Attribution and licenses
 
 This project derives from [DeepRoboticsLab/rl_training](https://github.com/DeepRoboticsLab/rl_training), with the BSD 3-Clause terms in [LICENSE](LICENSE), and incorporates robot_lab work by Ziqi Fan under [LICENSE-robot_lab](LICENSE-robot_lab). The IdleStopMotion integration credits the pinned frider635-beep source above. Retain the existing per-file copyright and license notices. Isaac Lab, Isaac Sim, and robot assets remain subject to their respective upstream licenses.

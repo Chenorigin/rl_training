@@ -210,6 +210,10 @@ python -m pytest -q -p no:cacheprovider tests
 
 测试包含小型 CPU 优化和 MuJoCo 物理用例，并非全部都是静态检查。IdleStopMotion 另完成过真实 Isaac **4 个环境、8 步**的推理冒烟及完整 checkpoint 恢复检查，未执行优化器更新；这些结果验证接线与有限输出，不能证明楼梯通行性能、长期稳定性或真机可用性。
 
+## 实机部署复盘
+
+[M20 Pro 实机部署复盘（2026 年 10 月）](logs/evaluation/m20_real_deployment_20261020/README.md)整理了传感器通信、控制映射、时序、动态地形、ARM 数值验证和版本管理中的问题、修复过程及工程经验，并区分已验证修复、阶段性缓解与未解决事项。该精选复盘单独纳入版本管理，原始运行日志仍保留在本地；短时验证结果不代表长期稳定或楼梯能力已通过验收。
+
 ## 来源与许可证
 
 - 项目基础来自 [DeepRoboticsLab/rl_training](https://github.com/DeepRoboticsLab/rl_training)，保留其版权声明与 [BSD-3-Clause 许可证](LICENSE)。
