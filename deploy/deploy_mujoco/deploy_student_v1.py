@@ -29,6 +29,7 @@ def runtime():
 def parse_args(argv=None):
     engine = runtime()
     parser = argparse.ArgumentParser(description=__doc__)
+    engine.baseline.add_spawn_arguments(parser)
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--checkpoint", type=Path)
     source.add_argument("--policy-jit", type=Path)
@@ -85,6 +86,8 @@ def parse_args(argv=None):
 
 
 def export_student(args, policy, provenance, identity):
+    from task_support.stair_quiet_v1.deployment import reject_unsupported_quiet_checkpoint
+    reject_unsupported_quiet_checkpoint(provenance, "Legacy actor-only TorchScript export")
     engine = runtime()
     engine.prepare_output(args.export_dir)
     dim = provenance["contract"]["student_observation_dim"]

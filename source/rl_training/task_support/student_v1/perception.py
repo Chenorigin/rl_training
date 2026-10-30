@@ -14,9 +14,15 @@ from .contract import (GRID_ROWS, GRID_COLS, GRID_RESOLUTION, HEIGHT_DIM,
                        HEIGHT_OFFSET, HEIGHT_CLIP, student_dim)
 
 
-def grid_points(device):
-    x = (torch.arange(GRID_COLS, device=device) - 8) * GRID_RESOLUTION
-    y = (torch.arange(GRID_ROWS, device=device) - 5) * GRID_RESOLUTION
+def capture_grid_shape(padding_m=0.):
+    extra = math.ceil(padding_m/GRID_RESOLUTION-1.e-7)
+    return GRID_ROWS+2*extra, GRID_COLS+2*extra
+
+
+def grid_points(device, padding_m=0.):
+    rows,cols = capture_grid_shape(padding_m)
+    x = (torch.arange(cols, device=device) - cols//2) * GRID_RESOLUTION
+    y = (torch.arange(rows, device=device) - rows//2) * GRID_RESOLUTION
     yy, xx = torch.meshgrid(y, x, indexing="ij")
     return torch.stack((xx.flatten(), yy.flatten()), -1)
 
@@ -48,7 +54,7 @@ def quaternion_rotation(q):
                         2*(x*z-w*y), 2*(y*z+w*x), 1-2*(x*x+y*y)), -1).reshape(-1, 3, 3)
 
 
-def query_grid(current, anchor, grid):
+def query_grid(current, anchor, grid, source_shape=(GRID_ROWS, GRID_COLS)):
     """current/anchor [N,x,y,yaw]; query acquisition coordinates of current grid."""
     co, si = current[:, 2:3].cos(), current[:, 2:3].sin()
     wx = current[:, 0:1] + co*grid[:, 0] - si*grid[:, 1]
@@ -56,20 +62,24 @@ def query_grid(current, anchor, grid):
     dx, dy = wx-anchor[:, 0:1], wy-anchor[:, 1:2]
     co, si = anchor[:, 2:3].cos(), anchor[:, 2:3].sin()
     gx, gy = co*dx+si*dy, -si*dx+co*dy
-    inside = (gx.abs() <= .8+1e-5) & (gy.abs() <= .5+1e-5)
-    return torch.stack((gx/.8, gy/.5), -1).reshape(-1, GRID_ROWS, GRID_COLS, 2), inside
+    rows,cols = source_shape
+    half_x,half_y = (cols-1)*GRID_RESOLUTION/2,(rows-1)*GRID_RESOLUTION/2
+    inside = (gx.abs() <= half_x+1e-5) & (gy.abs() <= half_y+1e-5)
+    return torch.stack((gx/half_x, gy/half_y), -1).reshape(-1, GRID_ROWS, GRID_COLS, 2), inside
 
 
-def terrain_visibility(hits, base, yaw, rotation, cfg):
+def terrain_visibility(hits, base, yaw, rotation, cfg, source_shape=(GRID_ROWS, GRID_COLS)):
     """Same front/rear FOV and height-field line of sight in both simulators.
 
     No reflectivity, beam angular sampling, overhangs or robot self-shadow.
     Sensor extrinsics are configurable engineering placeholders until calibrated.
     """
+    rows,cols = source_shape
+    half_x,half_y = (cols-1)*GRID_RESOLUTION/2,(rows-1)*GRID_RESOLUTION/2
     finite = torch.isfinite(hits).all(-1)
     safe = torch.where(finite[..., None], hits, base[:, None])
     visible = torch.zeros_like(finite)
-    z = torch.where(finite, hits[..., 2], 0.).reshape(-1, 1, GRID_ROWS, GRID_COLS)
+    z = torch.where(finite, hits[..., 2], 0.).reshape(-1, 1, rows, cols)
     mask = finite.float().reshape_as(z)
     for offset, rear in ((cfg.front_sensor_offset_m, False), (cfg.rear_sensor_offset_m, True)):
         off = torch.as_tensor(offset, device=hits.device, dtype=hits.dtype)
@@ -92,7 +102,7 @@ def terrain_visibility(hits, base, yaw, rotation, cfg):
             co, si = yaw.cos()[:, None, None], yaw.sin()[:, None, None]
             gx = co*rel[..., 0]+si*rel[..., 1]
             gy = -si*rel[..., 0]+co*rel[..., 1]
-            query = torch.stack((gx/.8, gy/.5), -1)
+            query = torch.stack((gx/half_x, gy/half_y), -1)
             ground = F.grid_sample(z, query, mode="nearest", align_corners=True)[:, 0]
             known = F.grid_sample(mask, query, mode="nearest", align_corners=True)[:, 0] > .5
             blocked = known & (ground > path[..., 2]+cfg.visibility_tolerance_m)
@@ -111,7 +121,7 @@ def tilt_height_jacobian(points, base, rotation):
 
 
 def pose_height_variance(z, valid, grid, xy_std, yaw_std, tilt_std, tilt_jacobian_norm_sq=None,
-                         confidence_step_ambiguity_weight=1.0):
+                         confidence_step_ambiguity_weight=1.0, source_shape=(GRID_ROWS, GRID_COLS)):
     """Confidence variance from finite differences and weighted step ambiguity.
 
     Relative map/query pose covariance is diagonal in this surrogate. Actual
@@ -119,7 +129,8 @@ def pose_height_variance(z, valid, grid, xy_std, yaw_std, tilt_std, tilt_jacobia
     Uses only measured heights with valid neighbors, including on stair edges.
     """
     n = z.shape[0]
-    z, valid = z.reshape(n, 11, 17), valid.reshape(n, 11, 17)
+    rows,cols = source_shape
+    z, valid = z.reshape(n, rows, cols), valid.reshape(n, rows, cols)
     valid = valid & torch.isfinite(z)
     z = torch.where(valid, z, 0.)
     dx = (z[:, :, 1:]-z[:, :, :-1]) * (valid[:, :, 1:] & valid[:, :, :-1])
@@ -147,6 +158,19 @@ def confidence_from_quality(valid, variance, age, cfg):
     return torch.where(usable, score, 0.)
 
 
+def continuous_delivery_steps(requested_s, step_dt):
+    """First control tick at or after a continuous delay, without an epsilon.
+
+    Correct the division's rounding at exact tick boundaries by comparing actual
+    tick times. Subtracting an epsilon would deliver some just-above-boundary
+    requests early. Callers supply nonnegative finite float64 requested seconds.
+    """
+    ticks = torch.ceil(requested_s/step_dt).long()
+    ticks -= ((ticks-1).to(requested_s.dtype)*step_dt >= requested_s).long()
+    ticks += (ticks.to(requested_s.dtype)*step_dt < requested_s).long()
+    return ticks
+
+
 class StudentObservationState:
     def __init__(self, num_envs, device, step_dt, cfg, history_steps=1):
         cfg.validate()
@@ -155,10 +179,16 @@ class StudentObservationState:
         self.cfg, self.device, self.step_dt, self.num_envs = cfg, device, step_dt, num_envs
         self.history_steps, self.obs_dim = history_steps, student_dim(history_steps)
         self.grid = grid_points(device)
+        self.capture_grid = grid_points(device,cfg.map_capture_padding_m)
+        self.capture_shape = capture_grid_shape(cfg.map_capture_padding_m)
+        rows,cols = self.capture_shape
+        iy = torch.arange(rows,device=device)[rows//2-5:rows//2+6]
+        ix = torch.arange(cols,device=device)[cols//2-8:cols//2+9]
+        self.output_indices = (iy[:,None]*cols+ix[None,:]).flatten()
         self.output_mask = map_output_mask(self.grid, cfg)
         minimum_period = max(step_dt, cfg.map_update_period_s-cfg.update_jitter_s)
         self.packet_slots = math.ceil((cfg.max_map_age_s+cfg.max_delay_s)/minimum_period)+3
-        shape = (self.packet_slots, num_envs, HEIGHT_DIM)
+        shape = (self.packet_slots, num_envs, self.capture_grid.shape[0])
         self.packet_z = torch.zeros(shape, device=device)
         self.packet_valid = torch.zeros(shape, device=device, dtype=torch.bool)
         self.packet_variance = torch.zeros(shape, device=device)
@@ -177,10 +207,19 @@ class StudentObservationState:
         self.occluded = torch.zeros(num_envs, device=device, dtype=torch.bool)
         self.occlusion_center = torch.zeros(num_envs, 2, device=device)
         self.needs_reset = torch.ones(num_envs, device=device, dtype=torch.bool)
+        self.zero_delivery = torch.zeros(num_envs, device=device, dtype=torch.bool)
+        self.zero_delivery_resets = torch.zeros(num_envs, device=device, dtype=torch.long)
+        self.delayed_delivery_resets = torch.zeros_like(self.zero_delivery_resets)
+        self.zero_delivery_packets = torch.zeros_like(self.zero_delivery_resets)
+        self.delayed_delivery_packets = torch.zeros_like(self.zero_delivery_resets)
+        if cfg.continuous_delay:
+            self.requested_delay_s = torch.zeros(num_envs, device=device, dtype=torch.float64)
+            self.actual_delay_s = torch.zeros_like(self.requested_delay_s)
         self.history = torch.zeros(num_envs, history_steps-1, 57, device=device)
         self.capture = torch.full((num_envs,), -1, device=device, dtype=torch.long)
         self.cell_age = torch.zeros(num_envs, HEIGHT_DIM, device=device)
-        self.last_visibility = torch.zeros_like(self.packet_valid[0])
+        self.capture_visibility = torch.zeros_like(self.packet_valid[0])
+        self.last_visibility = torch.zeros(num_envs,HEIGHT_DIM,dtype=torch.bool,device=device)
         self.last_channels = None
         self.command_transform = None  # Optional sensor-only command feedback, v3.5.
         self.last_step, self.last_obs = None, None
@@ -200,6 +239,9 @@ class StudentObservationState:
         self.needs_reset[ids] = True
         self.capture[ids] = -1
         self.observed_step[ids] = -1
+        if self.cfg.continuous_delay:
+            self.requested_delay_s[ids] = 0.
+            self.actual_delay_s[ids] = 0.
         self.last_step = None
 
     def _initialize(self):
@@ -212,6 +254,14 @@ class StudentObservationState:
                               torch.where(sample > 1-cfg.stress_probability, 2, 1))
         self.mixture[ids] = mixture
         self.severity[ids] = torch.where(mixture == 0, 0., torch.where(mixture == 2, cfg.stress_multiplier, 1.))
+        # Separate draw from clean/stress selection. Do not consume randomness
+        # at p=0: old tasks/checkpoints retain their exact seeded behavior.
+        if cfg.zero_delay_probability:
+            self.zero_delivery[ids] = torch.rand(ids.numel(),device=self.device) < cfg.zero_delay_probability
+        else:
+            self.zero_delivery[ids] = False
+        self.zero_delivery_resets[ids] += self.zero_delivery[ids].long()
+        self.delayed_delivery_resets[ids] += (~self.zero_delivery[ids]).long()
         scale = torch.tensor([cfg.height_bias_std, cfg.xy_bias_std, cfg.xy_bias_std,
                               cfg.yaw_bias_std, cfg.roll_pitch_std, cfg.roll_pitch_std], device=self.device)
         self.bias[ids] = torch.randn(ids.numel(), 6, device=self.device)*scale
@@ -224,8 +274,8 @@ class StudentObservationState:
     def observe(self, clean_proprio, hits, base, yaw, rotation, step):
         if self.last_step == step and self.last_obs is not None:
             return self.last_obs.clone()
-        if clean_proprio.shape != (self.num_envs, 57) or hits.shape != (self.num_envs, HEIGHT_DIM, 3):
-            raise ValueError("Expected clean proprio [N,57], ordered hits [N,187,3]")
+        if clean_proprio.shape != (self.num_envs, 57) or hits.shape != (self.num_envs, self.capture_grid.shape[0], 3):
+            raise ValueError(f'Expected clean proprio [N,57], ordered capture hits [N,{len(self.capture_grid)},3]')
         if not all(torch.isfinite(v).all() for v in (clean_proprio, base, yaw, rotation)):
             raise ValueError("Nonfinite proprio/pose")
         self._initialize()
@@ -239,7 +289,8 @@ class StudentObservationState:
         updated_drift = alpha*self.drift + torch.randn_like(self.drift)*drift_std*math.sqrt(1-alpha*alpha)
         self.drift[active] = updated_drift[active]
         pose_error = (self.bias+self.drift)*scale[:, None]
-        self.last_visibility = terrain_visibility(hits, base, yaw, rotation, cfg)
+        self.capture_visibility = terrain_visibility(hits, base, yaw, rotation, cfg,self.capture_shape)
+        self.last_visibility = self.capture_visibility[:,self.output_indices]
         redraw = self.next_occlusion <= step
         self.occluded[redraw] = torch.rand(int(redraw.sum()), device=self.device) < (cfg.occlusion_probability*scale[redraw]).clamp_max(1)
         self.occlusion_center[redraw] = (torch.rand(int(redraw.sum()), 2, device=self.device)-.5)*torch.tensor([1.6, 1.], device=self.device)
@@ -257,13 +308,13 @@ class StudentObservationState:
             if ids.numel():
                 slots = self.next_slot[ids] % self.packet_slots
                 self.next_slot[ids] += 1
-                valid = self.last_visibility[ids].clone()
+                valid = self.capture_visibility[ids].clone()
                 z = torch.where(torch.isfinite(hits[ids, :, 2]), hits[ids, :, 2], 0.)
-                radius = self.grid.norm(dim=-1)
+                radius = self.capture_grid.norm(dim=-1)
                 std = cfg.height_noise_std*scale[ids, None]*(1+radius)
                 std *= .5+torch.rand(ids.numel(), 1, device=self.device)
                 coarse = torch.randn(ids.numel(), 1, 3, 5, device=self.device)
-                correlated = F.interpolate(coarse, size=(11, 17), mode="bilinear", align_corners=True).flatten(1)
+                correlated = F.interpolate(coarse, size=self.capture_shape, mode="bilinear", align_corners=True).flatten(1)
                 z = z + torch.randn_like(z)*std + correlated*cfg.correlated_height_std*scale[ids, None]
                 z += pose_error[ids, 0, None]
                 # Same roll/pitch estimate error affects gravity and measured map slope.
@@ -272,7 +323,7 @@ class StudentObservationState:
                 points[..., 2] = z
                 jacobian = tilt_height_jacobian(points, base[ids], rotation[ids])
                 z += (jacobian*pose_error[ids, None, 4:6]).sum(-1)
-                delta = (self.grid[None]-self.occlusion_center[ids, None]).abs()
+                delta = (self.capture_grid[None]-self.occlusion_center[ids, None]).abs()
                 hole = (delta[..., 0] <= cfg.occlusion_width_m/2) & (delta[..., 1] <= cfg.occlusion_height_m/2)
                 valid &= ~(hole & self.occluded[ids, None])
                 valid &= torch.rand_like(z) >= (cfg.point_dropout*scale[ids, None]).clamp_max(1)
@@ -286,9 +337,9 @@ class StudentObservationState:
                 measured_points[..., 2] = z
                 quality_jacobian = tilt_height_jacobian(measured_points, base[ids], rotation[ids])
                 quality_tilt = torch.nan_to_num(quality_jacobian).square().sum(-1)
-                variance = height_variance + pose_height_variance(z, valid, self.grid, xy_std, yaw_std,
+                variance = height_variance + pose_height_variance(z, valid, self.capture_grid, xy_std, yaw_std,
                                                                   cfg.roll_pitch_std*math.sqrt(1.25)*scale[ids], quality_tilt,
-                                                                  cfg.confidence_step_ambiguity_weight)
+                                                                  cfg.confidence_step_ambiguity_weight,self.capture_shape)
                 jitter = torch.exp(torch.randn(ids.numel(), 1, device=self.device)*cfg.confidence_log_std*scale[ids, None])
                 overestimate = torch.rand(ids.numel(), 1, device=self.device) < (cfg.confidence_overestimate_probability*scale[ids, None]).clamp_max(1)
                 variance *= jitter*torch.where(overestimate, cfg.confidence_overestimate_factor, 1.)
@@ -299,14 +350,24 @@ class StudentObservationState:
                 self.packet_anchor[slots, ids, 2] = yaw[ids]+pose_error[ids, 3]
                 self.packet_capture[slots, ids] = step
                 # Hardware timing remains present at level=0.
-                delay = torch.randint(math.ceil(cfg.min_delay_s/self.step_dt-1e-9),
-                                      math.ceil(cfg.max_delay_s/self.step_dt)+1,
-                                      (ids.numel(),), device=self.device)
+                if cfg.continuous_delay:
+                    requested = torch.empty(ids.numel(), device=self.device, dtype=torch.float64).uniform_(cfg.min_delay_s, cfg.max_delay_s)
+                    self.requested_delay_s[ids] = torch.where(self.zero_delivery[ids], 0., requested)
+                    delay = continuous_delivery_steps(requested, self.step_dt)
+                else:
+                    delay = torch.randint(math.ceil(cfg.min_delay_s/self.step_dt-1e-9),
+                                          math.ceil(cfg.max_delay_s/self.step_dt)+1,
+                                          (ids.numel(),), device=self.device)
+                delay = torch.where(self.zero_delivery[ids],torch.zeros_like(delay),delay)
+                if cfg.continuous_delay:
+                    self.actual_delay_s[ids] = delay.to(torch.float64)*self.step_dt
                 self.packet_arrival[slots, ids] = step+delay
+                self.zero_delivery_packets[ids] += (delay == 0).long()
+                self.delayed_delivery_packets[ids] += (delay > 0).long()
         current = torch.cat((base[:, :2], yaw[:, None]), -1)
         current = current[None].expand(self.packet_slots, -1, -1).reshape(-1, 3)
-        query, inside = query_grid(current, self.packet_anchor.flatten(0, 1), self.grid)
-        packets = torch.stack((self.packet_z, self.packet_valid.float(), self.packet_variance), 2).reshape(-1, 3, 11, 17)
+        query, inside = query_grid(current, self.packet_anchor.flatten(0, 1), self.grid,self.capture_shape)
+        packets = torch.stack((self.packet_z, self.packet_valid.float(), self.packet_variance), 2).reshape(-1, 3, *self.capture_shape)
         sampled = F.grid_sample(packets, query, mode="nearest", padding_mode="zeros", align_corners=True)
         sampled = sampled.reshape(self.packet_slots, self.num_envs, 3, HEIGHT_DIM)
         age = (step-self.packet_capture)*self.step_dt

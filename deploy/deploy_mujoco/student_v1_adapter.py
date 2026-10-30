@@ -17,17 +17,27 @@ from m20_student_v1.profiles import profile_config as shared_profile_config, PRO
 from m20_student_v0.noise_profiles import canonical_profile_name
 
 
-def load_student(checkpoint, jit=False):
+def load_student(checkpoint, jit=False, *, execution_control=None):
+    from task_support.stair_quiet_v1.deployment import require_runtime
     checkpoint = Path(checkpoint).resolve()
     if jit:
         contract = json.loads((checkpoint.parent/"observation_contract.json").read_text())
         validate_contract(contract)
         saved_meta = json.loads((checkpoint.parent/"deployment.json").read_text())
         provenance = saved_meta.get("training_provenance", saved_meta)
-        policy = torch.jit.load(str(checkpoint), map_location="cpu").eval()
+        require_runtime(saved_meta, execution_control)
+        extra_files = {"quiet_execution_control.json": ""}
+        policy = torch.jit.load(str(checkpoint), map_location="cpu", _extra_files=extra_files).eval()
+        if extra_files["quiet_execution_control.json"]:
+            embedded = json.loads(extra_files["quiet_execution_control.json"])
+            require_runtime({"quiet_execution_control": embedded}, execution_control)
+            from task_support.stair_quiet_v1.deployment import execution_contract
+            if execution_contract(saved_meta, required=True) != embedded:
+                raise ValueError("Quiet TorchScript embedded/sidecar execution contracts disagree")
         source = "torchscript"
     else:
         saved = torch.load(checkpoint, map_location="cpu", weights_only=True)
+        require_runtime(saved, execution_control)
         if saved.get("student_v1", {}).get("version") != "v1":
             raise ValueError("Expected a v1 student checkpoint; teacher/v0 checkpoints are rejected")
         provenance = saved["student_v1"]["provenance"]
@@ -63,6 +73,7 @@ class StudentMapAdapter:
     def __init__(self, contract, cfg, extras, seed=42):
         self.contract, self.cfg, self.extras = contract, cfg, extras
         self.map = StudentObservationState(1, "cpu", .02, cfg, extras.history_steps)
+        self.capture_grid = self.map.capture_grid.numpy().copy()
         self.last_channels = None
         self.last_visibility = np.zeros(187, dtype=bool)
         self.last_blackout = False
@@ -80,8 +91,10 @@ class StudentMapAdapter:
         base = data.xpos[self.contract.base_id]
         rotation = data.xmat[self.contract.base_id].reshape(3, 3)
         yaw = math.atan2(rotation[1, 0], rotation[0, 0])
+        hits = (self.contract.capture_height_scan(data,self.capture_grid)
+                if self.cfg.map_capture_padding_m else self.contract.last_scan_hits)
         obs = self.map.observe(torch.as_tensor(clean[None, :57], dtype=torch.float32),
-                                torch.as_tensor(self.contract.last_scan_hits[None], dtype=torch.float32),
+                                torch.as_tensor(hits[None], dtype=torch.float32),
                                 torch.as_tensor(base[None], dtype=torch.float32),
                                 torch.tensor([yaw], dtype=torch.float32),
                                 torch.as_tensor(rotation[None], dtype=torch.float32), step)
@@ -92,6 +105,7 @@ class StudentMapAdapter:
 
     def reset(self):
         self.map.reset()
+        self.capture_grid = self.map.capture_grid.numpy().copy()
         self.last_channels = None
         self.last_visibility.fill(False)
         self.last_blackout = False
@@ -103,7 +117,8 @@ class StudentMapAdapter:
         self.reset()
 
     def summary(self):
-        return {"perception": asdict(self.cfg), "history_steps": self.extras.history_steps,
+        return {"perception": asdict(self.cfg), "capture_grid_shape":list(self.map.capture_shape),
+                "capture_points":len(self.capture_grid), "output_points":187, "history_steps": self.extras.history_steps,
                 "command_feedback": self.extras.command_feedback,
                 "confidence_pose_covariance_included": True,
                 "parameters_calibrated_on_hardware": False,

@@ -59,13 +59,18 @@ def load_motion_actor(obs, state, manifest):
     return actor
 
 
-def policy_inputs(observation, requested_command, actor):
+def policy_inputs(observation, requested_command, actor, trot_control=None):
     values = {'policy': torch.from_numpy(observation).unsqueeze(0)}
     if getattr(actor, 'uses_motion_control', False):
         raw = np.asarray(requested_command, dtype=np.float32)
         if raw.shape != (3,) or not np.isfinite(raw).all():
             raise ValueError('motion_control requires a finite 3D raw requested command')
         values['motion_control'] = torch.from_numpy(raw.copy()).reshape(1, 3)
+    if getattr(actor, 'uses_trot_control', False):
+        control = np.asarray(trot_control, dtype=np.float32)
+        if control.shape != (6,) or not np.isfinite(control).all():
+            raise ValueError('StairTrot requires six finite sensor-derived control values')
+        values['trot_control'] = torch.from_numpy(control.copy()).reshape(1, 6)
     return TensorDict(values, batch_size=[1])
 
 
@@ -120,4 +125,7 @@ class LegacyHeadingHold:
 def heading_controller(contract, actor, disabled=False):
     if not getattr(actor, 'uses_motion_control', False) or disabled:
         return None
-    return LegacyHeadingHold(contract, actor.m20_training_manifest['stair_tuning'])
+    manifest = actor.m20_training_manifest
+    if getattr(actor, 'uses_trot_control', False):
+        manifest = manifest['source_teacher_manifest']
+    return LegacyHeadingHold(contract, manifest['stair_tuning'])

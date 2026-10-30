@@ -192,9 +192,12 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # spawn the robot randomly in the grid (instead of their terrain levels)
     # reduce the number of terrains to save memory
     if env_cfg.scene.terrain.terrain_generator is not None:
-        env_cfg.scene.terrain.terrain_generator.num_rows = 5
-        env_cfg.scene.terrain.terrain_generator.num_cols = 5
-        env_cfg.scene.terrain.terrain_generator.curriculum = False
+        # StairTrot routes/completion use the deterministic ascent columns.
+        # Retain the checkpoint's geometry contract during playback.
+        if not hasattr(env_cfg, "stair_course"):
+            env_cfg.scene.terrain.terrain_generator.num_rows = 5
+            env_cfg.scene.terrain.terrain_generator.num_cols = 5
+            env_cfg.scene.terrain.terrain_generator.curriculum = False
         env_cfg.scene.terrain.max_init_terrain_level = None
 
     # disable randomization for play
@@ -207,6 +210,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         env_cfg.curriculum.command_levels = None
 
     if args_cli.keyboard:
+        if hasattr(env_cfg, "stair_course"):
+            raise ValueError("StairTrot playback uses its route command; --keyboard would break raw-command gating.")
         env_cfg.scene.num_envs = 1
         env_cfg.terminations.time_out = None
         env_cfg.commands.base_velocity.debug_vis = False

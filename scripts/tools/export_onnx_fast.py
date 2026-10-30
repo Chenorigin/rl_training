@@ -16,6 +16,8 @@ Example:
 
 import argparse
 import os
+from pathlib import Path
+import sys
 
 import onnx
 import torch
@@ -148,6 +150,9 @@ def main() -> None:
     # --- load checkpoint ---
     print(f"[INFO] Loading: {args.checkpoint_path}")
     ckpt = torch.load(args.checkpoint_path, map_location="cpu", weights_only=True)
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "source/rl_training"))
+    from task_support.stair_quiet_v1.deployment import reject_unsupported_quiet_checkpoint
+    reject_unsupported_quiet_checkpoint(ckpt, "Generic actor-only ONNX export")
 
     # rsl-rl-lib >=3.1.0 stores actor separately with "mlp." prefix;
     # older versions store everything in "model_state_dict" with "actor." prefix.

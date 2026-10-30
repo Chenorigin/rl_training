@@ -11,6 +11,8 @@ Only actor_state_dict is loaded here. This script reproduces the actor input
 and the saved action contract; it never reads critic-only observations.
 idle_stop_motion_v1 checkpoints additionally receive their original raw command
 in a separate 3D motion_control group and use their recorded legacy yaw feedback.
+StairTrot-v1 additionally computes its six-dimensional ascent/phase/route input
+from height rays and physical wheel contacts, and loads the complete new actor.
 
 The observation/action constants below come from the checkpoint run's
 params/env.yaml (2026-09-29_19-34-19), not from mutable current config.
@@ -24,6 +26,7 @@ import json
 import math
 import os
 import select
+import sys
 import termios
 import threading
 import time
@@ -37,8 +40,13 @@ from rsl_rl.models import MLPModel
 from tensordict import TensorDict
 
 from keyboard_input import X11WindowKeys
-from terrain_loader import PRESETS, STAIR_OVERRIDES, Terrain, attach_terrain, select_terrain
+from reset_placement import place_on_terrain
+from spawn_mat import add_spawn_arguments, add_spawn_mat, validate_spawn_mat
+from terrain_loader import (PRESETS, STAIR_OVERRIDES, Terrain, attach_terrain, select_terrain,
+                            static_terrain_flex_ids, terrain_ray, is_terrain_geom)
 from motion_residual_adapter import heading_controller, load_motion_actor, policy_inputs
+from stair_trot_adapter import load_stair_trot_actor, make_trot_controller
+from teacher_noise_adapter import add_noise_arguments, validate_noise_arguments, make_noise_adapter, noise_metadata
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -83,9 +91,9 @@ TELEOP_KEY_TIMEOUT = 0.5
 TELEOP_VELOCITIES = {"w": (0.7, 0.0, 0.0), "s": (-0.7, 0.0, 0.0),
                      "a": (0.0, 0.5, 0.0), "d": (0.0, -0.5, 0.0),
                      "q": (0.0, 0.0, 0.6), "e": (0.0, 0.0, -0.6)}
-# TELEOP_VELOCITIES = {"w": (1.2, 0.0, 0.0), "s": (-1.2, 0.0, 0.0),
-#                      "a": (0.0, 0.7, 0.0), "d": (0.0, -0.7, 0.0),
-#                      "q": (0.0, 0.0, 1.0), "e": (0.0, 0.0, -1.0)}
+TELEOP_LIMITS = np.max(np.abs(list(TELEOP_VELOCITIES.values())), axis=0)
+TELEOP_RISE_TIME = 1.0  # Seconds from zero to the requested speed.
+TELEOP_STOP_TIME = 0.3  # Normal release; damping/reset/focus loss stop immediately.
 
 
 def scan_grid() -> np.ndarray:
@@ -99,11 +107,17 @@ def scan_grid() -> np.ndarray:
     return points
 
 
-def load_actor(checkpoint: Path) -> MLPModel:
+def load_actor(checkpoint: Path, *, allow_execution_control=False) -> MLPModel:
     checkpoint = checkpoint.resolve()
     if not checkpoint.is_file():
         raise FileNotFoundError(f"Checkpoint not found: {checkpoint}")
     saved = torch.load(checkpoint, map_location="cpu", weights_only=True)
+    sys.path.insert(0, str(REPO_ROOT / "source/rl_training"))
+    from task_support.stair_quiet_v1.deployment import execution_contract, reject_unsupported_quiet_checkpoint
+    if allow_execution_control is True:
+        execution_contract(saved)
+    else:
+        reject_unsupported_quiet_checkpoint(saved, "Legacy teacher MuJoCo runtime")
     state = saved.get("actor_state_dict")
     if not isinstance(state, dict):
         raise ValueError("Checkpoint does not contain actor_state_dict")
@@ -113,6 +127,17 @@ def load_actor(checkpoint: Path) -> MLPModel:
         raise ValueError("Checkpoint actor architecture does not match this 244D -> 16D contract")
     obs = TensorDict({"policy": torch.zeros((1, ACTOR_OBS_DIM), dtype=torch.float32)}, batch_size=[1])
     manifest = saved.get("m20_training_manifest") or {}
+    if manifest.get("noise_refinement", {}).get("task") == "stair_quiet_v1_transition":
+        from transition_actor_adapter import load_transition_actor
+        return load_transition_actor(state, manifest)
+    if (any(key.startswith("safety_mlp.") for key in state)
+            or manifest.get("noise_refinement", {}).get("task") == "stair_quiet_v1_safe"):
+        from safe_actor_adapter import load_safe_actor
+        return load_safe_actor(state, manifest)
+    if any(key.startswith("trot_mlp.") for key in state) or manifest.get("refinement_version") == "m20_stair_trot_v1":
+        actor = load_stair_trot_actor(obs, state, manifest)
+        print("[POLICY] StairTrot-v1: complete teacher + ascent residual; policy244/raw_command3/trot_control6", flush=True)
+        return actor
     if any(key.startswith("residual_mlp.") for key in state) or manifest.get("m20_profile") == "idle_stop_motion_v1":
         return load_motion_actor(obs, state, manifest)
     actor = MLPModel(
@@ -137,8 +162,10 @@ def load_model(model_path: Path, args: argparse.Namespace) -> mujoco.MjModel:
     spec = mujoco.MjSpec.from_file(str(model_path))
     spec.option.timestep = PHYSICS_DT
     args.terrain_config = attach_terrain(spec, select_terrain(args),
-        {name: getattr(args, name, None) for name in STAIR_OVERRIDES})
+        {name: getattr(args, name, None) for name in (*STAIR_OVERRIDES, "spawn_xy")})
+    add_spawn_mat(spec, args.terrain_config, args)
     model = spec.compile()
+    validate_spawn_mat(model, args.terrain_config)
     if model.nu != ACTION_DIM:
         raise ValueError(f"Expected {ACTION_DIM} M20 motor actuators, got {model.nu}")
     # The training actuator adds wheel-side armature absent from this MJCF.
@@ -169,34 +196,36 @@ class M20Contract:
         self.grid = scan_grid()
         self.last_scan_hits = np.empty((len(self.grid), 3), dtype=np.float64)
         self.terrain_group = np.array([1, 0, 0, 0, 0, 0], dtype=np.uint8)
+        self.terrain_flex_ids = static_terrain_flex_ids(model)
         terrain_geoms = [
             i for i in range(model.ngeom)
-            if int(model.geom_group[i]) == 0 and int(model.geom_bodyid[i]) == 0
+            if is_terrain_geom(model, i)
         ]
         if not terrain_geoms:
-            raise ValueError("Model has no static group-0 terrain geometry for the height scan")
+            raise ValueError("Model has no group-0 collision terrain geometry for the height scan")
+        self.terrain_geom_ids = frozenset(terrain_geoms)
 
     def reset(self, data: mujoco.MjData, prone: bool = False) -> None:
         mujoco.mj_resetData(self.model, data)
         mujoco.mj_forward(self.model, data)
         x, y = self.terrain.spawn_xy
-        root_z = (0.2 if prone else 0.58) + self.ground_height(data, x, y)
         yaw = self.terrain.spawn_yaw
         root_qpos = int(self.root_joint.qposadr[0])
-        data.qpos[root_qpos : root_qpos + 7] = [x, y, root_z, math.cos(yaw / 2), 0, 0, math.sin(yaw / 2)]
+        data.qpos[root_qpos : root_qpos + 7] = [x, y, 0., math.cos(yaw / 2), 0, 0, math.sin(yaw / 2)]
         data.qpos[self.qpos_ids] = PRONE_JOINT_POS if prone else DEFAULT_JOINT_POS
         data.qvel[:] = 0.0
         data.ctrl[:] = 0.0
-        mujoco.mj_forward(self.model, data)
+        place_on_terrain(self.model, data, root_body_id=self.base_id,
+                         root_qpos_adr=root_qpos, terrain_geom_ids=self.terrain_geom_ids,
+                         terrain_flex_ids=self.terrain_flex_ids)
 
     def ground_height(self, data: mujoco.MjData, x: float, y: float) -> float:
         """Query actual collision terrain, including ramps and native XML geoms."""
         origin = np.array([x, y, self.terrain.ray_top], dtype=np.float64)
-        geom_id = np.zeros(1, dtype=np.int32)
-        distance = mujoco.mj_ray(self.model, data, origin, np.array([0., 0., -1.]),
-                                self.terrain_group, True, -1, geom_id)
-        if distance < 0 or geom_id[0] < 0 or self.model.geom_bodyid[geom_id[0]] != 0:
-            raise RuntimeError(f"No static collision terrain at {(x, y)}")
+        distance, geom_id, flex_id = terrain_ray(
+            self.model, data, origin, np.array([0., 0., -1.]), self.terrain_group, self.terrain_flex_ids)
+        if distance < 0 or (flex_id < 0 and geom_id not in self.terrain_geom_ids):
+            raise RuntimeError(f"No collision terrain at {(x, y)}")
         return float(origin[2] - distance)
 
     def crossing_summary(self, data: mujoco.MjData, fell: bool) -> dict:
@@ -211,7 +240,7 @@ class M20Contract:
                 "clearance_criterion": "all wheels beyond +X goal, inside width at final frame, no fall; bypass not checked"}
 
     def height_scan(self, data: mujoco.MjData) -> np.ndarray:
-        """Raycast static terrain using Isaac's yaw-aligned grid and sensor pose."""
+        """Raycast current terrain poses using Isaac's yaw-aligned grid."""
         rotation = data.xmat[self.base_id].reshape(3, 3)
         base_pos = data.xpos[self.base_id]
         ray_z = max(base_pos[2] + SCAN_HEIGHT, self.terrain.ray_top)
@@ -222,19 +251,35 @@ class M20Contract:
         world_xy[:, 1] = base_pos[1] + sin_yaw * self.grid[:, 0] + cos_yaw * self.grid[:, 1]
         ray_origin = np.array([0.0, 0.0, ray_z], dtype=np.float64)
         ray_direction = np.array([0.0, 0.0, -1.0], dtype=np.float64)
-        geom_id = np.zeros(1, dtype=np.int32)
         scan = np.empty(len(self.grid), dtype=np.float32)
         for i, xy in enumerate(world_xy):
             ray_origin[:2] = xy
-            distance = mujoco.mj_ray(
-                self.model, data, ray_origin, ray_direction, self.terrain_group, True, -1, geom_id
-            )
-            if distance < 0 or geom_id[0] < 0 or self.model.geom_bodyid[geom_id[0]] != 0:
-                raise RuntimeError(f"No static terrain ray hit at scan index {i}, world_xy={xy.tolist()}")
+            distance, geom_id, flex_id = terrain_ray(
+                self.model, data, ray_origin, ray_direction, self.terrain_group, self.terrain_flex_ids)
+            if distance < 0 or (flex_id < 0 and geom_id not in self.terrain_geom_ids):
+                raise RuntimeError(f"No terrain ray hit at scan index {i}, world_xy={xy.tolist()}")
             hit_z = ray_z - distance
             self.last_scan_hits[i] = (xy[0], xy[1], hit_z)
             scan[i] = np.clip(base_pos[2] - hit_z - SCAN_OFFSET, -1.0, 1.0)
         return scan
+
+    def capture_height_scan(self, data, grid):
+        """Additional measured terrain rays; missed outer rays remain unknown."""
+        rotation = data.xmat[self.base_id].reshape(3,3)
+        base = data.xpos[self.base_id]
+        yaw = math.atan2(rotation[1,0],rotation[0,0])
+        co,si = math.cos(yaw),math.sin(yaw)
+        xy = np.column_stack((base[0]+co*grid[:,0]-si*grid[:,1],
+                              base[1]+si*grid[:,0]+co*grid[:,1]))
+        hits = np.column_stack((xy,np.full(len(grid),np.nan)))
+        origin = np.array([0.,0.,max(base[2]+SCAN_HEIGHT,self.terrain.ray_top)])
+        for i,point in enumerate(xy):
+            origin[:2] = point
+            distance,geom,flex = terrain_ray(self.model,data,origin,np.array([0.,0.,-1.]),
+                                             self.terrain_group,self.terrain_flex_ids)
+            if distance >= 0 and (flex >= 0 or geom in self.terrain_geom_ids):
+                hits[i,2] = origin[2]-distance
+        return hits
 
     def observe(self, data: mujoco.MjData, command: np.ndarray, previous_action: np.ndarray) -> np.ndarray:
         body_velocity = np.zeros(6, dtype=np.float64)
@@ -307,6 +352,8 @@ class TeleopKeyboard:
         self._events: deque[str] = deque()
         self._last_motion_press: dict[str, float] = {}
         self._window_keys = X11WindowKeys.open()
+        self._command = np.zeros(3, dtype=np.float64)
+        self._terminal_physical = False
 
     def on_keycode(self, keycode: int) -> None:
         with self._lock:
@@ -318,16 +365,28 @@ class TeleopKeyboard:
                     return
         if keycode == 256:  # GLFW escape
             self.on_char("escape")
+        elif keycode == 259:  # GLFW backspace (also resets the native viewer)
+            self.on_char("reset")
         elif 65 <= keycode <= 90:
             self.on_char(chr(keycode).lower())
 
     def on_char(self, key: str) -> None:
-        key = "escape" if key == "\x1b" else key.lower()
+        key = "escape" if key == "\x1b" else "reset" if key in {"\x7f", "\x08"} else key.lower()
         with self._lock:
             if key in TELEOP_VELOCITIES:
-                self._last_motion_press[key] = time.monotonic()
-            elif key in {"z", "c", "x", "r", "h", "escape"}:
+                if not self._terminal_physical:
+                    self._last_motion_press[key] = time.monotonic()
+            elif key in {"z", "c", "x", "r", "h", "escape", "reset"}:
                 self._events.append(key)
+
+    def note_terminal_event(self) -> None:
+        with self._lock:
+            # Once verified, delayed terminal repeats after focus loss must
+            # never re-enable the character-timeout fallback.
+            self._terminal_physical |= (self._window_keys is not None
+                                        and self._window_keys.note_terminal_event())
+            if self._terminal_physical:
+                self._last_motion_press.clear()
 
     def take_events(self) -> list[str]:
         with self._lock:
@@ -338,6 +397,7 @@ class TeleopKeyboard:
     def clear_motion(self) -> None:
         with self._lock:
             self._last_motion_press.clear()
+            self._command.fill(0.)
 
     def close(self) -> None:
         with self._lock:
@@ -345,6 +405,7 @@ class TeleopKeyboard:
                 self._window_keys.close()
                 self._window_keys = None
             self._last_motion_press.clear()
+            self._command.fill(0.)
 
     def velocity_command(self) -> np.ndarray:
         now = time.monotonic()
@@ -353,14 +414,26 @@ class TeleopKeyboard:
                 key: seen for key, seen in self._last_motion_press.items()
                 if now - seen <= TELEOP_KEY_TIMEOUT
             }
-            pressed = set(self._last_motion_press)
-            if self._window_keys is not None:
-                pressed.update(self._window_keys.pressed())
-        command = np.zeros(3, dtype=np.float32)
-        for key in pressed:
-            command += TELEOP_VELOCITIES[key]
-        return np.clip(command, [-0.7, -0.5, -0.6], [0.7, 0.5, 0.6]).astype(np.float32)
-        # return np.clip(command, [-1.2, -0.7, -1.0], [1.2, 0.7, 1.0]).astype(np.float32)
+            if self._window_keys is not None and self._window_keys.focused():
+                pressed = self._window_keys.pressed()
+                self._last_motion_press.clear()
+            elif self._terminal_physical or not self._last_motion_press:
+                # Focus loss must not leave a decaying movement command behind.
+                self._command.fill(0.)
+                return self._command.astype(np.float32)
+            else:
+                pressed = set(self._last_motion_press)
+            target = np.zeros(3, dtype=np.float64)
+            for key in pressed:
+                target += TELEOP_VELOCITIES[key]
+            target = np.clip(target, -TELEOP_LIMITS, TELEOP_LIMITS)
+            # Reverse through zero first. Each call is one policy tick, so a
+            # paused viewer or slow render cannot jump straight to full speed.
+            braking = (target * self._command < 0) | (target == 0)
+            goal = np.where(braking, 0., target)
+            rate = TELEOP_LIMITS / np.where(braking, TELEOP_STOP_TIME, TELEOP_RISE_TIME)
+            self._command += np.clip(goal - self._command, -rate * POLICY_DT, rate * POLICY_DT)
+            return self._command.astype(np.float32)
 
 
 class TerminalInput:
@@ -395,6 +468,7 @@ class TerminalInput:
                 break
             if not keys:
                 break
+            self.keyboard.note_terminal_event()
             for key in keys:
                 self.keyboard.on_char(chr(key))
 
@@ -454,14 +528,18 @@ def draw_height_scan(viewer, contract: M20Contract, visible: bool) -> None:
         scene.ngeom = len(hits)
 
 
-def interactive_rollout(args: argparse.Namespace) -> dict:
+def interactive_rollout(args: argparse.Namespace, *, actor=None, execution_factory=None) -> dict:
     """Start prone, stand with Z, then hand control to the teacher with C."""
     torch.set_num_threads(1)
-    actor = load_actor(args.checkpoint)
+    if actor is None:
+        actor = load_actor(args.checkpoint)
     model = load_model(args.model, args)
     contract = M20Contract(model, args.terrain_config)
     data = mujoco.MjData(model)
     contract.reset(data, prone=True)
+    perception = make_noise_adapter(args, contract)
+    execution = execution_factory(model, contract) if execution_factory is not None else None
+    trot = make_trot_controller(contract, actor, POLICY_DT)
     heading_hold = heading_controller(contract, actor, getattr(args, "disable_heading_hold", False))
     metrics = live = None
     if getattr(args, "quiet_landing", False):
@@ -480,11 +558,12 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
             viewer.cam.distance = 3.2
             viewer.cam.elevation = -18.0
         terminal_active = terminal.start()
-        print("[KEYS] Z stand | C teacher policy | X lie down | R damping | H height scan | Esc quit", flush=True)
+        print("[KEYS] Z stand | C teacher policy | X lie down | R damping | Backspace reset | H height scan | Esc quit", flush=True)
         print("[HEIGHTMAP] 187 points: green=local ground, red=higher, blue=lower", flush=True)
         print("[KEYS] W/S forward/back | A/D left/right | Q/E turn left/right", flush=True)
         print(f"[KEYS] Input: MuJoCo window{' or focused terminal' if terminal_active else ''}", flush=True)
-        print(f"[KEYS] Window motion: {'hold/release state (X11)' if keys._window_keys is not None else 'repeat events with timeout; use focused terminal if window only reports PRESS'}", flush=True)
+        print(f"[KEYS] Motion: {'X11 held keys in viewer or verified local terminal; combine W+A/Q' if keys._window_keys is not None else 'limited press/timeout fallback; reliable held combinations require an X11 viewer'}", flush=True)
+        print(f"[KEYS] Gradual speed: {TELEOP_RISE_TIME:g}s to full speed, {TELEOP_STOP_TIME:g}s release braking; R stops immediately", flush=True)
         print("[MODE] prone", flush=True)
     except BaseException:
         terminal.close()
@@ -503,7 +582,10 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
     pending_policy = False
     show_height_scan = True
     previous_action = np.zeros(ACTION_DIM, dtype=np.float32)
-    records = {"time": [], "root_pos": [], "command": [], "requested_command": [], "mode": [], "action": []} if args.output else None
+    records = {"time": [], "root_pos": [], "command": [], "requested_command": [], "mode": [],
+               "action": [], "action_issued": []} if args.output else None
+    if records is not None and trot is not None:
+        records["trot_control"] = []
     transitions = [{"time": 0.0, "mode": "prone"}]
     start_x = float(data.xpos[contract.base_id, 0])
     max_x = start_x
@@ -515,19 +597,41 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
     def enter(new_mode: str) -> None:
         nonlocal mode
         mode = new_mode
+        keys.clear_motion()
         if heading_hold is not None:
             heading_hold.reset()
+        if trot is not None:
+            trot.reset()
+        if execution is not None:
+            execution.reset()
+        if perception is not None:
+            perception.reset()
         transitions.append({"time": round(float(data.time), 3), "mode": new_mode})
         print(f"[MODE] {new_mode} t={data.time:.2f}s", flush=True)
+
+    def reset_session() -> None:
+        nonlocal pending_policy, stand_initial, lie_initial
+        contract.reset(data, prone=True)
+        pending_policy = False
+        stand_initial = lie_initial = None
+        previous_action.fill(0.)
+        if metrics is not None:
+            metrics.reset()
+        enter("prone")
 
     try:
         while viewer.is_running() and (args.steps is None or step < args.steps):
             tick_start = time.perf_counter()
+            if execution is not None or perception is not None:
+                mujoco.mj_fwdPosition(model, data)
+                mujoco.mj_fwdVelocity(model, data)
             terminal.poll()
             quit_requested = False
             for key in keys.take_events():
                 if key == "escape":
                     quit_requested = True
+                elif key == "reset":
+                    reset_session()
                 elif key == "h":
                     show_height_scan = not show_height_scan
                     print(f"[HEIGHTMAP] {'visible' if show_height_scan else 'hidden'}", flush=True)
@@ -585,16 +689,31 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
                 current = metrics.kinematics if data.time > 0 else data
                 quiet_start_xy = current.xpos[contract.base_id, :2].copy()
             applied_action = np.zeros(ACTION_DIM, dtype=np.float32)
+            issued_action = applied_action.copy()
+            trot_control = np.zeros(6, dtype=np.float32)
             if mode == "policy":
-                obs = contract.observe(data, command, previous_action)
+                obs = (perception.observe(data, command, previous_action, step) if perception is not None
+                       else contract.observe(data, command, previous_action))
+                if execution is not None:
+                    execution.observe(data, perception.map_adapter if perception is not None else None)
+                if trot is not None:
+                    trot_control = (trot.control(data, requested_command, terrain_points=perception.terrain_points(data))
+                                    if perception is not None else trot.control(data, requested_command))
                 with torch.inference_mode():
-                    tensor_obs = policy_inputs(obs, requested_command, actor)
+                    tensor_obs = (execution.policy_inputs(obs, requested_command, actor, data, perception, trot_control)
+                                  if execution is not None and hasattr(execution, "policy_inputs")
+                                  else policy_inputs(obs, requested_command, actor, trot_control))
                     raw_action = actor(tensor_obs).squeeze(0).cpu().numpy()
                 if raw_action.shape != (ACTION_DIM,) or not np.isfinite(raw_action).all():
                     raise RuntimeError(f"Invalid actor action at step {step}: {raw_action}")
                 blend = min(1.0, (data.time - policy_start) / 0.3)
                 applied_action = np.clip(raw_action * blend, -100.0, 100.0).astype(np.float32)
                 previous_action = applied_action.copy()
+                issued_action = applied_action.copy()
+                if execution is not None and hasattr(execution, 'check_issued'):
+                    execution.check_issued(data, issued_action)
+                if perception is not None:
+                    applied_action = perception.action(issued_action)
             elif mode == "standing":
                 elapsed = data.time - stand_start
                 if elapsed < STAND_PHASE_DURATION:
@@ -618,17 +737,29 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
                 records["requested_command"].append(requested_command.copy())
                 records["mode"].append(mode)
                 records["action"].append(applied_action.copy())
+                records["action_issued"].append(issued_action.copy())
+                if trot is not None:
+                    records["trot_control"].append(trot_control.copy())
             for _ in range(substeps):
+                if execution is not None:
+                    mujoco.mj_step1(model, data)
                 if mode == "policy":
-                    contract.apply_pd(data, applied_action)
+                    if execution is not None:
+                        data.ctrl[contract.actuator_ids] = execution.apply(data, applied_action, command)
+                    else:
+                        contract.apply_pd(data, applied_action)
                 elif mode in {"standing", "ready", "lying"}:
                     contract.apply_pose_pd(data, target)
                 else:
                     contract.apply_damping(data)
                 if metrics is None:
-                    mujoco.mj_step(model, data)
+                    if execution is None:
+                        mujoco.mj_step(model, data)
+                    else:
+                        mujoco.mj_step2(model, data)
                 else:
-                    mujoco.mj_step1(model, data)
+                    if execution is None:
+                        mujoco.mj_step1(model, data)
                     snapshot = metrics.pre_step(data)
                     mujoco.mj_step2(model, data)
                     metrics.post_step(data, snapshot, record=args.output is not None or live is not None)
@@ -636,15 +767,37 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
                         for group in (metrics.records, metrics.extended_records):
                             for values in group.values(): del values[:-1000]
                         del metrics.events[:-1000]
+                if execution is not None:
+                    if mode != "policy" and hasattr(execution, "after_idle_step"):
+                        execution.after_idle_step(data)
+                    else:
+                        execution.after_step(data)
+                    if metrics is not None and (args.output is not None or live is not None):
+                        execution.record(metrics.extended_records)
+                if trot is not None:
+                    trot.sample_contacts(data)
+            if execution is not None or perception is not None:
+                mujoco.mj_fwdPosition(model, data)
+                mujoco.mj_fwdVelocity(model, data)
+                if not np.isfinite(data.qpos).all() or not np.isfinite(data.qvel).all():
+                    raise RuntimeError("Non-finite MuJoCo state")
             steps_done += 1
             if metrics is not None:
                 metrics.tracker.distance[0] += float(np.linalg.norm(metrics.kinematics.xpos[contract.base_id, :2]-quiet_start_xy))
-            draw_height_scan(viewer, contract, show_height_scan)
+            if perception is not None:
+                perception.draw(viewer, data, show_height_scan)
+            else:
+                draw_height_scan(viewer, contract, show_height_scan)
             if metrics is not None:
                 metrics.draw(viewer, data)
             if live is not None and step % 5 == 0:
                 live.update(metrics)
+            before_sync = float(data.time)
             viewer.sync()
+            if data.time < before_sync:
+                # Native Backspace/UI Reset uses XML qpos0. Replace it before
+                # any physics step, including when no key callback is emitted.
+                reset_session()
             time.sleep(max(0.0, POLICY_DT - (time.perf_counter() - tick_start)))
             position = data.xpos[contract.base_id]
             max_x = max(max_x, float(position[0]))
@@ -688,6 +841,12 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
         "fell_in_policy": bool(fell_ever),
         "critic_used": False,
     }
+    if trot is not None:
+        result["stair_trot"] = trot.summary()
+        result["actor_input_dim"] = sum(result["stair_trot"]["input_groups"].values())
+    if execution is not None:
+        result.update(execution.metadata())
+    result.update(noise_metadata(args, perception))
     if records is not None:
         for key in records:
             records[key] = np.asarray(records[key])
@@ -696,6 +855,8 @@ def interactive_rollout(args: argparse.Namespace) -> dict:
         result["trajectory"] = str(args.output.resolve())
     if metrics is not None:
         result["quiet"] = metrics.summary()
+        if getattr(args, "snapshot", None):
+            metrics.snapshot(data, args.snapshot)
         if args.output is not None:
             quiet_path = args.output.with_name(args.output.stem+"_quiet.npz")
             metrics.save(quiet_path, result)
@@ -711,6 +872,8 @@ def rollout(args: argparse.Namespace) -> dict:
     contract = M20Contract(model, args.terrain_config)
     data = mujoco.MjData(model)
     contract.reset(data)
+    perception = make_noise_adapter(args, contract)
+    trot = make_trot_controller(contract, actor, POLICY_DT)
     heading_hold = heading_controller(contract, actor, getattr(args, "disable_heading_hold", False) or getattr(args, "track_course", False))
     metrics = live = None
     if getattr(args, "quiet_landing", False):
@@ -725,7 +888,10 @@ def rollout(args: argparse.Namespace) -> dict:
     substeps = round(POLICY_DT / PHYSICS_DT)
     if not math.isclose(substeps * PHYSICS_DT, POLICY_DT):
         raise RuntimeError("Policy period is not an integer number of physics steps")
-    records = {"time": [], "root_pos": [], "root_quat": [], "observation": [], "action": [], "command": [], "requested_command": []}
+    records = {"time": [], "root_pos": [], "root_quat": [], "observation": [], "action": [],
+               "action_applied": [], "command": [], "requested_command": []}
+    if trot is not None:
+        records["trot_control"] = []
     start_x = float(data.xpos[contract.base_id, 0])
     fell = False
     fell_ever = False
@@ -738,6 +904,9 @@ def rollout(args: argparse.Namespace) -> dict:
     try:
         for step in range(args.steps if args.steps is not None else 1000):
             tic = time.perf_counter()
+            if perception is not None:
+                mujoco.mj_fwdPosition(model, data)
+                mujoco.mj_fwdVelocity(model, data)
             if heading_hold is not None:
                 command = heading_hold.update(data, requested_command)
             if getattr(args, "track_course", False):
@@ -745,21 +914,27 @@ def rollout(args: argparse.Namespace) -> dict:
                 # course heading/center rather than requesting zero yaw rate.
                 rotation = data.xmat[contract.base_id].reshape(3, 3)
                 yaw = math.atan2(rotation[1, 0], rotation[0, 0])
-                target = contract.terrain.spawn_yaw
-                lateral = float(np.clip(-0.5*(data.xpos[contract.base_id, 1]-contract.terrain.spawn_xy[1]), -0.25, 0.25))
+                route_xy, target = (trot.state.fixed_route if trot is not None and trot.state.fixed_route is not None
+                                    else (contract.terrain.spawn_xy, contract.terrain.spawn_yaw))
+                lateral = float(np.clip(-0.5*(data.xpos[contract.base_id, 1]-route_xy[1]), -0.25, 0.25))
                 world_x = args.command_x*math.cos(target)-lateral*math.sin(target)
                 world_y = args.command_x*math.sin(target)+lateral*math.cos(target)
                 command[:2] = (math.cos(yaw)*world_x+math.sin(yaw)*world_y,
                                -math.sin(yaw)*world_x+math.cos(yaw)*world_y)
                 heading_error = math.atan2(math.sin(target-yaw), math.cos(target-yaw))
                 command[2] = np.clip(0.5*heading_error, -0.5, 0.5)
-            obs = contract.observe(data, command, previous_action)
+            obs = (perception.observe(data, command, previous_action, step) if perception is not None
+                   else contract.observe(data, command, previous_action))
+            trot_control = (trot.control(data, requested_command, terrain_points=perception.terrain_points(data))
+                            if trot is not None and perception is not None else
+                            trot.control(data, requested_command) if trot is not None else None)
             with torch.inference_mode():
-                tensor_obs = policy_inputs(obs, requested_command, actor)
+                tensor_obs = policy_inputs(obs, requested_command, actor, trot_control)
                 action = actor(tensor_obs).squeeze(0).cpu().numpy()
             if action.shape != (ACTION_DIM,) or not np.isfinite(action).all():
                 raise RuntimeError(f"Invalid actor action at step {step}: {action}")
             action = np.clip(action, -100.0, 100.0)
+            applied_action = perception.action(action) if perception is not None else action
             if metrics is not None:
                 metrics.command_xy = command[:2]
                 metrics.tracker.begin_step()
@@ -770,10 +945,13 @@ def rollout(args: argparse.Namespace) -> dict:
             records["root_quat"].append(data.xquat[contract.base_id].copy())
             records["observation"].append(obs)
             records["action"].append(action.copy())
+            records["action_applied"].append(applied_action.copy())
             records["command"].append(command.copy())
             records["requested_command"].append(requested_command.copy())
+            if trot is not None:
+                records["trot_control"].append(trot_control.copy())
             for _ in range(substeps):
-                contract.apply_pd(data, action)
+                contract.apply_pd(data, applied_action)
                 if metrics is None:
                     mujoco.mj_step(model, data)
                 else:
@@ -785,14 +963,29 @@ def rollout(args: argparse.Namespace) -> dict:
                         for group in (metrics.records, metrics.extended_records):
                             for values in group.values(): del values[:-1000]
                         del metrics.events[:-1000]
+                if trot is not None:
+                    trot.sample_contacts(data)
             previous_action = action.astype(np.float32)
             if metrics is not None:
                 metrics.tracker.distance[0] += float(np.linalg.norm(metrics.kinematics.xpos[contract.base_id, :2]-quiet_start_xy))
             if viewer is not None:
-                draw_height_scan(viewer, contract, True)
+                if perception is not None:
+                    perception.draw(viewer, data, True)
+                else:
+                    draw_height_scan(viewer, contract, True)
                 if metrics is not None:
                     metrics.draw(viewer, data)
+                before_sync = float(data.time)
                 viewer.sync()
+                if data.time < before_sync:
+                    contract.reset(data)
+                    previous_action.fill(0.)
+                    command[:] = requested_command
+                    for state in (perception, trot, heading_hold):
+                        if state is not None:
+                            state.reset()
+                    if metrics is not None:
+                        metrics.reset()
                 time.sleep(max(0.0, POLICY_DT - (time.perf_counter() - tic)))
             if live is not None and step % 5 == 0:
                 live.update(metrics)
@@ -839,6 +1032,10 @@ def rollout(args: argparse.Namespace) -> dict:
         "fell": fell_ever,
         "track_course": getattr(args, "track_course", False),
     }
+    result.update(noise_metadata(args, perception))
+    if trot is not None:
+        result["stair_trot"] = trot.summary()
+        result["actor_input_dim"] = sum(result["stair_trot"]["input_groups"].values())
     if args.output is not None:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         np.savez_compressed(args.output, **records, summary=json.dumps(result))
@@ -855,6 +1052,8 @@ def rollout(args: argparse.Namespace) -> dict:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    add_noise_arguments(parser)
+    add_spawn_arguments(parser)
     parser.add_argument("--checkpoint", type=Path, default=DEFAULT_CHECKPOINT)
     parser.add_argument("--model", type=Path, required=True, help="M20 MuJoCo XML (pin the tested model version)")
     terrain_choice = parser.add_mutually_exclusive_group()
@@ -887,6 +1086,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--live-plot", action="store_true",
                         help="Live four-wheel speed/energy/force curves; enables --quiet-landing")
     args = parser.parse_args()
+    validate_noise_arguments(args, parser)
     args.quiet_landing = args.quiet_landing or args.live_plot
     if ((args.steps is not None and args.steps <= 0)
         or any(value is not None and value <= 0 for value in

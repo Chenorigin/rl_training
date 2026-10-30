@@ -59,7 +59,7 @@ source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/
 
 `_env.py` 指定环境实现，`_env_cfg.py` 定义环境配置，`_ppo_cfg.py` 是统一命名的训练配置入口。学生任务在该入口中仍使用蒸馏算法。专用实现集中到 `task_support/<slug>/`，继承和共享代码按原有接口复用。
 
-当前注册 **12 个 Gym 任务**，以 [任务注册表](source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/__init__.py) 为准：
+当前注册 **13 个 Gym 任务**，以 [任务注册表](source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/config/wheeled/deeprobotics_m20/__init__.py) 为准：
 
 | Gym ID | slug | 用途 |
 | --- | --- | --- |
@@ -68,6 +68,7 @@ source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/
 | `Rough-Deeprobotics-M20-PreTeacher-v0` | `pre_teacher` | 前置教师训练 |
 | `Rough-Deeprobotics-M20-StairTeacher-v0` | `stair_teacher` | 楼梯教师 |
 | `Rough-Deeprobotics-M20-IdleStopMotion-v1` | `idle_stop_motion_v1` | 冻结驻足基座上的运动残差教师 |
+| `Rough-Deeprobotics-M20-StairTrot-v1` | `stair_trot_v1` | 上楼对角同步 trot，冻结完整教师以保护平地轮行 |
 | `Rough-Deeprobotics-M20-StairStudent-v0` | `stair_student` | 扩展感知输入的 PPO 微调任务 |
 | `Rough-Deeprobotics-M20-QuietLanding-v0` | `quiet_landing` | 轻盈落地教师 |
 | `Rough-Deeprobotics-M20-GaitRefinement-v2` | `gait_refinement_v2` | 驻足、航向与回放保留训练 |
@@ -77,6 +78,9 @@ source/rl_training/rl_training/tasks/manager_based/locomotion/velocity/
 | `Rough-Deeprobotics-M20-Student-v3.5` | `student_v3_5` | 完整运动残差教师的学生蒸馏 |
 
 在 Isaac Lab 环境中运行 `python scripts/tools/list_envs.py` 可查看实际注册的环境。
+
+新建上楼 trot 任务的训练、续训和回放命令见 [StairTrot-v1 操作指南](docs/m20_stair_trot_v1.md)。
+训练由用户手动启动；代码交付时只执行无优化器更新的检查，尚无新训练权重或步态达标结论。
 
 ## 教师训练与 Isaac 回放
 
@@ -160,6 +164,8 @@ python scripts/reinforcement_learning/rsl_rl/distill_student.py \
 
 教师、v0 学生和 v1/v3/v3.5 学生分别使用对应部署入口。MuJoCo 参数采用连字符：
 
+StairTrot-v1 权重也使用 `deploy_mujoco.py`，自动加载完整残差和六维控制状态；具体命令见 [StairTrot-v1 MuJoCo 部署](docs/m20_stair_trot_v1.md#mujoco-部署)。
+
 ```bash
 python deploy/deploy_mujoco/deploy_mujoco.py \
   --checkpoint deploy/models/idle_stop_motion_v1/idle_stop_motion_v1_46400.pt \
@@ -209,10 +215,6 @@ python -m pytest -q -p no:cacheprovider tests
 ```
 
 测试包含小型 CPU 优化和 MuJoCo 物理用例，并非全部都是静态检查。IdleStopMotion 另完成过真实 Isaac **4 个环境、8 步**的推理冒烟及完整 checkpoint 恢复检查，未执行优化器更新；这些结果验证接线与有限输出，不能证明楼梯通行性能、长期稳定性或真机可用性。
-
-## 实机部署复盘
-
-[M20 Pro 实机部署复盘（2026 年 10 月）](logs/evaluation/m20_real_deployment_20261020/README.md)整理了传感器通信、控制映射、时序、动态地形、ARM 数值验证和版本管理中的问题、修复过程及工程经验，并区分已验证修复、阶段性缓解与未解决事项。该精选复盘单独纳入版本管理，原始运行日志仍保留在本地；短时验证结果不代表长期稳定或楼梯能力已通过验收。
 
 ## 来源与许可证
 

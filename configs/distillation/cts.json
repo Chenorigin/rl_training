@@ -1,0 +1,745 @@
+{
+  "seed": 42,
+  "num_steps_per_env": 24,
+  "max_iterations": 30000,
+  "save_interval": 500,
+  "legacy_stairs": {
+    "steps": 10
+  },
+  "motion_practice": {
+    "fraction": 0.15,
+    "patch_length": 10.0,
+    "patch_width": 5.0,
+    "patch_gap": 2.0,
+    "mesh_resolution": 0.1,
+    "slope_degrees": [
+      -12.0,
+      -6.0,
+      6.0,
+      12.0
+    ],
+    "wave_amplitudes_m": [
+      0.035,
+      0.07
+    ],
+    "wave_lengths_m": [
+      1.2,
+      1.8
+    ],
+    "speed_range": [
+      0.25,
+      0.65
+    ],
+    "yaw_rate_range": [
+      0.25,
+      0.65
+    ],
+    "arc_yaw_range": [
+      0.15,
+      0.3
+    ],
+    "initial_hold_s": 0.4,
+    "move_s": 3.0,
+    "stop_s": 0.6,
+    "reset_xy_range": [
+      0.1,
+      0.1
+    ],
+    "reset_yaw_range": 0.15,
+    "reset_velocity_range": 0.03,
+    "push_interval_range_s": [
+      0.6,
+      1.2
+    ],
+    "push_velocity_range": [
+      -0.08,
+      0.08
+    ],
+    "boundary_margin": 0.65,
+    "tracking_std": 0.5,
+    "linear_reward": 3.0,
+    "yaw_reward": 1.5,
+    "normal_tilt_cost": 1.0,
+    "action_rate_cost": 0.02,
+    "effort_cost": 1e-05,
+    "failure_cost": 10.0,
+    "min_root_height": 0.22,
+    "support_distance_m": 0.04,
+    "ray_height_tolerance_m": 0.002,
+    "flat_clearance_free_m": 0.025,
+    "flat_clearance_scale_m": 0.05,
+    "flat_air_cost": 2.0,
+    "flat_support_cost": 0.5,
+    "flat_leg_pose_cost": 0.15,
+    "flat_leg_rate_cost": 0.02
+  },
+  "sample_stairs": {
+    "terrain_xml": "deploy/deploy_mujoco/terrains/sample_stairs.xml",
+    "support_hold_s": 0.03,
+    "phase_bonus": 1.0
+  },
+  "platform_practice": {
+    "fraction": 0.05,
+    "width": 1.0,
+    "patch_length": 10.0,
+    "floor_padding": 4.0,
+    "patch_gap": 2.0,
+    "height_bands": [
+      [
+        0.04,
+        0.12
+      ],
+      [
+        0.12,
+        0.25
+      ],
+      [
+        0.25,
+        0.55
+      ],
+      [
+        0.55,
+        1.0
+      ]
+    ],
+    "samples_per_band": 4,
+    "terrain_seed": 42,
+    "risk_height_range": [
+      0.12,
+      0.55
+    ],
+    "speed_range": [
+      0.25,
+      0.55
+    ],
+    "approach_speed_range": [
+      0.45,
+      0.6
+    ],
+    "initial_hold_s": 0.4,
+    "move_s": 3.0,
+    "stop_s": 0.6,
+    "low_start_from_end": 0.7,
+    "reset_xy_range": [
+      0.05,
+      0.12
+    ],
+    "reset_yaw_range": 0.15,
+    "reset_velocity_range": 0.03,
+    "push_interval_range_s": [
+      0.6,
+      1.2
+    ],
+    "push_velocity_range": [
+      -0.08,
+      0.08
+    ],
+    "boundary_margin": 0.6,
+    "min_root_height": 0.1,
+    "fall_speed_m_s": 0.8,
+    "fall_grace_s": 0.1,
+    "edge_margin": 0.08,
+    "prediction_s": 0.2,
+    "tracking_std": 0.5,
+    "linear_reward": 2.0,
+    "yaw_reward": 0.5,
+    "tilt_cost": 1.0,
+    "edge_cost": 4.0,
+    "center_cost": 0.5,
+    "impact_cost": 0.5,
+    "departure_cost": 5.0,
+    "stop_speed_m_s": 0.1,
+    "action_rate_cost": 0.02,
+    "effort_cost": 1e-05,
+    "failure_cost": 10.0,
+    "descent_bonus": 2.0
+  },
+  "auxiliary": {
+    "temporal_loss_weight": 0.5,
+    "spatial_loss_weight": 0.1,
+    "stability_batch_size": 256,
+    "spatial_noise_scale": 0.5,
+    "retention_loss_weight": 1.0,
+    "retention_manifest": "deploy/models/cts/nonforward_retention_startup_20261027/manifest.json",
+    "retention_sha256": "b774e08914ed5f30cebd628fb38b48fabd7661fcb984dd92980daa8eeee43ddf",
+    "retention_command_manifest": "deploy/models/cts/nonforward_retention_startup_20261027/commands.json",
+    "retention_command_sha256": "218dc9665823d5a36c7c2e3347f50e0943d89782c2423ee386538d0476b05617",
+    "retention_batch_size": 256,
+    "leg_loss_weight": 1.0,
+    "wheel_loss_weight": 1.0
+  },
+  "algorithm": {
+    "teacher_fraction": 0.75,
+    "cohort_seed": 42,
+    "learning_rate": 3e-05,
+    "train_teacher_base": true,
+    "teacher_learning_rate": 3e-06,
+    "student_learning_rate": 5e-05,
+    "gamma": 0.99,
+    "lam": 0.95,
+    "clip_param": 0.1,
+    "num_learning_epochs": 5,
+    "num_mini_batches": 4,
+    "value_loss_coef": 1.0,
+    "max_grad_norm": 1.0,
+    "student_learning_epochs": 2,
+    "student_batch_size": 1024,
+    "latent_loss_weight": 1.0,
+    "decoder_hidden_dims": [
+      128,
+      64
+    ],
+    "decoder_bound": [
+      0.18,
+      0.35,
+      0.35,
+      0.18,
+      0.35,
+      0.35,
+      0.18,
+      0.35,
+      0.35,
+      0.18,
+      0.35,
+      0.35,
+      0.16,
+      0.16,
+      0.16,
+      0.16
+    ],
+    "anchor_coefficient": 0.5,
+    "entropy_coef": 0.0,
+    "desired_kl": 0.01
+  },
+  "map_delay_mixture": {
+    "zero_delay_probability": 0.2
+  },
+  "map_recovery": {
+    "enabled": true,
+    "episode_probability": 0.3,
+    "interval_s": [
+      3.0,
+      6.0
+    ],
+    "blackout_extra_s": [
+      0.1,
+      0.4
+    ],
+    "recovery_s": [
+      0.3,
+      0.8
+    ],
+    "initial_keep_fraction": [
+      0.05,
+      0.2
+    ],
+    "ramp_probability": 0.5
+  },
+  "map_capture": {
+    "padding_m": 0.6
+  },
+  "straight_practice": {
+    "fraction": 0.05,
+    "move_s": 8.0,
+    "patch_length": 16.0,
+    "leg_action_loss_weight": 1.0,
+    "batch_size": 256
+  },
+  "all_terrain": {
+    "enabled": true,
+    "fractions": [
+      0.26,
+      0.26,
+      0.13,
+      0.15,
+      0.03,
+      0.03,
+      0.02,
+      0.02,
+      0.05,
+      0.05
+    ],
+    "geometry": {
+      "seed": 42,
+      "samples_per_level": 16,
+      "geometry_levels": 7,
+      "tile_length": 24.0,
+      "tile_width": 6.0,
+      "grid_resolution": 0.1,
+      "height_range": [
+        0.15,
+        0.25
+      ],
+      "depth_range": [
+        0.15,
+        0.35
+      ],
+      "width_range": [
+        1.0,
+        4.0
+      ],
+      "steps_range": [
+        8,
+        20
+      ],
+      "platform_length_range": [
+        0.8,
+        1.5
+      ],
+      "stiffness_range": [
+        40000.0,
+        400000.0
+      ],
+      "damping_range": [
+        500.0,
+        1500.0
+      ],
+      "initial_height_max": 0.2,
+      "intermediate_height_max": 0.225,
+      "initial_depth_min": 0.25,
+      "intermediate_depth_min": 0.2,
+      "initial_steps_max": 12,
+      "initial_width_min": 2.0,
+      "route_start": 1.5,
+      "goal_landing": 1.2,
+      "goal_clearance": 0.75,
+      "start_backward": 3.0,
+      "field_half_length": 8.0,
+      "ground_thickness": 0.25,
+      "tile_gap": 2.0,
+      "field_goal": 5.0,
+      "spawn_flat_half_length": 0.9,
+      "spawn_transition_length": 0.8,
+      "slope_angle_range": [
+        0.03,
+        0.3
+      ],
+      "wave_amplitude_range": [
+        0.015,
+        0.18
+      ],
+      "wave_length_range": [
+        1.2,
+        3.5
+      ],
+      "rough_amplitude_range": [
+        0.008,
+        0.1
+      ],
+      "rough_wavelength_range": [
+        0.35,
+        1.5
+      ],
+      "rough_components": 5,
+      "obstacle_count_range": [
+        8,
+        16
+      ],
+      "obstacle_length_range": [
+        0.18,
+        0.65
+      ],
+      "obstacle_width_range": [
+        0.18,
+        0.65
+      ],
+      "obstacle_height_range": [
+        0.025,
+        0.26
+      ],
+      "obstacle_x_range": [
+        1.7,
+        6.5
+      ],
+      "obstacle_y_half_range": 2.25,
+      "mixed_obstacle_x_range": [
+        4.2,
+        6.5
+      ],
+      "mixed_ramp_height_range": [
+        0.02,
+        0.12
+      ],
+      "mixed_ramp_start": 1.2,
+      "mixed_ramp_length": 2.0,
+      "pit_count_range": [
+        8,
+        16
+      ],
+      "pit_x_range": [
+        1.6,
+        6.8
+      ],
+      "pit_y_half_range": 2.2,
+      "pit_radius_range": [
+        0.25,
+        0.65
+      ],
+      "pit_depth_range": [
+        0.015,
+        0.19
+      ],
+      "platform_height_range": [
+        0.04,
+        1.0
+      ],
+      "platform_width_range": [
+        1.2,
+        2.6
+      ],
+      "raised_platform_length_range": [
+        6.0,
+        8.0
+      ],
+      "raised_platform_back_edge": -3.0
+    },
+    "curriculum": {
+      "window_episodes": 100,
+      "promote_success": 0.9,
+      "demote_success": 0.7,
+      "consecutive_windows": 2,
+      "max_window_updates": 30000,
+      "min_boundary_episodes": 10,
+      "min_delayed_episodes": 30,
+      "role_fractions": [
+        0.6,
+        0.25,
+        0.15
+      ],
+      "geometry_levels": 7,
+      "dr_levels": 3,
+      "seed": 42
+    },
+    "domain": {
+      "static_friction": [
+        0.4,
+        1.1
+      ],
+      "dynamic_ratio": [
+        0.65,
+        0.9
+      ],
+      "mass_scale": [
+        0.9,
+        1.1
+      ],
+      "kp_scale": [
+        0.9,
+        1.1
+      ],
+      "kd_scale": [
+        0.9,
+        1.1
+      ],
+      "com_offset_m": 0.015,
+      "initial_scale": 0.5
+    },
+    "commands": {
+      "forward_speed": [
+        0.25,
+        0.65
+      ],
+      "backward_speed": [
+        0.15,
+        0.35
+      ],
+      "yaw_rate": [
+        0.2,
+        0.6
+      ],
+      "initial_hold_s": 0.4,
+      "move_s": 5.0,
+      "straight_move_s": 8.0,
+      "stop_s": 1.0,
+      "success_hold_s": 0.2,
+      "route_time_margin_s": 8.0,
+      "tracking_rms_m_s": 0.25,
+      "yaw_tracking_rms_rad_s": 0.35,
+      "stop_speed_m_s": 0.1,
+      "stop_yaw_rad_s": 0.15,
+      "terrain_exposure_m": 2.5,
+      "relative_tracking_tolerance": 0.6,
+      "tracking_floor_m_s": 0.03,
+      "yaw_tracking_floor_rad_s": 0.05
+    },
+    "rewards": {
+      "linear": 3.0,
+      "yaw": 1.5,
+      "progress": 2.0,
+      "success": 5.0,
+      "tilt": 0.5,
+      "action_rate": 0.02,
+      "effort": 1e-05,
+      "failure": 10.0,
+      "slip": 0.05,
+      "impact": 0.1,
+      "stop": 2.0,
+      "min_root_clearance": 0.18,
+      "min_upright": 0.6,
+      "boundary_margin": 0.2,
+      "flat_air_cost": 2.0,
+      "flat_support_cost": 0.5,
+      "flat_pose_cost": 0.15,
+      "flat_leg_rate_cost": 0.02,
+      "flat_clearance_free_m": 0.025,
+      "flat_clearance_scale_m": 0.05
+    },
+    "actor": {
+      "idle_leg_scale": 0.25,
+      "new_domain_anchor_scale": 0.1
+    },
+    "simulation": {
+      "collision_stack_mib": 1024
+    },
+    "motion_stability": {
+      "lateral_speed": [
+        0.08,
+        0.35
+      ],
+      "lateral_travel_m": 0.6,
+      "command_ramp_s": [
+        0.15,
+        0.45
+      ],
+      "abrupt_command_probability": 0.25,
+      "arc_transition_probability": 0.5
+    },
+    "startup_stability": {
+      "joint_offset_rad": 0.2,
+      "joint_velocity_rad_s": 0.03,
+      "roll_pitch_rate_cost": 0.15,
+      "idle_wheel_speed_cost": 0.02,
+      "idle_joint_speed_cost": 0.01,
+      "idle_action_rate_cost": 0.1,
+      "joint_limit_cost": 0.5,
+      "joint_limit_margin_fraction": 0.1
+    },
+    "hind_clearance": {
+      "enabled": true,
+      "margin_m": 0.05,
+      "lookahead_m": 0.16,
+      "min_rise_m": 0.04,
+      "support_tolerance_m": 0.025,
+      "command_min_m_s": 0.05,
+      "force_scale_N": 150.0,
+      "clearance_weight": 2.5,
+      "riser_weight": 0.5,
+      "support_weight": 0.75
+    },
+    "compound_commands": {
+      "enabled": true,
+      "forward_speed": [
+        0.08,
+        0.7
+      ],
+      "backward_speed": [
+        0.08,
+        0.7
+      ],
+      "lateral_speed": [
+        0.08,
+        0.5
+      ],
+      "yaw_rate": [
+        0.1,
+        0.6
+      ],
+      "travel_m": 1.8,
+      "transition_probability": 0.5
+    },
+    "wall_practice": {
+      "enabled": true,
+      "episode_fraction": 0.75,
+      "samples_per_kind_level": 4,
+      "width_range": [
+        0.9,
+        1.8
+      ],
+      "initial_min_width": 1.4,
+      "wall_height_range": [
+        0.9,
+        1.3
+      ],
+      "wall_thickness": 0.15,
+      "speed_range": [
+        0.15,
+        0.4
+      ],
+      "yaw_rate": 0.3,
+      "heading_kp": 1.5,
+      "align_angle": 0.025,
+      "waypoint_tolerance": 0.1,
+      "spawn_yaw": 0.08,
+      "spawn_margin": 0.03,
+      "spawn_half_length": 0.55,
+      "spawn_half_width": 0.41,
+      "offset_fraction": 0.9,
+      "turn_width": 1.5,
+      "stop_margin": 0.2,
+      "timeout_s": 60.0,
+      "safe_margin": 0.04,
+      "penetration_limit": 0.015,
+      "clearance_weight": 3.0,
+      "leg_delta_weight": 0.1,
+      "leg_jerk_weight": 0.05,
+      "target_delta_scale": 0.02,
+      "collision_geometry": "configs/distillation/m20_collision_envelope.json",
+      "collision_geometry_sha256": "9e6f3905ba4d4d9497a746618220649671142e85fc79cbe398e658abb59979e6",
+      "minimum_turn_rate": 0.12
+    }
+  },
+  "joint_limits": {
+    "version": 1,
+    "joint_names": [
+      "fl_hipx_joint",
+      "fl_hipy_joint",
+      "fl_knee_joint",
+      "fr_hipx_joint",
+      "fr_hipy_joint",
+      "fr_knee_joint",
+      "hl_hipx_joint",
+      "hl_hipy_joint",
+      "hl_knee_joint",
+      "hr_hipx_joint",
+      "hr_hipy_joint",
+      "hr_knee_joint"
+    ],
+    "target_bounds_rad": [
+      [
+        -0.436,
+        0.611
+      ],
+      [
+        -2.286,
+        2.583
+      ],
+      [
+        -2.809,
+        2.792
+      ],
+      [
+        -0.611,
+        0.436
+      ],
+      [
+        -2.286,
+        2.583
+      ],
+      [
+        -2.809,
+        2.792
+      ],
+      [
+        -0.436,
+        0.611
+      ],
+      [
+        -2.583,
+        2.286
+      ],
+      [
+        -2.792,
+        2.809
+      ],
+      [
+        -0.611,
+        0.436
+      ],
+      [
+        -2.583,
+        2.286
+      ],
+      [
+        -2.792,
+        2.809
+      ]
+    ],
+    "feedback_bounds_rad": [
+      [
+        -0.436,
+        0.611
+      ],
+      [
+        -2.286,
+        2.583
+      ],
+      [
+        -2.809,
+        2.792
+      ],
+      [
+        -0.611,
+        0.436
+      ],
+      [
+        -2.286,
+        2.583
+      ],
+      [
+        -2.809,
+        2.792
+      ],
+      [
+        -0.436,
+        0.611
+      ],
+      [
+        -2.583,
+        2.286
+      ],
+      [
+        -2.792,
+        2.809
+      ],
+      [
+        -0.611,
+        0.436
+      ],
+      [
+        -2.583,
+        2.286
+      ],
+      [
+        -2.792,
+        2.809
+      ]
+    ],
+    "default_position_rad": [
+      0.0,
+      -0.3,
+      0.6,
+      0.0,
+      -0.3,
+      0.6,
+      0.0,
+      0.3,
+      -0.6,
+      0.0,
+      0.3,
+      -0.6
+    ],
+    "action_scale": [
+      0.125,
+      0.25,
+      0.25,
+      0.125,
+      0.25,
+      0.25,
+      0.125,
+      0.25,
+      0.25,
+      0.125,
+      0.25,
+      0.25
+    ],
+    "normalized_action_clip": [
+      -100.0,
+      100.0
+    ],
+    "margin_fraction": 0.1,
+    "target_cost_weight": 1.0,
+    "feedback_cost_weight": 1.0,
+    "student_loss_weight": 1.0,
+    "source_robot_sha256": "57b41c8e0b504800f192deb4ce5bd1900f0ba75617a12f1fa4f78cbdc993fe54"
+  }
+}

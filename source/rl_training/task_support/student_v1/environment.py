@@ -58,12 +58,17 @@ def last_issued_action(env):
     return action_delay(env).previous_issued
 
 
+def capture_hits(env):
+    name = 'height_scanner_capture' if env.cfg.student_perception.map_capture_padding_m else 'height_scanner'
+    return env.scene.sensors[name].data.ray_hits_w
+
+
 def student_observation(env):
     robot = env.scene["robot"]
     rotation = quaternion_rotation(robot.data.root_quat_w)
     yaw = torch.atan2(rotation[:, 1, 0], rotation[:, 0, 0])
     return sensor_state(env).observe(clean_teacher_proprio(env),
-                                     env.scene.sensors["height_scanner"].data.ray_hits_w,
+                                     capture_hits(env),
                                      robot.data.root_pos_w, yaw, rotation, int(env.common_step_counter))
 
 

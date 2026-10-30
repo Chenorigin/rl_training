@@ -18,10 +18,11 @@ import numpy as np
 TERRAIN_DIR = Path(__file__).resolve().parent / "terrains"
 PRESETS = {
     "flat": "flat.xml", "ascent": "stairs_ascent.xml", "descent": "stairs_descent.xml",
+    "ascent_open": "stairs_ascent_open.xml",
     "slope_up": "slope_up.xml", "slope_down": "slope_down.xml", "rough": "rough.xml",
     "obstacles": "obstacles.xml", "hurdles": "hurdles.xml", "mixed": "mixed.xml",
 }
-KINDS = set(PRESETS) | {"custom"}
+KINDS = (set(PRESETS) - {"ascent_open"}) | {"custom"}
 STAIR_OVERRIDES = {"stair_height": "step_height", "tread_depth": "tread_depth",
                    "stair_count": "step_count", "stair_start": "start_x"}
 
@@ -36,11 +37,68 @@ class Terrain:
     goal_x: float
     course_width: float
     ray_top: float
+    spawn_mat: dict | None = None
 
     def summary(self) -> dict:
-        return {"terrain": self.kind, "terrain_xml": str(self.path),
+        result = {"terrain": self.kind, "terrain_xml": str(self.path),
                 "terrain_parameters": self.parameters, "goal_x": self.goal_x,
                 "course_width": self.course_width}
+        result["spawn_xy"] = list(self.spawn_xy)
+        result["spawn_mat"] = self.spawn_mat
+        if self.parameters.get("open_risers") == [1.0]:
+            result["open_risers"] = True
+            result["surface_collision"] = "world-fixed zero-radius triangular flex; no riser/side/bottom faces"
+        return result
+
+
+def static_terrain_flex_ids(model):
+    """Only group-0 flexes whose vertices are all fixed to the world."""
+    result = []
+    for flex in range(getattr(model, "nflex", 0)):
+        start, count = int(model.flex_vertadr[flex]), int(model.flex_vertnum[flex])
+        if model.flex_group[flex] == 0 and count and np.all(model.flex_vertbodyid[start:start+count] == 0):
+            result.append(flex)
+    return tuple(result)
+
+
+def terrain_ray(model, data, origin, direction, groups, flex_ids=None):
+    """Nearest ordinary geom OR actual static flex face; mj_ray omits flexes."""
+    geom = np.full(1, -1, dtype=np.int32)
+    distance = mujoco.mj_ray(model, data, origin, direction, groups, True, -1, geom)
+    hit_geom, hit_flex = int(geom[0]), -1
+    for flex in static_terrain_flex_ids(model) if flex_ids is None else flex_ids:
+        value = mujoco.mj_rayFlex(model, data, 0, False, False, True, False,
+                                  flex, origin, direction)
+        if value >= 0 and (distance < 0 or value < distance):
+            distance, hit_geom, hit_flex = value, -1, flex
+    return distance, hit_geom, hit_flex
+
+
+def is_terrain_geom(model, geom):
+    """Collision terrain, including passive bodies attached with our prefix.
+
+    Body 0 remains the contact-reader sentinel for terrain, not a claim that
+    the physical object is fixed. Robot bodies must never become terrain.
+    """
+    return (geom >= 0 and model.geom_group[geom] == 0
+            and bool(model.geom_contype[geom] or model.geom_conaffinity[geom])
+            and (model.geom_bodyid[geom] == 0
+                 or model.geom(geom).name.startswith("terrain_")))
+
+
+def terrain_contact_bodies(model, contact, flex_ids):
+    """Map fixed/movable terrain to sentinel 0; preserve robot body IDs."""
+    bodies = []
+    for side in range(2):
+        geom = int(contact.geom[side])
+        if geom >= 0:
+            body = int(model.geom_bodyid[geom])
+            bodies.append(0 if is_terrain_geom(model, geom) else (body or None))
+        elif int(contact.flex[side]) in flex_ids:
+            bodies.append(0)
+        else:
+            bodies.append(None)
+    return tuple(bodies)
 
 
 def read_config(path: Path, overrides: dict | None = None):
@@ -62,6 +120,11 @@ def read_config(path: Path, overrides: dict | None = None):
         parameters[name] = values
     for name, value in (overrides or {}).items():
         if value is not None:
+            if name == "spawn_xy":
+                if len(value) != 2 or not np.isfinite(value).all():
+                    raise ValueError("spawn_xy must contain finite x y")
+                parameters[name] = [float(v) for v in value]
+                continue
             if kind not in {"ascent", "descent"}:
                 raise ValueError("Stair CLI overrides require an ascent/descent terrain XML")
             if not math.isfinite(value):
@@ -73,6 +136,13 @@ def read_config(path: Path, overrides: dict | None = None):
 def attach_terrain(robot_spec: mujoco.MjSpec, path: Path, overrides: dict | None = None) -> Terrain:
     path = path.resolve()
     kind, p = read_config(path, overrides)
+    flag = p.get("open_risers", [0.0])
+    if len(flag) != 1 or flag[0] not in (0.0, 1.0):
+        raise ValueError("open_risers must be a single 0 or 1")
+    open_risers = flag[0] == 1.0
+    if open_risers and kind != "ascent":
+        raise ValueError("open_risers requires terrain_kind=ascent")
+    pending_surface = None
 
     def scalar(name: str, *, positive: bool = False, integer: bool = False) -> float:
         values = p.get(name)
@@ -91,19 +161,61 @@ def attach_terrain(robot_spec: mujoco.MjSpec, path: Path, overrides: dict | None
     if len(spawn) != 2:
         raise ValueError("spawn_xy must contain x y")
     yaw = math.radians(scalar("spawn_yaw_deg"))
+    if any(item.name.startswith("terrain_") for item in (*robot_spec.geoms, *robot_spec.bodies)):
+        raise ValueError("Robot XML uses reserved terrain_ body/geom namespace")
     terrain_spec = mujoco.MjSpec.from_file(str(path))
-    if terrain_spec.worldbody.bodies:
-        raise ValueError("Terrain XML must use worldbody geoms, without robot/dynamic bodies")
-    if any(g.group != 0 or not (g.contype or g.conaffinity) for g in terrain_spec.worldbody.geoms):
-        raise ValueError("Terrain geoms must be collision geoms in group 0 (height scan group)")
+    components = scalar("dynamic_components", positive=True, integer=True) if "dynamic_components" in p else 0
+    internal_count = (scalar("passive_internal_joints", positive=True, integer=True)
+                      if "passive_internal_joints" in p else 0)
+    if terrain_spec.worldbody.bodies or components or internal_count:
+        if kind != "custom" or len(terrain_spec.worldbody.bodies) != components:
+            raise ValueError("Movable terrain requires custom kind and matching dynamic_components count")
+        # Each assembly remains free relative to world. Explicitly declared
+        # internal spring hinges approximate support compliance, never anchoring
+        # the assembly to the world or prescribing its motion.
+        bodies = list(terrain_spec.bodies)[1:]
+        roots = list(terrain_spec.worldbody.bodies)
+        if any(
+                len(b.joints) != 1 or b.joints[0].type != mujoco.mjtJoint.mjJNT_FREE
+                for b in roots) or any(b.mocap or b.gravcomp != 0 for b in bodies):
+            raise ValueError("Each terrain component requires one free root, gravity and no mocap driver")
+        if any(np.any(np.asarray(b.joints[0].stiffness) != 0)
+               or np.any(np.asarray(b.joints[0].damping) != 0)
+               or b.joints[0].frictionloss != 0 for b in roots):
+            raise ValueError("Terrain free roots must have zero stiffness, damping and frictionloss")
+        # Uncompiled MjsBody.id is -1 for every non-world body.
+        children = [b for b in bodies if b.parent != terrain_spec.worldbody]
+        joints = [j for b in children for j in b.joints]
+        if len(joints) != internal_count or any(not b.joints for b in children):
+            raise ValueError("Terrain internal joints require matching passive_internal_joints count")
+        if any(j.type != mujoco.mjtJoint.mjJNT_HINGE
+               or j.limited != mujoco.mjtLimited.mjLIMITED_TRUE
+               or not (j.range[0] < 0 < j.range[1])
+               or np.asarray(j.stiffness).flat[0] <= 0 or np.asarray(j.damping).flat[0] <= 0
+               or j.springref != 0 for j in joints):
+            raise ValueError("Terrain internal joints require bounded zero-rest spring hinges with positive damping")
+        if terrain_spec.actuators or terrain_spec.equalities or terrain_spec.tendons:
+            raise ValueError("Movable terrain must be passive, without actuators, equality constraints or tendons")
+    for geom in terrain_spec.geoms:
+        collides = bool(geom.contype or geom.conaffinity)
+        if components and collides and not geom.name:
+            raise ValueError("Movable terrain collision geoms require names for sensor/contact identification")
+        if (collides and geom.group != 0) or (not collides and geom.group != 2):
+            raise ValueError("Terrain collision geoms require group 0; display-only geoms require group 2")
     # Replace the robot file's floor, keeping its bodies, assets and lighting.
     for geom in list(robot_spec.worldbody.geoms):
         if geom.group == 0 and (geom.contype or geom.conaffinity):
             robot_spec.delete(geom)
     common = dict(contype=1, conaffinity=1, condim=3, group=0, friction=friction)
+    if open_risers and terrain_spec.worldbody.geoms:
+        raise ValueError("Open stairs generate their own surfaces; native geoms could hide risers")
+    floor_z = scalar("floor_height") if open_risers else 0.0
+    if floor_z > 0:
+        raise ValueError("floor_height must not exceed the approach tread height (zero)")
     if not any(g.type == mujoco.mjtGeom.mjGEOM_PLANE for g in terrain_spec.worldbody.geoms):
         terrain_spec.worldbody.add_geom(name="floor", type=mujoco.mjtGeom.mjGEOM_PLANE,
-                                       size=[100, 100, 0.1], rgba=[0.32, 0.35, 0.38, 1], **common)
+                                       size=[100, 100, 0.1], pos=[0, 0, floor_z],
+                                       rgba=[0.32, 0.35, 0.38, 1], **common)
     highest = 0.0
 
     def box(name, x0, x1, top, y=0.0, box_width=width, color=(0.48, 0.52, 0.59, 1)):
@@ -157,13 +269,44 @@ def attach_terrain(robot_spec: mujoco.MjSpec, path: Path, overrides: dict | None
             h, depth = scalar("step_height", positive=True), scalar("tread_depth", positive=True)
             count = int(scalar("step_count", positive=True, integer=True))
             platform = scalar("platform_length", positive=True)
-            if kind == "descent":
+            if open_risers:
+                approach = scalar("approach_length", positive=True)
+                if not (start-approach <= spawn[0] < start and abs(spawn[1]) < width/2):
+                    raise ValueError("Open-stair spawn_xy must lie on the approach surface")
+                if count > 10000:
+                    raise ValueError("Open staircase exceeds 10000 steps")
+                goal = start + count * depth
+                spans = [(start-approach, start, 0.0)]
+                spans += [(start+i*depth, start+(i+1)*depth, (i+1)*h) for i in range(count)]
+                spans += [(goal, goal+platform, count*h)]
+                vertices, elements = [], []
+                visual_half_thickness = 1.e-6
+                for surface_index, (x0, x1, z) in enumerate(spans):
+                    i = len(vertices)//3
+                    vertices += [x0, -width/2, z, x1, -width/2, z,
+                                 x1, width/2, z, x0, width/2, z]
+                    elements += [i, i+1, i+2, i, i+2, i+3]
+                    # Radius-zero rigid flex is invisible in the default skin
+                    # view. A site is display-only by construction. Do not use
+                    # disabled plane geoms: MuJoCo 3.10's plane/flex path can
+                    # still create contacts against those static planes.
+                    terrain_spec.worldbody.add_site(
+                        name=f"open_visual_{surface_index}", type=mujoco.mjtGeom.mjGEOM_BOX,
+                        pos=[(x0+x1)/2, 0, z-visual_half_thickness],
+                        size=[(x1-x0)/2, width/2, visual_half_thickness],
+                        group=2, rgba=[.48, .52, .59, 1])
+                pending_surface = dict(name="terrain_open_stair_surface", dim=2, radius=0.0,
+                                       vertbody=["world"], vert=vertices, elem=elements,
+                                       internal=0, selfcollide=0, rgba=[.48, .52, .59, 0], **common)
+                highest = count*h
+            elif kind == "descent":
                 if not (start - platform <= spawn[0] < start and abs(spawn[1]) < width / 2):
                     raise ValueError("descent spawn_xy must lie on the elevated approach platform")
                 box("approach", start - platform, start, count * h)
-            goal = stairs("stair", start, h, depth, count, kind == "descent")
-            if kind == "ascent":
-                box("exit", goal, goal + platform, count * h)
+            if not open_risers:
+                goal = stairs("stair", start, h, depth, count, kind == "descent")
+                if kind == "ascent":
+                    box("exit", goal, goal + platform, count * h)
         elif kind in {"slope_up", "slope_down"}:
             length = scalar("ramp_length", positive=True)
             angle = scalar("slope_deg", positive=True)
@@ -234,19 +377,27 @@ def attach_terrain(robot_spec: mujoco.MjSpec, path: Path, overrides: dict | None
                 scalar("obstacle_height", positive=True))
             goal = end + scalar("obstacle_depth", positive=True)
 
-    # Static native geometries can be taller than generated ones.
+    # Use world poses: movable-component geom positions are body-local.
     terrain_model = terrain_spec.compile()
+    terrain_data = mujoco.MjData(terrain_model)
+    mujoco.mj_forward(terrain_model, terrain_data)
     for i in range(terrain_model.ngeom):
+        if terrain_model.geom_group[i] != 0:
+            continue
         if terrain_model.geom_type[i] == mujoco.mjtGeom.mjGEOM_PLANE:
-            highest = max(highest, float(terrain_model.geom_pos[i, 2]))
+            highest = max(highest, float(terrain_data.geom_xpos[i, 2]))
             continue
         extent = float(np.linalg.norm(terrain_model.geom_size[i]))
-        highest = max(highest, float(terrain_model.geom_pos[i, 2]) + extent)
+        highest = max(highest, float(terrain_data.geom_xpos[i, 2]) + extent)
     ray_top = highest + 20.0
     if goal <= spawn[0]:
         raise ValueError("goal_x must be beyond spawn_x for the +X traversal summary")
     frame = robot_spec.worldbody.add_frame()
     robot_spec.attach(terrain_spec, prefix="terrain_", frame=frame)
+    if pending_surface is not None:
+        # MjSpec.attach copies the world tree, but can omit a flex attached
+        # only to world. Add directly to the final model so collision survives.
+        robot_spec.add_flex(**pending_surface)
     return Terrain(path, kind, p, tuple(spawn), yaw, goal, width, ray_top)
 
 

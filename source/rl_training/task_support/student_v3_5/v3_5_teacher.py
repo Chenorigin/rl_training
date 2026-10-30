@@ -41,7 +41,10 @@ def validate_manifest(manifest):
     return deepcopy(manifest)
 
 
-def teacher_manifest(saved, resume=False):
+def teacher_manifest(saved, resume=False, *, allow_quiet=False):
+    if not allow_quiet:
+        from task_support.stair_quiet_v1.deployment import reject_unsupported_quiet_checkpoint
+        reject_unsupported_quiet_checkpoint(saved, "Legacy v3.5 teacher adapter")
     manifest = (saved.get('student_v1', {}).get('provenance', {}).get('teacher_manifest')
                 if resume else saved.get('m20_training_manifest'))
     return validate_manifest(manifest or {})

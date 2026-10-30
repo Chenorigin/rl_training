@@ -5,6 +5,7 @@ import sys
 import mujoco
 import numpy as np
 import torch
+from terrain_loader import static_terrain_flex_ids, terrain_contact_bodies
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "source/rl_training"))
 from task_support.quiet_landing.signals import LEGS, QuietLandingSettings, TouchdownTracker, map_clearance
@@ -16,6 +17,7 @@ class QuietMujocoMetrics:
         if model.opt.integrator == mujoco.mjtIntegrator.mjINT_RK4:
             raise ValueError("Split-step quiet diagnostics cannot preserve RK4 integration")
         self.model, self.contract = model, contract
+        self.flex_ids = getattr(contract, "terrain_flex_ids", static_terrain_flex_ids(model))
         self.kinematics = mujoco.MjData(model)
         self.tracker = TouchdownTracker(1, "cpu", settings or QuietLandingSettings())
         self.settings = self.tracker.settings
@@ -33,6 +35,10 @@ class QuietMujocoMetrics:
         self.translation_energy = np.zeros(4)
         for name in ("wheel_velocity_w", "wheel_speed_m_s", "wheel_translation_energy_J", "force_norm_N", "root_pos_w"):
             self.records[name] = []
+
+    def reset(self):
+        """Start a fresh diagnostics episode after a simulation reset."""
+        self.__init__(self.model, self.contract, self.settings)
 
     def pre_step(self, data):
         velocity = np.empty((4, 3))
@@ -61,8 +67,7 @@ class QuietMujocoMetrics:
             contact = data.contact[contact_id]
             if contact.efc_address < 0:
                 continue
-            body1 = int(self.model.geom_bodyid[contact.geom1])
-            body2 = int(self.model.geom_bodyid[contact.geom2])
+            body1, body2 = terrain_contact_bodies(self.model, contact, self.flex_ids)
             # Only robot/static-terrain contacts, not leg/self contacts.
             if not ((body1 in wheel_index and body2 == 0) or (body2 in wheel_index and body1 == 0)):
                 continue
@@ -197,6 +202,30 @@ class QuietMujocoMetrics:
         path.with_suffix(".events.json").write_text(json.dumps(self.events, indent=2))
         self.plot(path.with_suffix(".png"))
         self.plot_extended(path.with_name(path.stem+"_extended.png"))
+
+    def snapshot(self, data, path):
+        from contextlib import nullcontext
+        from types import SimpleNamespace
+        import matplotlib.pyplot as plt
+        camera = mujoco.MjvCamera()
+        camera.type = mujoco.mjtCamera.mjCAMERA_TRACKING
+        camera.trackbodyid = self.contract.base_id
+        camera.distance, camera.elevation = 2.5, -20
+        self.model.vis.global_.offwidth = max(self.model.vis.global_.offwidth, 960)
+        self.model.vis.global_.offheight = max(self.model.vis.global_.offheight, 640)
+        with mujoco.Renderer(self.model, height=640, width=960) as renderer:
+            renderer.update_scene(data, camera=camera)
+            self.draw(SimpleNamespace(lock=nullcontext, user_scn=renderer.scene), data)
+            path = Path(path)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            fig, ax = plt.subplots(figsize=(9.6, 6.4), dpi=100)
+            ax.imshow(renderer.render())
+            ax.text(.02, .98, self.table_text(), va="top", color="white", fontsize=10,
+                    fontfamily="monospace", transform=ax.transAxes,
+                    bbox={"facecolor": "black", "alpha": .65, "pad": 6})
+            ax.axis("off")
+            fig.savefig(path, bbox_inches="tight", pad_inches=0)
+            plt.close(fig)
 
     def plot_extended(self, path):
         import matplotlib.pyplot as plt

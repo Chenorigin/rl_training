@@ -31,13 +31,21 @@ from m20_student_v0.output_storage import require_disk_space, OutputStorageCfg
 from m20_student_v0.output_storage import output_budget as output_budget_v0
 from m20_student_v0.configuration import DeeproboticsM20StudentV0DistillationCfg
 from m20_student_v0.perception import StudentV0PerceptionCfg
+from task_support.stair_quiet_v1.deployment import STUDENT_TASK as QUIET_STUDENT_TASK
+from task_support.student_v3_safe.configuration import TASK as SAFE_STUDENT_TASK
+
+
+def motion_task(task):
+    return task in ("Rough-Deeprobotics-M20-Student-v3.5", QUIET_STUDENT_TASK)
 
 TASK_VERSIONS = {
+    SAFE_STUDENT_TASK: "v1",
     "Rough-Deeprobotics-M20-Student-v0": "v0",
     "Rough-Deeprobotics-M20-Student-v1": "v1",
     # V3 retains the v1 checkpoint/observation format and distillation backend.
     "Rough-Deeprobotics-M20-Student-v3": "v1",
     "Rough-Deeprobotics-M20-Student-v3.5": "v1",
+    QUIET_STUDENT_TASK: "v1",
 }
 
 
@@ -141,17 +149,19 @@ def settings_v1(args, saved):
     cfg = StudentV1PerceptionCfg(**perception)
     cfg.validate()
     student_dim(training["history_steps"])
-    teacher_groups = ['teacher', 'motion_control'] if args.resume and args.task == 'Rough-Deeprobotics-M20-Student-v3.5' else ['teacher']
+    if args.task == QUIET_STUDENT_TASK and not args.resume:
+        training["experiment_name"] = "deeprobotics_m20_stair_quiet_v1_student"
+    teacher_groups = ['teacher', 'motion_control'] if args.resume and motion_task(args.task) else ['teacher']
     if training["obs_groups"] != {"student": ["policy"], "teacher": teacher_groups}:
         raise ValueError("V1 actor may only consume the sensor policy observation")
     if training["algorithm"]["class_name"] != "m20_student_v1.distillation.StudentV1Distillation":
         raise ValueError("Unexpected v1 algorithm")
     task = args.task or meta.get("task", "Rough-Deeprobotics-M20-Student-v1")
-    if task == "Rough-Deeprobotics-M20-Student-v3.5":
+    if motion_task(task):
         from m20_student_v1.v3_5_teacher import teacher_manifest, teacher_config
         if training['history_steps'] != 4:
             raise ValueError('V3.5 preserves the 789D student input: history_steps must be 4')
-        manifest = teacher_manifest(saved, bool(args.resume))
+        manifest = teacher_manifest(saved, bool(args.resume), allow_quiet=task == QUIET_STUDENT_TASK)
         expected = teacher_config(manifest)
         if args.resume and training['teacher'] != expected:
             raise ValueError('V3.5 resume teacher configuration differs from its manifest')
@@ -180,7 +190,7 @@ def preflight_v1(args, saved, training, perception, n, source_path):
     torch.manual_seed(training["seed"])
     dim = student_dim(training["history_steps"])
     obs = TensorDict({"policy": torch.zeros(2, dim), "teacher": torch.zeros(2, 244)}, batch_size=[2])
-    motion = args.task == 'Rough-Deeprobotics-M20-Student-v3.5'
+    motion = motion_task(args.task)
     model_cfg = deepcopy(training)
     if model_cfg['student'].pop('class_name') != 'rsl_rl.models.MLPModel':
         raise ValueError('Student must remain MLPModel with explicit optional history')
@@ -272,7 +282,7 @@ def preflight_v1(args, saved, training, perception, n, source_path):
     free_disk = require_disk_space(args.log_root, required)
     allowance = 8*1024**3+n*4*1024**2+budget["sample_buffer_bytes"]
     host = psutil.virtual_memory()
-    report = {"version": "v1", "task_version": 'v3.5' if motion else 'legacy', **teacher_check,
+    report = {"version": "v1", "task_version": ('stair_quiet_v1' if args.task == QUIET_STUDENT_TASK else ('v3.5' if motion else 'legacy')), **teacher_check,
               "source_path": str(source_path), "source_sha256": file_hash(source_path),
               "initialization": initialization, "actor_dim": dim, "teacher_dim": 244,
               "export_max_action_error": error, "num_envs": n, "device": args.device,
@@ -281,6 +291,11 @@ def preflight_v1(args, saved, training, perception, n, source_path):
               "budget": budget, "occupancy_cap_fraction": .85,
               "basis": "8 GiB simulator allowance + 4 MiB/env + actual tensor budget; engineering reserve, validate peak before scaling",
               "trained": False, "simulator_started": False, "optimizer_updates": 0}
+    if args.task == QUIET_STUDENT_TASK:
+        from task_support.stair_quiet_v1.distill import check_source
+        report["quiet_execution_control"] = check_source(args.task, saved, resume=bool(args.resume))
+        from task_support.stair_quiet_v1.deployment import RUNTIME_SCOPE
+        report["execution_control_scope"] = RUNTIME_SCOPE
     if host.total-host.available+allowance > .85*host.total:
         raise RuntimeError("Insufficient whole-host memory headroom")
     if args.device.startswith("cuda"):
@@ -312,11 +327,17 @@ def train_or_validate_v1(args, saved, training, perception, task, n, old_meta, s
         cfg.student_perception = perception
         cfg.student_history_steps = training["history_steps"]
         cfg.seed = training["seed"]
-        motion = task == 'Rough-Deeprobotics-M20-Student-v3.5'
+        motion = motion_task(task)
+        quiet = task == QUIET_STUDENT_TASK
+        quiet_contract = None
+        if quiet:
+            from task_support.stair_quiet_v1.distill import check_source, configure_environment
+            quiet_contract = check_source(task, saved, resume=bool(args.resume))
+            configure_environment(cfg, quiet_contract)
         manifest = None
         if motion:
             from m20_student_v1.v3_5_teacher import teacher_manifest
-            manifest = teacher_manifest(saved, bool(args.resume))
+            manifest = teacher_manifest(saved, bool(args.resume), allow_quiet=quiet)
             cfg.motion_teacher_tuning = deepcopy(manifest['stair_tuning'])
         if args.validate_only:
             cfg.scene.terrain.terrain_generator.num_rows = 2
@@ -370,6 +391,9 @@ def train_or_validate_v1(args, saved, training, perception, task, n, old_meta, s
                                   command_feedback={'version': 'legacy_v1_v3_5', 'tuning': manifest['stair_tuning']},
                                   teacher_action_target='complete frozen base + raw-command-gated residual',
                                   student_initialization='explicit student' if args.init_student else old_meta.get('student_initialization', 'frozen teacher base'))
+            if quiet:
+                from task_support.stair_quiet_v1.distill import provenance_for
+                provenance = provenance_for(provenance, quiet_contract)
             runner.alg.provenance = provenance
             (run_dir/"provenance.json").write_text(json.dumps(provenance, indent=2)+"\n")
             (run_dir/"observation_contract.json").write_text(json.dumps(provenance["contract"], indent=2)+"\n")
@@ -411,7 +435,10 @@ def train_or_validate_v1(args, saved, training, perception, task, n, old_meta, s
                 shutil.copy2(V3_5_CONFIG_PATH, run_dir/'source_snapshot/student_v3_5.json')
             runner.add_git_repo_to_log(__file__)
             runner.learn(args.max_iterations or training["max_iterations"], init_at_random_ep_len=False)
-            if not args.no_export:
+            if not args.no_export and quiet:
+                from task_support.stair_quiet_v1.distill import export_bundle
+                export_bundle(runner, run_dir / "exported", runner.alg.provenance)
+            elif not args.no_export:
                 export_dir = run_dir/"exported"
                 runner.export_policy_to_jit(str(export_dir), "student_v1.pt")
                 shutil.copy2(run_dir/"observation_contract.json", export_dir/"observation_contract.json")
@@ -479,6 +506,9 @@ def configure_run(args, saved, default_task="Rough-Deeprobotics-M20-Student-v0")
     version = TASK_VERSIONS.get(args.task)
     if version is None or (checkpoint_version is not None and version != checkpoint_version):
         raise ValueError("Task does not match the checkpoint version")
+    from task_support.stair_quiet_v1.distill import check_source, prepare_initialization
+    check_source(args.task, saved, resume=bool(args.resume))
+    prepare_initialization(args)
     if version == "v0":
         for name in ("init_student", "config", "history_steps", "teacher_ratio_end"):
             if getattr(args, name) is not None:
@@ -486,8 +516,8 @@ def configure_run(args, saved, default_task="Rough-Deeprobotics-M20-Student-v0")
     elif args.xr:
         raise ValueError("V1 sensor timing requires XR disabled")
     task_version = "v3" if args.task == "Rough-Deeprobotics-M20-Student-v3" else version
-    if args.task == 'Rough-Deeprobotics-M20-Student-v3.5':
-        task_version = 'v3_5'
+    if motion_task(args.task):
+        task_version = 'stair_quiet_v1_student' if args.task == QUIET_STUDENT_TASK else 'v3_5'
         if not args.resume and args.config is None:
             args.config = V3_5_CONFIG_PATH
     if task_version == "v3" and not args.resume and args.config is None:
@@ -517,6 +547,12 @@ def main(argv=None, default_task="Rough-Deeprobotics-M20-Student-v0"):
     if args.init_student:
         args.init_student = resolve_checkpoint(args.init_student)
     saved = torch.load(source_path, map_location="cpu", weights_only=True)
+    checkpoint_task = saved.get("student_v1", {}).get("provenance", {}).get("task")
+    if args.task == SAFE_STUDENT_TASK or (args.task is None and args.resume and checkpoint_task == SAFE_STUDENT_TASK):
+        if args.resume and checkpoint_task != SAFE_STUDENT_TASK:
+            raise ValueError("Safe student resume task differs from checkpoint")
+        from task_support.student_v3_safe.entry import run
+        return run(args, saved, source_path, launch_app)
     version = configure_run(args, saved, default_task)
     settings = settings_v0 if version == "v0" else settings_v1
     training, perception, task, n, meta = settings(args, saved)

@@ -10,6 +10,7 @@ from pathlib import Path
 import sys
 
 import mujoco
+from terrain_loader import static_terrain_flex_ids, terrain_ray
 import numpy as np
 import torch
 
@@ -161,7 +162,7 @@ def visible_terrain(model, data, base_id, hits, sensor_offset,
     """
     rotation = data.xmat[base_id].reshape(3, 3)
     groups = np.array([1, 0, 0, 0, 0, 0], dtype=np.uint8)
-    geom_id = np.zeros(1, dtype=np.int32)
+    flex_ids = static_terrain_flex_ids(model)
     visible = np.zeros(len(hits), dtype=bool)
     sensors = [(sensor_offset, False)]
     if rear_sensor_offset is not None:
@@ -175,7 +176,7 @@ def visible_terrain(model, data, base_id, hits, sensor_offset,
             if distance < 1e-8:
                 visible[i] = True
                 continue
-            first = mujoco.mj_ray(model, data, origin, delta / distance, groups, True, -1, geom_id)
+            first, _, _ = terrain_ray(model, data, origin, delta / distance, groups, flex_ids)
             visible[i] = first >= 0 and first >= distance - 0.005
     return visible
 

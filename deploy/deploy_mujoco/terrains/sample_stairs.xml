@@ -1,0 +1,188 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mujoco model="sample_five_movable_modules">
+  <!-- 视频来源 sample.mp4；外尺寸由用户确认（2026-10-22）。单位 m、kg、s。沿 +X：两件小梯并排上楼 → 白平台 → 整件大梯下楼；深色木台位于 -Y 一侧。共五件独立组件，直接触地垫。白平台的四细腿通过内部弹性关节等效支腿/连接柔度；没有驱动、对世界的锚定或复位弹簧。质量、刚度、阻尼、摩擦及摆放间隙未实测；不能把受力摆动的幅度当成已匹配实物。木板仍为刚性。 -->
+  <compiler angle="radian" inertiafromgeom="true" inertiagrouprange="0 0" />
+  <option timestep="0.005" gravity="0 0 -9.81" />
+  <statistic center="1.1 0 0.2" extent="3.2" />
+  <visual>
+    <headlight diffuse=".7 .7 .7" ambient=".35 .35 .35" />
+    <global azimuth="90" elevation="-35" />
+  </visual>
+  <custom>
+    <text name="terrain_kind" data="custom" />
+    <text name="calibration_status" data="dimensions_confirmed_leg_compliance_estimated" />
+    <text name="reference_video" data="sample.mp4" />
+    <numeric name="dynamic_components" data="5" />
+    <numeric name="width" data="1.0" />
+    <numeric name="friction" data=".85 .005 .0001" />
+    <numeric name="spawn_xy" data="-1.0 0" />
+    <numeric name="spawn_yaw_deg" data="0" />
+    <numeric name="goal_x" data="2.30" />
+    <numeric name="passive_internal_joints" data="8" />
+  </custom>
+  <default>
+    <!-- 动力学可调项：wood 密度按实测总质量同比例调整；metal 为铝方管等效密度（非实心铝）。几何板厚为视频估计。接触参数控制柔度/耗散；禁止用 freejoint damping 强行把模块拉回原位。 -->
+    <default class="wood">
+      <geom type="box" group="0" contype="1" conaffinity="1" density="500" friction=".9 .005 .0001" condim="4" solref=".015 1" solimp=".9 .95 .001" rgba=".68 .52 .34 1" />
+    </default>
+    <default class="metal">
+      <geom type="box" group="0" contype="1" conaffinity="1" density="300" friction=".9 .005 .0001" condim="4" solref=".015 1" solimp=".9 .95 .001" rgba=".65 .68 .7 1" />
+    </default>
+    <default class="white_leg_flex">
+      <!-- 等效支腿弯曲/连接松度：每腿两个正交被动铰链。
+           stiffness 单位 N*m/rad，damping 单位 N*m*s/rad，range 单位 rad。
+           降 stiffness 会增大摆幅，降 damping 会延长回摆；此处未实物标定。
+           2026-10-23 用户确认没有测量值，采用当前工程估计为默认参数。
+           视频用于判断外形与摆放比例；柔度按几厘米级受力侧摆选取。
+           小角度横向刚度近似为四腿关节刚度之和除以支腿长度平方；
+           台面竖向载荷还会通过几何效应降低侧向刚度。
+           实际响应由载荷、接触和此处关节参数共同决定，未指定固定摆幅。
+           弹簧只作用在腿与台面之间，整个平台仍能受力移动。 -->
+      <joint type="hinge" limited="true" range="-.25 .25" stiffness="60" damping="1.2" springref="0" solreflimit=".02 1" />
+    </default>
+  </default>
+  <asset>
+    <texture name="mat_grid" type="2d" builtin="checker" rgb1=".19 .23 .24" rgb2=".23 .27 .28" width="128" height="128" />
+    <material name="mat_ground" texture="mat_grid" texrepeat="16 16" texuniform="true" reflectance="0" />
+  </asset>
+  <worldbody>
+    <light pos="1 -2 4" dir="0 0 -1" diffuse=".8 .8 .8" />
+    <!-- 地垫接触近似：priority=1 使模块与地面接触时使用此处摩擦及柔度。需用现场推移/压边试验校准；不宣称摩擦值或晃动幅度已匹配实物。 -->
+    <geom name="floor" type="plane" size="20 20 .1" group="0" contype="1" conaffinity="1" material="mat_ground" condim="4" priority="1" friction=".85 .005 .0001" solref=".02 .8" solimp=".85 .95 .002" />
+    <!-- stairs_25_left：三阶，每级高 .15、踏深 0.25、全宽 0.5。局部 +X 为上楼方向。踏板厚 .03、侧板厚 .025、立板厚 .02 为估算。板材构成空心整体，惯量按板材而非实心大方块计算。 -->
+    <body name="stairs_25_left" pos="0 0.25 0">
+      <freejoint name="stairs_25_left_free" />
+      <!-- 并排两件之间的可视拼接线，不参与碰撞或质量计算。 -->
+      <site name="assembly_seam_1" type="box" pos="0.125 -0.25 0.1501" size="0.125 0.0008 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="assembly_seam_2" type="box" pos="0.375 -0.25 0.3001" size="0.125 0.0008 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="assembly_seam_3" type="box" pos="0.625 -0.25 0.4501" size="0.125 0.0008 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <geom class="wood" name="stairs_25_left_tread_1" pos="0.125 0 0.135" size="0.125 0.25 0.015" />
+      <geom class="wood" name="stairs_25_left_riser_1" pos="0.01 0 0.06" size="0.01 0.225 0.06" rgba=".58 .43 .28 1" />
+      <geom class="wood" name="stairs_25_left_side_1_-1" pos="0.125 -0.2375 0.06" size="0.125 0.0125 0.06" rgba=".63 .48 .31 1" />
+      <geom class="wood" name="stairs_25_left_side_1_1" pos="0.125 0.2375 0.06" size="0.125 0.0125 0.06" rgba=".63 .48 .31 1" />
+      <site name="stairs_25_left_seam_0_1" type="box" pos="0.08333333 0 0.1501" size="0.0006 0.25 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_25_left_seam_0_2" type="box" pos="0.1666667 0 0.1501" size="0.0006 0.25 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_25_left_nosing_0" type="box" pos="0.006 0 0.1502" size="0.006 0.25 0.0002" rgba=".60 .64 .66 1" group="2" />
+      <geom class="wood" name="stairs_25_left_tread_2" pos="0.375 0 0.285" size="0.125 0.25 0.015" />
+      <geom class="wood" name="stairs_25_left_riser_2" pos="0.26 0 0.21" size="0.01 0.225 0.06" rgba=".58 .43 .28 1" />
+      <geom class="wood" name="stairs_25_left_side_2_-1" pos="0.375 -0.2375 0.135" size="0.125 0.0125 0.135" rgba=".63 .48 .31 1" />
+      <geom class="wood" name="stairs_25_left_side_2_1" pos="0.375 0.2375 0.135" size="0.125 0.0125 0.135" rgba=".63 .48 .31 1" />
+      <site name="stairs_25_left_seam_1_1" type="box" pos="0.3333333 0 0.3001" size="0.0006 0.25 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_25_left_seam_1_2" type="box" pos="0.4166667 0 0.3001" size="0.0006 0.25 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_25_left_nosing_1" type="box" pos="0.256 0 0.3002" size="0.006 0.25 0.0002" rgba=".60 .64 .66 1" group="2" />
+      <geom class="wood" name="stairs_25_left_tread_3" pos="0.625 0 0.435" size="0.125 0.25 0.015" />
+      <geom class="wood" name="stairs_25_left_riser_3" pos="0.51 0 0.36" size="0.01 0.225 0.06" rgba=".58 .43 .28 1" />
+      <geom class="wood" name="stairs_25_left_side_3_-1" pos="0.625 -0.2375 0.21" size="0.125 0.0125 0.21" rgba=".63 .48 .31 1" />
+      <geom class="wood" name="stairs_25_left_side_3_1" pos="0.625 0.2375 0.21" size="0.125 0.0125 0.21" rgba=".63 .48 .31 1" />
+      <site name="stairs_25_left_seam_2_1" type="box" pos="0.5833333 0 0.4501" size="0.0006 0.25 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_25_left_seam_2_2" type="box" pos="0.6666667 0 0.4501" size="0.0006 0.25 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_25_left_nosing_2" type="box" pos="0.506 0 0.4502" size="0.006 0.25 0.0002" rgba=".60 .64 .66 1" group="2" />
+      <geom class="wood" name="stairs_25_left_back" pos="0.74 0 0.21" size="0.01 0.225 0.21" rgba=".63 .48 .31 1" />
+    </body>
+    <!-- stairs_25_right：三阶，每级高 .15、踏深 0.25、全宽 0.5。局部 +X 为上楼方向。踏板厚 .03、侧板厚 .025、立板厚 .02 为估算。板材构成空心整体，惯量按板材而非实心大方块计算。 -->
+    <body name="stairs_25_right" pos="0 -0.25 0">
+      <freejoint name="stairs_25_right_free" />
+      <geom class="wood" name="stairs_25_right_tread_1" pos="0.125 0 0.135" size="0.125 0.25 0.015" />
+      <geom class="wood" name="stairs_25_right_riser_1" pos="0.01 0 0.06" size="0.01 0.225 0.06" rgba=".58 .43 .28 1" />
+      <geom class="wood" name="stairs_25_right_side_1_-1" pos="0.125 -0.2375 0.06" size="0.125 0.0125 0.06" rgba=".63 .48 .31 1" />
+      <geom class="wood" name="stairs_25_right_side_1_1" pos="0.125 0.2375 0.06" size="0.125 0.0125 0.06" rgba=".63 .48 .31 1" />
+      <site name="stairs_25_right_seam_0_1" type="box" pos="0.08333333 0 0.1501" size="0.0006 0.25 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_25_right_seam_0_2" type="box" pos="0.1666667 0 0.1501" size="0.0006 0.25 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_25_right_nosing_0" type="box" pos="0.006 0 0.1502" size="0.006 0.25 0.0002" rgba=".60 .64 .66 1" group="2" />
+      <geom class="wood" name="stairs_25_right_tread_2" pos="0.375 0 0.285" size="0.125 0.25 0.015" />
+      <geom class="wood" name="stairs_25_right_riser_2" pos="0.26 0 0.21" size="0.01 0.225 0.06" rgba=".58 .43 .28 1" />
+      <geom class="wood" name="stairs_25_right_side_2_-1" pos="0.375 -0.2375 0.135" size="0.125 0.0125 0.135" rgba=".63 .48 .31 1" />
+      <geom class="wood" name="stairs_25_right_side_2_1" pos="0.375 0.2375 0.135" size="0.125 0.0125 0.135" rgba=".63 .48 .31 1" />
+      <site name="stairs_25_right_seam_1_1" type="box" pos="0.3333333 0 0.3001" size="0.0006 0.25 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_25_right_seam_1_2" type="box" pos="0.4166667 0 0.3001" size="0.0006 0.25 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_25_right_nosing_1" type="box" pos="0.256 0 0.3002" size="0.006 0.25 0.0002" rgba=".60 .64 .66 1" group="2" />
+      <geom class="wood" name="stairs_25_right_tread_3" pos="0.625 0 0.435" size="0.125 0.25 0.015" />
+      <geom class="wood" name="stairs_25_right_riser_3" pos="0.51 0 0.36" size="0.01 0.225 0.06" rgba=".58 .43 .28 1" />
+      <geom class="wood" name="stairs_25_right_side_3_-1" pos="0.625 -0.2375 0.21" size="0.125 0.0125 0.21" rgba=".63 .48 .31 1" />
+      <geom class="wood" name="stairs_25_right_side_3_1" pos="0.625 0.2375 0.21" size="0.125 0.0125 0.21" rgba=".63 .48 .31 1" />
+      <site name="stairs_25_right_seam_2_1" type="box" pos="0.5833333 0 0.4501" size="0.0006 0.25 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_25_right_seam_2_2" type="box" pos="0.6666667 0 0.4501" size="0.0006 0.25 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_25_right_nosing_2" type="box" pos="0.506 0 0.4502" size="0.006 0.25 0.0002" rgba=".60 .64 .66 1" group="2" />
+      <geom class="wood" name="stairs_25_right_back" pos="0.74 0 0.21" size="0.01 0.225 0.21" rgba=".63 .48 .31 1" />
+    </body>
+    <!-- stairs_30：三阶，每级高 .15、踏深 0.3、全宽 1。局部 +X 为上楼方向。踏板厚 .03、侧板厚 .025、立板厚 .02 为估算。板材构成空心整体，惯量按板材而非实心大方块计算。 -->
+    <body name="stairs_30" pos="2.21 0 0" quat="0 0 0 1">
+      <freejoint name="stairs_30_free" />
+      <geom class="wood" name="stairs_30_tread_1" pos="0.15 0 0.135" size="0.15 0.5 0.015" />
+      <geom class="wood" name="stairs_30_riser_1" pos="0.01 0 0.06" size="0.01 0.475 0.06" rgba=".58 .43 .28 1" />
+      <geom class="wood" name="stairs_30_side_1_-1" pos="0.15 -0.4875 0.06" size="0.15 0.0125 0.06" rgba=".63 .48 .31 1" />
+      <geom class="wood" name="stairs_30_side_1_1" pos="0.15 0.4875 0.06" size="0.15 0.0125 0.06" rgba=".63 .48 .31 1" />
+      <site name="stairs_30_seam_0_1" type="box" pos="0.1 0 0.1501" size="0.0006 0.5 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_30_seam_0_2" type="box" pos="0.2 0 0.1501" size="0.0006 0.5 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_30_nosing_0" type="box" pos="0.006 0 0.1502" size="0.006 0.5 0.0002" rgba=".60 .64 .66 1" group="2" />
+      <geom class="wood" name="stairs_30_tread_2" pos="0.45 0 0.285" size="0.15 0.5 0.015" />
+      <geom class="wood" name="stairs_30_riser_2" pos="0.31 0 0.21" size="0.01 0.475 0.06" rgba=".58 .43 .28 1" />
+      <geom class="wood" name="stairs_30_side_2_-1" pos="0.45 -0.4875 0.135" size="0.15 0.0125 0.135" rgba=".63 .48 .31 1" />
+      <geom class="wood" name="stairs_30_side_2_1" pos="0.45 0.4875 0.135" size="0.15 0.0125 0.135" rgba=".63 .48 .31 1" />
+      <site name="stairs_30_seam_1_1" type="box" pos="0.4 0 0.3001" size="0.0006 0.5 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_30_seam_1_2" type="box" pos="0.5 0 0.3001" size="0.0006 0.5 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_30_nosing_1" type="box" pos="0.306 0 0.3002" size="0.006 0.5 0.0002" rgba=".60 .64 .66 1" group="2" />
+      <geom class="wood" name="stairs_30_tread_3" pos="0.75 0 0.435" size="0.15 0.5 0.015" />
+      <geom class="wood" name="stairs_30_riser_3" pos="0.61 0 0.36" size="0.01 0.475 0.06" rgba=".58 .43 .28 1" />
+      <geom class="wood" name="stairs_30_side_3_-1" pos="0.75 -0.4875 0.21" size="0.15 0.0125 0.21" rgba=".63 .48 .31 1" />
+      <geom class="wood" name="stairs_30_side_3_1" pos="0.75 0.4875 0.21" size="0.15 0.0125 0.21" rgba=".63 .48 .31 1" />
+      <site name="stairs_30_seam_2_1" type="box" pos="0.7 0 0.4501" size="0.0006 0.5 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_30_seam_2_2" type="box" pos="0.8 0 0.4501" size="0.0006 0.5 0.0001" rgba=".25 .19 .12 1" group="2" />
+      <site name="stairs_30_nosing_2" type="box" pos="0.606 0 0.4502" size="0.006 0.5 0.0002" rgba=".60 .64 .66 1" group="2" />
+      <geom class="wood" name="stairs_30_back" pos="0.89 0 0.21" size="0.01 0.475 0.21" rgba=".63 .48 .31 1" />
+    </body>
+    <!-- 白平台确认外尺寸：沿 X .55、沿 Y .90、总高 .45，横向居中。
+         四腿截面全宽 .02、每腿质量 .15、铰链刚度/阻尼均为估算。
+         台面可相对四腿摆动，脚底仅靠地垫接触支撑，未固定到地面。
+         与 dark_box 的台面初始净缝 .055、高差 .05；晃动和滑移会改变缝宽。
+         净缝按视频所示约五厘米量级作摆放估计，保留当前默认值；
+         高差来自用户确认的两个台面高度，二者均没有被过渡几何抹平。
+         缝隙没有隐藏承重平面或斜坡，台面边缘保持真实碰撞。 -->
+    <body name="white_platform" pos="1.03 0 0">
+      <freejoint name="white_platform_free" />
+      <geom class="wood" name="white_deck" pos="0 0 0.435" size="0.275 0.45 0.015" density="450" rgba=".92 .92 .88 1" />
+      <geom class="metal" name="white_frame_y_-0.42" pos="0 -0.42 0.4" size="0.225 0.02 0.02" />
+      <geom class="metal" name="white_frame_y_0.42" pos="0 0.42 0.4" size="0.225 0.02 0.02" />
+      <geom class="metal" name="white_frame_x_-0.245" pos="-0.245 0 0.4" size="0.02 0.4 0.02" />
+      <geom class="metal" name="white_frame_x_0.245" pos="0.245 0 0.4" size="0.02 0.4 0.02" />
+      <site name="tape_long_0" type="box" pos="-0.165 0 0.4502" size="0.008 0.45 0.0002" rgba=".94 .66 .08 1" group="2" />
+      <site name="tape_long_1" type="box" pos="-0.055 0 0.4502" size="0.008 0.45 0.0002" rgba=".94 .66 .08 1" group="2" />
+      <site name="tape_long_2" type="box" pos="0.055 0 0.4502" size="0.008 0.45 0.0002" rgba=".94 .66 .08 1" group="2" />
+      <site name="tape_long_3" type="box" pos="0.165 0 0.4502" size="0.008 0.45 0.0002" rgba=".94 .66 .08 1" group="2" />
+      <site name="tape_cross_0" type="box" pos="0 -0.15 0.4503" size="0.275 0.009 0.0001" rgba=".94 .66 .08 1" group="2" />
+      <site name="tape_cross_1" type="box" pos="0 0.04 0.4503" size="0.275 0.009 0.0001" rgba=".94 .66 .08 1" group="2" />
+      <body name="white_leg_-0.245_-0.42_support" pos="-0.245 -0.42 .42">
+        <joint class="white_leg_flex" name="white_leg_-0.245_-0.42_bend_x" axis="1 0 0" />
+        <joint class="white_leg_flex" name="white_leg_-0.245_-0.42_bend_y" axis="0 1 0" />
+        <geom class="metal" name="white_leg_-0.245_-0.42" pos="0 0 -.21" size=".01 .01 .21" mass=".15" />
+      </body>
+      <body name="white_leg_-0.245_0.42_support" pos="-0.245 0.42 .42">
+        <joint class="white_leg_flex" name="white_leg_-0.245_0.42_bend_x" axis="1 0 0" />
+        <joint class="white_leg_flex" name="white_leg_-0.245_0.42_bend_y" axis="0 1 0" />
+        <geom class="metal" name="white_leg_-0.245_0.42" pos="0 0 -.21" size=".01 .01 .21" mass=".15" />
+      </body>
+      <body name="white_leg_0.245_-0.42_support" pos="0.245 -0.42 .42">
+        <joint class="white_leg_flex" name="white_leg_0.245_-0.42_bend_x" axis="1 0 0" />
+        <joint class="white_leg_flex" name="white_leg_0.245_-0.42_bend_y" axis="0 1 0" />
+        <geom class="metal" name="white_leg_0.245_-0.42" pos="0 0 -.21" size=".01 .01 .21" mass=".15" />
+      </body>
+      <body name="white_leg_0.245_0.42_support" pos="0.245 0.42 .42">
+        <joint class="white_leg_flex" name="white_leg_0.245_0.42_bend_x" axis="1 0 0" />
+        <joint class="white_leg_flex" name="white_leg_0.245_0.42_bend_y" axis="0 1 0" />
+        <geom class="metal" name="white_leg_0.245_0.42" pos="0 0 -.21" size=".01 .01 .21" mass=".15" />
+      </body>
+    </body>
+    <!-- 唯一深色木台：沿 X .75、沿 Y .40、高 .40。位于白平台前侧（-Y），与木梯侧缘留 .005 间隙；不是上楼方向的额外一级。空心木箱，.025 板厚为估算。 -->
+    <body name="dark_box" pos="1.03 -0.705 0">
+      <freejoint name="dark_box_free" />
+      <geom class="wood" name="dark_box_top" pos="0 0 0.3875" size="0.375 0.2 0.0125" rgba=".35 .16 .065 1" />
+      <geom class="wood" name="dark_box_wall_x_-0.3625" pos="-0.3625 0 0.1875" size="0.0125 0.2 0.1875" rgba=".35 .16 .065 1" />
+      <geom class="wood" name="dark_box_wall_x_0.3625" pos="0.3625 0 0.1875" size="0.0125 0.2 0.1875" rgba=".35 .16 .065 1" />
+      <geom class="wood" name="dark_box_wall_y_-0.1875" pos="0 -0.1875 0.1875" size="0.35 0.0125 0.1875" rgba=".35 .16 .065 1" />
+      <geom class="wood" name="dark_box_wall_y_0.1875" pos="0 0.1875 0.1875" size="0.35 0.0125 0.1875" rgba=".35 .16 .065 1" />
+      <site name="dark_box_seam_0" type="box" pos="0 -0.1 0.4001" size="0.375 0.0006 0.0001" rgba=".17 .075 .025 1" group="2" />
+      <site name="dark_box_seam_1" type="box" pos="0 0 0.4001" size="0.375 0.0006 0.0001" rgba=".17 .075 .025 1" group="2" />
+      <site name="dark_box_seam_2" type="box" pos="0 0.1 0.4001" size="0.375 0.0006 0.0001" rgba=".17 .075 .025 1" group="2" />
+    </body>
+  </worldbody>
+</mujoco>

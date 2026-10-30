@@ -45,6 +45,7 @@ def profile_config(name, provenance, profile_file=None, level=None):
         for key in (*HEIGHT, *POSE, *PROPRIO, *DROPOUT, *QUALITY_ERROR):
             values[key] = 0.
         values.update(map_update_period_s=.02, update_jitter_s=0., min_delay_s=0., max_delay_s=0.,
+                      zero_delay_probability=0.,
                       action_delay_steps=0, lidar_horizontal_fov_deg=360., terrain_visibility=False,
                       variance_growth_per_s=0.)
         group = {"lidar_fov": FOV, "height": HEIGHT, "pose": POSE, "dropout": DROPOUT,

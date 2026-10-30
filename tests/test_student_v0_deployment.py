@@ -234,6 +234,13 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(adapter.observe(self.data, np.zeros(3), np.zeros(16), 2)[244:431].sum(), 0)
 
     def test_visibility_positive_and_occluded_negative(self):
+        # The positive oracle is an unobstructed plane. A physical starting
+        # mat legitimately occludes low rays just beyond its far edge.
+        self.args.no_spawn_mat = True
+        self.model = baseline.load_model(self.robot, self.args)
+        self.contract = baseline.M20Contract(self.model, self.args.terrain_config)
+        self.data = mujoco.MjData(self.model)
+        self.contract.reset(self.data)
         self.contract.height_scan(self.data)
         hits = self.contract.last_scan_hits
         self.assertTrue(visible_terrain(self.model, self.data, self.contract.base_id, hits, (0,0,.15)).all())

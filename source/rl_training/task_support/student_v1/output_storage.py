@@ -16,9 +16,17 @@ def tensor_budget(cfg, num_envs, perception):
     minimum_period = max(.02, perception.map_update_period_s-perception.update_jitter_s)
     slots = math.ceil((perception.max_map_age_s+perception.max_delay_s)/minimum_period)+3
     map_bytes = slots*num_envs*(187*9+3*4+2*8)
+    # Two boolean masks reuse the original rollout's observations and labels;
+    # no duplicate temporal replay or additional deployed inputs are allocated.
+    rollout_bytes += rollout*2
+    retention = 0
+    if algorithm.get("retention_loss_weight", 0.):
+        from .retention import retention_bytes
+        retention = retention_bytes(algorithm["retention_manifest"], algorithm["retention_sha256"])
     return {"replay_bytes": replay_bytes, "rollout_bytes": rollout_bytes, "map_bytes": map_bytes,
-            "sample_buffer_bytes": replay_bytes+rollout_bytes+map_bytes,
-            "sample_buffer_formula": "(regular+critical)*((actor_dim+16)*4+tag4*8+holdout1) + rollout + map packets"}
+            "retention_bytes": retention,
+            "sample_buffer_bytes": replay_bytes+rollout_bytes+map_bytes+retention,
+            "sample_buffer_formula": "(regular+critical)*((actor_dim+16)*4+tag4*8+holdout1) + rollout + map packets + pinned motion-retention tensors/indices"}
 
 
 def output_budget(cfg, num_envs, iterations, perception, start_update=0, min_free_disk_gb=2.):

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 无踢面上楼梯：仅水平零厚度三角面，无竖直面、侧面或底面。
+     通过 deploy_mujoco.py / terrain_loader.py 生成静态 rigid flex 碰撞面。
+     本机 MuJoCo 3.10 已验证 radius=0 的 rigid flex 可碰撞承重。
+     显示 site 的顶面与碰撞面同坐标，永不参与物理碰撞或高度扫描。
+     不使用 mesh geom（会凸化）或薄 box 碰撞体（仍存在侧面）。 -->
+<mujoco model="ascent_open_terrain">
+  <compiler angle="radian"/>
+  <custom>
+    <!-- 沿世界 +X 上楼；保留 ascent 类型以复用控制和终线逻辑。 -->
+    <text name="terrain_kind" data="ascent"/>
+    <numeric name="open_risers" data="1"/>
+    <!-- width：踏板左右全宽；friction：滑动/扭转/滚动摩擦。 -->
+    <numeric name="width" data="4.0"/>
+    <numeric name="friction" data="1.0 0.01 0.01"/>
+    <!-- 出生点应在低处起步平台范围内；z 由碰撞面射线查询。 -->
+    <numeric name="spawn_xy" data="-1.0 0.0"/>
+    <numeric name="spawn_yaw_deg" data="0"/>
+    <!-- first riser X；approach_length：其前方低平台的长度。 -->
+    <numeric name="start_x" data="0.25"/>
+    <numeric name="approach_length" data="2.0"/>
+    <!-- 单级阶高 / 水平踏深，单位 m；梯数为正整数。 -->
+    <numeric name="step_height" data="0.17"/>
+    <numeric name="tread_depth" data="0.30"/>
+    <numeric name="step_count" data="20"/>
+    <!-- 出口平台与末级同高；低处防坠平面没有竖直边界。 -->
+    <numeric name="platform_length" data="10.0"/>
+    <numeric name="floor_height" data="-0.5"/>
+  </custom>
+</mujoco>

@@ -1,0 +1,104 @@
+{
+  "schema": "m20_nonforward_retention_v1",
+  "obs_dim": 789,
+  "action_dim": 16,
+  "classes": [
+    "backward",
+    "left",
+    "right",
+    "yaw_left",
+    "yaw_right"
+  ],
+  "sample_count": 3000,
+  "payload": "samples.npz",
+  "payload_sha256": "56cc7ebc09885b3b46392d8bd6ea389ca447c3d646e66a6b7eb61307340517c4",
+  "source_checkpoint": "deploy/models/student_v3_5/model_21000.pt",
+  "source_checkpoint_sha256": "1f6f14857776b64200f6a2d4c81ad7af48e738604bbcec67acb8c7113a6dae73",
+  "label_semantics": "prior789D student nominal actions before handover blend, clipping or actuator delay; no privileged input",
+  "observation_profile_source": {
+    "path": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/rsl_rl/deeprobotics_m20_student_v3_safe/2026-10-26_13-28-33_059999_student_v3_safe/model_500.pt",
+    "sha256": "77a824307db8fa0988c2f7d3f0da92cc55b793bb30e4e5bdcddfdeca3f6630b8"
+  },
+  "collection": "real MuJoCo closed loop through original deploy_mujoco.interactive_rollout, original shared landing control and student-v1 sensor path; display/keyboard/sleep replaced",
+  "split": "entire seed42 train; entire seed43 held out from optimization; future performance seeds must be unseen",
+  "model": {
+    "path": "/home/ubuntu/桌面/m20_1/M20_perception_Lidar_rl_2/M20_perception_Lidar_rl/deep_robotics_model/M20/mjcf/M20.xml",
+    "sha256": "98ac70602d930dac0f0b65124309c59c9c98cca9186f071262981e0e32bceb7a"
+  },
+  "terrain": {
+    "path": "/home/ubuntu/cyq_shixi_projects/rl_training/deploy/deploy_mujoco/terrains/flat.xml",
+    "sha256": "c666ac27dde7fb49ef016901beb952588d451fc4068c0b88db8836079c2a876c"
+  },
+  "sources": [
+    {
+      "case": "legacy_v35_flat_backward_seed42",
+      "seed": 42,
+      "samples": 300,
+      "heldout_from_optimization": false,
+      "trace_sha256": "e8895f76f245f57b80ea39c7fade1ae16b3196f2dbc2ea913ecff980a2e3f8e4"
+    },
+    {
+      "case": "legacy_v35_flat_backward_seed43",
+      "seed": 43,
+      "samples": 300,
+      "heldout_from_optimization": true,
+      "trace_sha256": "4f99aad83ef50cf4518f58bf7a4e2d0293486d55572b726bf77b8f61a1a75a3b"
+    },
+    {
+      "case": "legacy_v35_flat_left_seed42",
+      "seed": 42,
+      "samples": 300,
+      "heldout_from_optimization": false,
+      "trace_sha256": "68319c0a0aedd161403f75cb78ddf2dbd8941968740c7b25d850e9c90e2f7c93"
+    },
+    {
+      "case": "legacy_v35_flat_left_seed43",
+      "seed": 43,
+      "samples": 300,
+      "heldout_from_optimization": true,
+      "trace_sha256": "c395abd9486da24ce60754b99d92d305ec358363c13efd74308d2991ba504708"
+    },
+    {
+      "case": "legacy_v35_flat_right_seed42",
+      "seed": 42,
+      "samples": 300,
+      "heldout_from_optimization": false,
+      "trace_sha256": "a50d4fded56109880e1e7bc3f50692d7fae068d3a58470772a9859b2550e09b0"
+    },
+    {
+      "case": "legacy_v35_flat_right_seed43",
+      "seed": 43,
+      "samples": 300,
+      "heldout_from_optimization": true,
+      "trace_sha256": "944ffcde228c8cdb4c29191cd48d16e7eb09ed0055ca6f9bdb497e0472babf03"
+    },
+    {
+      "case": "legacy_v35_flat_yaw_left_seed42",
+      "seed": 42,
+      "samples": 300,
+      "heldout_from_optimization": false,
+      "trace_sha256": "d2cf784320f1eb4f858914cf58c88e0e603a38179ddc78e2f461bc218218fb61"
+    },
+    {
+      "case": "legacy_v35_flat_yaw_left_seed43",
+      "seed": 43,
+      "samples": 300,
+      "heldout_from_optimization": true,
+      "trace_sha256": "19815407a3c81a193da6117525d87a4dc2c8d6b0a804292bc8fc3e6cb2ff8147"
+    },
+    {
+      "case": "legacy_v35_flat_yaw_right_seed42",
+      "seed": 42,
+      "samples": 300,
+      "heldout_from_optimization": false,
+      "trace_sha256": "1b3d703161a5c43eaa0de1f9f18909a5b13a4eb22f71e5e1eb3f8eb9a65151ae"
+    },
+    {
+      "case": "legacy_v35_flat_yaw_right_seed43",
+      "seed": 43,
+      "samples": 300,
+      "heldout_from_optimization": true,
+      "trace_sha256": "40d3cbb4074a192d60fb0cf0b1c224cc9268a7520bc8cd63a3752ca1de9f18cb"
+    }
+  ]
+}

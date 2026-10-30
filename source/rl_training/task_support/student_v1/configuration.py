@@ -26,10 +26,16 @@ class StudentV1PerceptionCfg:
     terrain_visibility: bool = True
     visibility_samples: int = 16
     visibility_tolerance_m: float = 0.015
+    # Zero preserves archived acquisition geometry and seeded sensor behavior.
+    map_capture_padding_m: float = 0.0
     map_update_period_s: float = 0.10
     update_jitter_s: float = 0.02
     min_delay_s: float = 0.0
     max_delay_s: float = 0.06
+    # Independent episode draw. Zero preserves legacy timing and RNG exactly.
+    zero_delay_probability: float = 0.0
+    # Opt-in for CTS v13; archived profiles retain their integer-step RNG.
+    continuous_delay: bool = False
     max_map_age_s: float = 1.00
     packet_dropout: float = 0.05
     burst_probability: float = 0.02
@@ -65,8 +71,17 @@ class StudentV1PerceptionCfg:
     confidence_overestimate_factor: float = 0.25
 
     def validate(self):
+        if type(self.map_capture_padding_m) not in (int, float) or not 0 <= self.map_capture_padding_m <= 2.:
+            raise ValueError('map_capture_padding_m must be a finite distance in [0,2]')
+        if type(self.zero_delay_probability) not in (int, float):
+            raise ValueError("zero_delay_probability must be numeric")
         if not isinstance(self.front_only, bool):
             raise ValueError("front_only must be a boolean")
+        if type(self.continuous_delay) is not bool:
+            raise ValueError('continuous_delay must be a boolean')
+        for name in ('min_delay_s', 'max_delay_s'):
+            if type(getattr(self, name)) not in (int, float):
+                raise ValueError(name + ' must be a numeric duration')
         if isinstance(self.front_blind_distance_m, bool):
             raise ValueError("front_blind_distance_m must be a distance, not a boolean")
         for item in fields(self):
@@ -138,6 +153,10 @@ class DeeproboticsM20StudentV1DistillationCfg:
         "stratified_fraction": 0.5, "hard_fraction": 0.25,
         "noise_level_start": 0.5, "noise_level_end": 1.0, "noise_ramp_updates": 4000,
         "rnd_cfg": None, "symmetry_cfg": None, "symmetry_loss_weight": 0.0,
+        "temporal_loss_weight": 0.0, "spatial_loss_weight": 0.0,
+        "stability_batch_size": 256, "spatial_noise_scale": 0.5, "stability_noise_std": None,
+        "retention_loss_weight": 0.0, "retention_manifest": None,
+        "retention_sha256": None, "retention_batch_size": 256,
     })
 
     def to_dict(self):

@@ -13,6 +13,10 @@ _MDP = "rl_training.tasks.manager_based.locomotion.velocity.mdp"
 
 # (Gym ID, canonical task name, Env class, EnvCfg class, PPO/distillation class)
 _TASKS = (
+    ('Rough-Deeprobotics-M20-StairQuiet-v1-Width', 'stair_quiet_v1_width', 'M20StairQuietV1WidthEnv', 'DeeproboticsM20StairQuietV1WidthEnvCfg', 'DeeproboticsM20StairQuietV1WidthPPORunnerCfg'),
+    ('Rough-Deeprobotics-M20-StairQuiet-v1', 'stair_quiet_v1', 'M20StairQuietV1Env', 'DeeproboticsM20StairQuietV1EnvCfg', 'DeeproboticsM20StairQuietV1PPORunnerCfg'),
+    ('Rough-Deeprobotics-M20-StairQuiet-v1-Student', 'stair_quiet_v1', 'M20StairQuietV1StudentEnv', 'DeeproboticsM20StairQuietV1StudentEnvCfg', 'DeeproboticsM20StairQuietV1StudentDistillationCfg'),
+    ('Rough-Deeprobotics-M20-StairTrot-v1', 'stair_trot_v1', 'M20StairTrotV1Env', 'DeeproboticsM20StairTrotV1EnvCfg', 'DeeproboticsM20StairTrotV1PPORunnerCfg'),
     ('Rough-Deeprobotics-M20-IdleStopMotion-v1', 'idle_stop_motion_v1', 'M20IdleStopMotionV1Env', 'DeeproboticsM20IdleStopMotionV1EnvCfg', 'DeeproboticsM20IdleStopMotionV1PPORunnerCfg'),
     ('Rough-Deeprobotics-M20-Student-v3.5', 'student_v3_5', 'M20StudentV35Env', 'DeeproboticsM20StudentV35EnvCfg', 'DeeproboticsM20StudentV35DistillationCfg'),
     ('Rough-Deeprobotics-M20-Student-v3', 'student_v3', 'M20StudentV3Env', 'DeeproboticsM20StudentV3EnvCfg', 'DeeproboticsM20StudentV3DistillationCfg'),

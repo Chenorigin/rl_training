@@ -1,0 +1,139 @@
+{
+  "history_steps": 4,
+  "perception": {
+    "level": 1.0,
+    "clean_probability": 0.0,
+    "stress_probability": 0.0,
+    "stress_multiplier": 2.0,
+    "front_only": true,
+    "front_blind_distance_m": 0.0,
+    "lidar_horizontal_fov_deg": 135.0,
+    "front_sensor_offset_m": [
+      0.32028,
+      0.0,
+      -0.013
+    ],
+    "rear_sensor_offset_m": [
+      -0.1,
+      0.0,
+      0.15
+    ],
+    "lidar_min_range_m": 0.05,
+    "lidar_max_range_m": 5.0,
+    "vertical_fov_min_deg": -90.0,
+    "vertical_fov_max_deg": 90.0,
+    "terrain_visibility": true,
+    "visibility_samples": 16,
+    "visibility_tolerance_m": 0.015,
+    "map_update_period_s": 0.1,
+    "update_jitter_s": 0.02,
+    "min_delay_s": 0.28,
+    "max_delay_s": 0.42,
+    "max_map_age_s": 0.5,
+    "packet_dropout": 0.05,
+    "burst_probability": 0.02,
+    "burst_duration_s": 0.3,
+    "point_dropout": 0.03,
+    "occlusion_probability": 0.3,
+    "occlusion_width_m": 0.4,
+    "occlusion_height_m": 0.3,
+    "occlusion_hold_s": 0.5,
+    "height_noise_std": 0.01,
+    "height_bias_std": 0.015,
+    "correlated_height_std": 0.01,
+    "map_artifact_probability": 0.03,
+    "map_artifact_height_std": 0.05,
+    "xy_bias_std": 0.015,
+    "yaw_bias_std": 0.01,
+    "pose_drift_xy_std": 0.015,
+    "pose_drift_yaw_std": 0.01,
+    "drift_time_constant_s": 2.0,
+    "roll_pitch_std": 0.01,
+    "gyro_std_rad_s": 0.015,
+    "gyro_bias_std_rad_s": 0.005,
+    "joint_position_std_rad": 0.002,
+    "joint_velocity_std_rad_s": 0.05,
+    "action_delay_steps": 1,
+    "variance_growth_per_s": 0.001,
+    "confidence_reference_std": 0.05,
+    "confidence_age_tau_s": 0.5,
+    "confidence_step_ambiguity_weight": 0.0,
+    "confidence_log_std": 0.0,
+    "confidence_overestimate_probability": 0.0,
+    "confidence_overestimate_factor": 0.25
+  },
+  "training": {
+    "experiment_name": "deeprobotics_m20_student_v3_safe",
+    "seed": 42,
+    "max_iterations": 30000,
+    "save_interval": 500,
+    "idle_practice": {
+      "every": 4,
+      "initial_hold_s": 2.0,
+      "move_s": 0.5,
+      "stop_s": 0.75
+    },
+    "algorithm": {
+      "save_replay": false,
+      "teacher_ratio": 0.5,
+      "teacher_ratio_end": 0.0,
+      "teacher_warmup_updates": 1000,
+      "teacher_decay_updates": 7000,
+      "noise_level_start": 1.0,
+      "noise_level_end": 1.0,
+      "noise_ramp_updates": 4000,
+      "temporal_loss_weight": 0.5,
+      "spatial_loss_weight": 0.1,
+      "stability_batch_size": 256,
+      "spatial_noise_scale": 0.5,
+      "retention_loss_weight": 1.0,
+      "retention_manifest": "deploy/models/student_v3_safe/nonforward_retention_20261026/manifest.json",
+      "retention_sha256": "a68420f6f20bf09f304689ed8d9acea5b445f03c82426ac88d8caa1744b8493d",
+      "retention_batch_size": 256,
+      "gait_policy_gradient": {
+        "weight": 0.02,
+        "leg_std": 0.04,
+        "wheel_std": 0.02,
+        "discount": 0.99,
+        "clip_ratio": 0.2,
+        "max_kl": 0.03,
+        "batch_size": 256,
+        "action_delay_steps": 1
+      }
+    },
+    "diagonal_reward": {
+      "weight": 1.0,
+      "min_hold_s": 0.08,
+      "max_half_cycle_s": 0.8,
+      "min_clearance_m": 0.025,
+      "progress_speed_m_s": 0.5,
+      "forward_min_m_s": 0.1,
+      "lateral_max_m_s": 0.1,
+      "yaw_max_rad_s": 0.15,
+      "upright_min": 0.9,
+      "heading_max_rad": 0.25
+    },
+    "terrain_course": {
+      "tile_length": 12.0,
+      "family_cycle": [
+        "legacy",
+        "legacy",
+        "round_trip",
+        "open_ascent"
+      ],
+      "round_trip": {
+        "height": 0.15,
+        "up_depth": 0.25,
+        "down_depth": 0.3,
+        "steps": 3,
+        "platform_length": 0.56
+      },
+      "open_ascent": {
+        "height": 0.17,
+        "depth": 0.3,
+        "steps": 20
+      },
+      "episode_length_s": 35.0
+    }
+  }
+}

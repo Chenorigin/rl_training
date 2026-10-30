@@ -69,7 +69,11 @@ class StudentV1Distillation(Distillation):
                  batch_size=1024, replay_rollouts=8, hard_replay_rollouts=2, save_replay=True,
                  leg_loss_weight=1., wheel_loss_weight=1., landing_loss_weight=2., recovery_loss_weight=2.,
                  stratified_fraction=.5, hard_fraction=.25,
-                 noise_level_start=.5, noise_level_end=1., noise_ramp_updates=4000, symmetry_loss_weight=0., **kwargs):
+                 noise_level_start=.5, noise_level_end=1., noise_ramp_updates=4000, symmetry_loss_weight=0.,
+                 temporal_loss_weight=0., spatial_loss_weight=0., stability_batch_size=256,
+                 spatial_noise_scale=.5, stability_noise_std=None,
+                 retention_loss_weight=0., retention_manifest=None, retention_sha256=None,
+                 retention_batch_size=256, **kwargs):
         super().__init__(*args, **kwargs)
         if self.is_multi_gpu or self.student.is_recurrent or self.teacher.is_recurrent:
             raise ValueError("V1 uses single-process feedforward models with optional explicit history")
@@ -102,6 +106,35 @@ class StudentV1Distillation(Distillation):
         if not math.isfinite(symmetry_loss_weight) or symmetry_loss_weight < 0:
             raise ValueError("Invalid symmetry_loss_weight")
         self.symmetry_loss_weight = symmetry_loss_weight
+        for name, value in (("temporal_loss_weight", temporal_loss_weight),
+                            ("spatial_loss_weight", spatial_loss_weight), ("spatial_noise_scale", spatial_noise_scale)):
+            if isinstance(value, bool) or not math.isfinite(value) or value < 0:
+                raise ValueError(f"Invalid {name}")
+        if type(stability_batch_size) is not int or stability_batch_size < 1:
+            raise ValueError("Invalid stability_batch_size")
+        if spatial_loss_weight:
+            keys = {"gyro", "gravity", "joint_position", "joint_velocity", "height"}
+            if (not isinstance(stability_noise_std, dict) or set(stability_noise_std) != keys
+                    or any(isinstance(v, bool) or not math.isfinite(v) or v < 0 for v in stability_noise_std.values())
+                    or not spatial_noise_scale > 0):
+                raise ValueError("Spatial stability requires finite sensor noise in observation units")
+        self.temporal_loss_weight, self.spatial_loss_weight = temporal_loss_weight, spatial_loss_weight
+        self.stability_batch_size, self.spatial_noise_scale = stability_batch_size, spatial_noise_scale
+        self.stability_noise_std = stability_noise_std
+        if isinstance(retention_loss_weight, bool) or not math.isfinite(retention_loss_weight) or retention_loss_weight < 0:
+            raise ValueError("Invalid retention_loss_weight")
+        if type(retention_batch_size) is not int or retention_batch_size < 5:
+            raise ValueError("Retention batch must cover all five non-forward commands")
+        self.retention_loss_weight, self.retention_batch_size = retention_loss_weight, retention_batch_size
+        self.retention = None
+        if retention_loss_weight:
+            if self.student.obs_dim != 789 or not retention_manifest or not retention_sha256:
+                raise ValueError("Motion retention requires pinned 789D rehearsal data")
+            from .retention import MotionRetention
+            self.retention = MotionRetention(retention_manifest, retention_sha256, self.device)
+        shape = (self.storage.num_transitions_per_env, self.storage.num_envs)
+        self.stability_training_mask = torch.zeros(shape, dtype=torch.bool, device=self.device)
+        self.stability_regular_phase = torch.zeros_like(self.stability_training_mask)
         self.teacher.requires_grad_(False).eval()
         if self.student.distribution is not None:
             self.student.distribution.requires_grad_(False)
@@ -185,6 +218,8 @@ class StudentV1Distillation(Distillation):
         # Keep at least one training example in a tiny offline fixture/rollout.
         if holdout.all():
             holdout[0] = False
+        self.stability_training_mask[self.storage.step] = ~holdout
+        self.stability_regular_phase[self.storage.step] = tags[:, 0] == 0
         self._append("replay", before, labels, tags, holdout)
         critical = (tags[:, 0] != 0) & ~holdout
         self._append("hard", before[critical], labels[critical], tags[critical], holdout[critical])
@@ -229,11 +264,24 @@ class StudentV1Distillation(Distillation):
             sampled_tags = torch.cat((sampled_tags, ht[hard_ids]))
         return observations, labels, sampled_tags
 
+    def auxiliary_loss(self):
+        """Task-local objective hook; legacy distillation has no reward gradient."""
+        return next(self.student.mlp.parameters()).new_zeros(()), {}
+
     def update(self):
         if not self.rollout_samples:
             raise RuntimeError("No collected v1 samples")
-        total = torch.zeros(5, device=self.device)
+        from .stability import adjacent_training_pairs, action_group_mse, perturb_sensors, temporal_residual_loss
+        total = torch.zeros(8, device=self.device)
+        retention_by_command = torch.zeros(5, device=self.device)
+        steps = self.storage.step
+        raw_commands = self.storage.observations.get("motion_control")
+        pairs = adjacent_training_pairs(self.storage.observations["policy"][:steps], self.storage.dones[:steps],
+                                        self.stability_training_mask[:steps], self.stability_regular_phase[:steps],
+                                        None if raw_commands is None else raw_commands[:steps])
+        pair_count = pairs[0].numel()
         updates = 0
+        auxiliary_stats = {}
         for _ in range(self.num_learning_epochs):
             for _ in range(math.ceil(self.rollout_samples/self.batch_size)):
                 observations, labels, tags = self._batch(min(self.batch_size, self.rollout_samples))
@@ -246,13 +294,47 @@ class StudentV1Distillation(Distillation):
                     mirrored = self.student(TensorDict({"policy": mirror_observations(observations)}, batch_size=[len(observations)]))
                     symmetry_loss = (mirrored - mirror_actions(predicted.detach())).square().mean()
                     loss = loss + self.symmetry_loss_weight * symmetry_loss
+                temporal_loss, spatial_loss = loss.new_zeros(()), loss.new_zeros(())
+                if self.temporal_loss_weight and pair_count:
+                    selected = torch.randint(pair_count, (min(self.stability_batch_size, pair_count),), device=self.device)
+                    time, env = pairs[0][selected], pairs[1][selected]
+                    current = self.storage.observations["policy"][time, env]
+                    previous = self.storage.observations["policy"][time-1, env]
+                    both = torch.cat((current, previous))
+                    actions = self.student(TensorDict({"policy": both}, batch_size=[len(both)]))
+                    temporal_loss = temporal_residual_loss(*actions.chunk(2),
+                        self.storage.privileged_actions[time, env], self.storage.privileged_actions[time-1, env],
+                        *self.loss_weights[:2])
+                    loss = loss + self.temporal_loss_weight * temporal_loss
+                if self.spatial_loss_weight:
+                    ids = (tags[:, 0] == 0).nonzero().flatten()[:self.stability_batch_size]
+                    if ids.numel():
+                        perturbed = perturb_sensors(observations[ids], self.stability_noise_std, self.spatial_noise_scale)
+                        alternate = self.student(TensorDict({"policy": perturbed}, batch_size=[len(ids)]))
+                        spatial_loss = action_group_mse(alternate-predicted[ids], *self.loss_weights[:2])
+                        loss = loss + self.spatial_loss_weight * spatial_loss
+                retention_loss = loss.new_zeros(())
+                if self.retention is not None:
+                    retained_obs, retained_labels, retained_commands = self.retention.sample(self.retention_batch_size)
+                    retained_actions = self.student(TensorDict({"policy": retained_obs}, batch_size=[len(retained_obs)]))
+                    residual = retained_actions-retained_labels
+                    retention_loss = action_group_mse(residual, *self.loss_weights[:2])
+                    loss = loss + self.retention_loss_weight * retention_loss
+                    for command_class in range(5):
+                        retention_by_command[command_class] += action_group_mse(
+                            residual[retained_commands == command_class], *self.loss_weights[:2]).detach()
+                auxiliary, diagnostics = self.auxiliary_loss()
+                loss = loss + auxiliary
+                for key, value in diagnostics.items():
+                    auxiliary_stats[key] = auxiliary_stats.get(key, 0.) + float(value.detach())
                 if not torch.isfinite(loss):
                     raise ValueError("Nonfinite distillation loss")
                 self.optimizer.zero_grad(set_to_none=True)
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(self.student.mlp.parameters(), self.max_grad_norm or 1., error_if_nonfinite=True)
                 self.optimizer.step()
-                total += torch.stack((behavior_loss.detach(), legs.mean().detach(), wheels.mean().detach(), symmetry_loss.detach(), loss.detach()))
+                total += torch.stack((behavior_loss.detach(), legs.mean().detach(), wheels.mean().detach(), symmetry_loss.detach(),
+                                      loss.detach(), temporal_loss.detach(), spatial_loss.detach(), retention_loss.detach()))
                 updates += 1
         self.num_updates += 1
         gate_open = self._advance_schedule()
@@ -260,12 +342,24 @@ class StudentV1Distillation(Distillation):
         values = total/updates
         stats = {"behavior": float(values[0]), "leg_mse": float(values[1]), "wheel_mse": float(values[2]),
                  "mirror_mse": float(values[3]), "total_loss": float(values[4]), "symmetry_loss_weight": self.symmetry_loss_weight,
+                 "temporal_residual_mse": float(values[5]), "spatial_action_mse": float(values[6]),
+                 "temporal_pair_count": float(pair_count), "temporal_loss_weight": self.temporal_loss_weight,
+                 "spatial_loss_weight": self.spatial_loss_weight,
+                 "retention_mse": float(values[7]), "retention_loss_weight": self.retention_loss_weight,
                  "teacher_ratio_target": self.teacher_ratio, "teacher_executed_fraction": self.executed_teacher/self.executed_total,
                  "teacher_decay_gate_open": float(gate_open), "student_failure_ema": self.failure_ema,
                  "student_completed_episodes": float(self.student_episodes), "noise_level": self.noise_level,
                  "replay_samples": float(self.replay_size), "critical_replay_samples": float(self.hard_size),
                  "present_strata": float(torch.unique(stratum_keys(self.replay_tags[:self.replay_size])).numel())}
         with torch.inference_mode():
+            if self.retention is not None:
+                from .retention import CLASSES
+                heldout_obs, heldout_labels, _ = self.retention.sample(self.retention_batch_size, heldout=True)
+                heldout_actions = self.student(TensorDict({"policy": heldout_obs}, batch_size=[len(heldout_obs)]))
+                stats["retention_heldout_mse"] = float(action_group_mse(heldout_actions-heldout_labels, *self.loss_weights[:2]))
+                for index, name in enumerate(CLASSES):
+                    stats[f"retention_{name}_mse"] = float(retention_by_command[index]/updates)
+                    stats[f"retention_{name}_training_samples"] = float(self.retention.pools["train"][index].numel())
             ids = self.replay_holdout[:self.replay_size].nonzero().flatten()[:self.batch_size]
             if ids.numel():
                 predicted = self.student(TensorDict({"policy": self.replay_obs[ids]}, batch_size=[len(ids)]))
@@ -286,6 +380,7 @@ class StudentV1Distillation(Distillation):
         for level in torch.unique(current_tags[:, 3]).tolist():
             stats[f"coverage_terrain_level_{level}"] = float((current_tags[:, 3] == level).float().mean())
         self.rollout_samples = self.executed_teacher = self.executed_total = 0
+        stats.update({key: value/updates for key, value in auxiliary_stats.items()})
         return stats
 
     def _advance_schedule(self):
@@ -302,7 +397,8 @@ class StudentV1Distillation(Distillation):
                 "capacity": self.capacity, "hard_capacity": self.hard_capacity,
                 "schedule_progress": self.schedule_progress, "student_episodes": self.student_episodes,
                 "failure_ema": self.failure_ema, "provenance": self.provenance,
-                "replay_saved": self.save_replay}
+                "replay_saved": self.save_replay,
+                "retention": None if self.retention is None else self.retention.receipt}
         for prefix in ("replay", "hard"):
             size = getattr(self, prefix+"_size") if self.save_replay else 0
             meta[prefix+"_size"] = size
@@ -318,6 +414,13 @@ class StudentV1Distillation(Distillation):
         resume = load_cfg is None and "student_state_dict" in loaded_dict
         if resume:
             meta = validate_resume_checkpoint(loaded_dict, self.obs_dim, self.capacity, self.hard_capacity, self.decay)
+            retained = meta.get("retention")
+            current = None if self.retention is None else self.retention.receipt
+            # Absolute storage location may change across machines; pinned
+            # content, reference weights and split counts must remain identical.
+            semantic = lambda value: None if value is None else {k:v for k,v in value.items() if k != "manifest"}
+            if semantic(retained) != semantic(current):
+                raise ValueError("Resume motion-retention data changed")
             load_cfg = {"student": True, "teacher": True, "optimizer": True, "iteration": True}
         result = super().load(loaded_dict, load_cfg, strict)
         self.teacher.requires_grad_(False).eval()

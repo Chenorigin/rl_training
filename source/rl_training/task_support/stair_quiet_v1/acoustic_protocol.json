@@ -1,0 +1,25 @@
+{
+  "schema": "stair_quiet_v1.acoustic_standard.v1",
+  "objective": "both_LAeq_and_LAFmax_dB_readings_at_most_half_of_each_baseline",
+  "max_db_reading_fraction": 0.5,
+  "min_repeats_per_policy": 6,
+  "max_completion_duration_relative_difference": 0.1,
+  "max_stationary_interval_s": 0.5,
+  "min_background_margin_db": 10.0,
+  "max_field_calibration_error_db": 0.5,
+  "max_field_calibration_drift_db": 0.5,
+  "measurement_window": "first_stair_contact_to_all_wheels_on_top_landing",
+  "laeq_aggregation": "duration_weighted_energy_mean",
+  "lafmax_aggregation": "maximum_across_all_repeats",
+  "uncertainty_guard": "candidate_plus_U_at_most_fraction_times_baseline_minus_U",
+  "baselines": {
+    "idle_stop_motion_v1_46400": {
+      "path": "deploy/models/idle_stop_motion_v1/idle_stop_motion_v1_46400.pt",
+      "sha256": "2326cd0aa65219334ed1e2fd7a63dbc880d351f61b512d34ebcaa24ed6bafe8c"
+    },
+    "student_v3_5_21000": {
+      "path": "deploy/models/student_v3_5/model_21000.pt",
+      "sha256": "1f6f14857776b64200f6a2d4c81ad7af48e738604bbcec67acb8c7113a6dae73"
+    }
+  }
+}

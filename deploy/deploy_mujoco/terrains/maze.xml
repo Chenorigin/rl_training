@@ -1,0 +1,73 @@
+<mujoco model="m20_wall_sensitivity_maze">
+  <!-- 围墙敏感性测试：仅平地和静态墙，不混入台阶、坡度或随机摩擦。
+       可直接用 mujoco.viewer 打开，也可传给各部署入口 terrain-xml 参数。
+       单位 m；+X 向前，+Y 向左，+Z 向上；geom size 是半尺寸。
+       紧凑 arena 内边界 x=[-2,7], y=[-2.2,2.2]；左侧入口，右下侧出口。
+       所有墙高 1.0、厚 0.15；pos.z=size.z，使墙底恰好落在地面。
+       入口直道净宽 1.2；相邻隔墙之间净宽 1.55。
+       四道隔墙交替开口，净宽依次 1.1 / 1.0 / 0.95 / 0.9。
+       所有应连接的墙端互相搭接；只有入口、出口和折返通道留空，不留侧缝。
+       调墙位置或通道宽度：编辑下方对应 geom 的 pos / size；不改机器人 spawn。
+       调墙高：各墙 pos 第三项与 size 第三项一起修改，墙高为 size.z 的两倍。
+       对比实验建议 no-spawn-mat 选项，并保持策略、指令和噪声配置相同。
+       waypoint 仅供人工参考，不自动寻路；通过迷宫需要手动转向/侧移。 -->
+  <compiler angle="radian"/>
+  <statistic center="2.5 0 0" extent="5.5"/>
+  <visual>
+    <global offwidth="1200" offheight="800" azimuth="90" elevation="-70"/>
+    <headlight ambient="0.45 0.45 0.45" diffuse="0.65 0.65 0.65"/>
+  </visual>
+  <custom>
+    <text name="terrain_kind" data="custom"/>
+    <!-- 公共部署参数：出生位置/朝向和 flat.xml 一致，地面摩擦也一致。 -->
+    <numeric name="width" data="4.4"/>
+    <numeric name="friction" data="1.0 0.01 0.01"/>
+    <numeric name="spawn_xy" data="-1 0"/>
+    <numeric name="spawn_yaw_deg" data="0"/>
+    <numeric name="goal_x" data="8"/>
+    <!-- 手动参考路线的世界 XY；此 numeric 是路线记录，不驱动控制器。
+         保持朝 +X 侧移也能走通；窄口前先在宽区域调整朝向。 -->
+    <numeric name="maze_route_xy" data="-1 0 -0.2 0 -0.2 1.65 1.25 1.65 1.25 -1.7 2.95 -1.7 2.95 1.725 4.65 1.725 4.65 -1.75 8 -1.75"/>
+  </custom>
+  <default>
+    <default class="maze_wall">
+      <geom type="box" group="0" contype="1" conaffinity="1" condim="3"
+            friction="1.0 0.01 0.01" rgba="0.58 0.66 0.72 1"/>
+    </default>
+  </default>
+  <worldbody>
+    <!-- 与 flat 相同的连续地面；没有隐蔽门槛、碰撞标记或地面高差。 -->
+    <geom name="ground" type="plane" size="40 40 0.1" pos="0 0 0"
+          group="0" contype="1" conaffinity="1" condim="3"
+          friction="1.0 0.01 0.01" rgba="0.32 0.35 0.38 1"/>
+
+    <!-- 外围墙。入口在左侧中央；出口在右侧下方，外面仍有平地。 -->
+    <geom name="boundary_north" class="maze_wall" pos="2.5 2.275 0.5" size="4.65 0.075 0.5"/>
+    <geom name="boundary_south" class="maze_wall" pos="2.5 -2.275 0.5" size="4.65 0.075 0.5"/>
+    <geom name="boundary_west_upper" class="maze_wall" pos="-2.075 1.42 0.5" size="0.075 0.82 0.5"/>
+    <geom name="boundary_west_lower" class="maze_wall" pos="-2.075 -1.42 0.5" size="0.075 0.82 0.5"/>
+    <geom name="boundary_east" class="maze_wall" pos="7.075 0.47 0.5" size="0.075 1.77 0.5"/>
+
+    <!-- 起步直道：先观察双侧墙；出直道后留出宽空间再向北绕过 divider_1。 -->
+    <geom name="entry_left" class="maze_wall" pos="-1.4 0.675 0.5" size="0.72 0.075 0.5"
+          rgba="0.65 0.72 0.78 1"/>
+    <geom name="entry_right" class="maze_wall" pos="-1.4 -0.675 0.5" size="0.72 0.075 0.5"
+          rgba="0.65 0.72 0.78 1"/>
+
+    <!-- 依次从北、南、北、南绕行；开口越往后越窄。
+         divider_1: 从 y=(1.1,2.2) 通过；其下端伸入外围墙。 -->
+    <geom name="divider_1" class="maze_wall" pos="0.4 -0.57 0.5" size="0.075 1.67 0.5"/>
+    <!-- divider_2: 从 y=(-2.2,-1.2) 通过；上端伸入外围墙。 -->
+    <geom name="divider_2" class="maze_wall" pos="2.1 0.52 0.5" size="0.075 1.72 0.5"/>
+    <!-- divider_3: 从 y=(1.25,2.2) 通过。 -->
+    <geom name="divider_3" class="maze_wall" pos="3.8 -0.495 0.5" size="0.075 1.745 0.5"/>
+    <!-- divider_4: 从 y=(-2.2,-1.3) 通过。 -->
+    <geom name="divider_4" class="maze_wall" pos="5.5 0.47 0.5" size="0.075 1.77 0.5"/>
+
+    <!-- 起终点为不碰撞 site，颜色仅作视觉定位，不进入高度扫描。 -->
+    <site name="maze_start" type="cylinder" pos="-1 0 0.003" size="0.2 0.002"
+          rgba="0.2 0.8 0.35 0.8" group="2"/>
+    <site name="maze_finish" type="cylinder" pos="8 -1.75 0.003" size="0.2 0.002"
+          rgba="0.9 0.65 0.15 0.8" group="2"/>
+  </worldbody>
+</mujoco>

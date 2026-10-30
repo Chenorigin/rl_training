@@ -27,6 +27,7 @@ from student_v0_adapter import (StudentMapAdapter, load_student, profile_config,
 
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
+    baseline.add_spawn_arguments(parser)
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--checkpoint", type=Path)
     source.add_argument("--policy-jit", type=Path)
@@ -180,7 +181,7 @@ def create_simulation(args, provenance, prone=False):
     torch.manual_seed(args.seed)
     cfg, extras = profile_config(args.noise_profile, provenance, args.profile_file, args.noise_level)
     model = baseline.load_model(args.model, args)
-    terrain_ids = (model.geom_bodyid == 0) & (model.geom_group == 0) & ((model.geom_contype != 0) | (model.geom_conaffinity != 0))
+    terrain_ids = np.array([baseline.is_terrain_geom(model, i) for i in range(model.ngeom)])
     model.geom_friction[terrain_ids, 0] *= args.friction_scale
     # Override contact mixing as well: lower terrain friction must actually act.
     if args.friction_scale != 1.:
@@ -250,7 +251,7 @@ def rollout(args, policy, provenance, identity):
             records["qpos"].append(data.qpos.copy())
             records["qvel"].append(data.qvel.copy())
             records["observation"].append(obs)
-            records["action_issued"].append(issued)
+            records["action_issued"].append(issued.copy())
             records["action_applied"].append(applied.copy())
             records["base_position"].append(pre_pos)
             records["command"].append(current_command.copy())
@@ -281,7 +282,17 @@ def rollout(args, policy, provenance, identity):
             records["fell_post_step"].append(fall_now)
             if viewer:
                 draw_student_map(viewer, contract, adapter.last_channels, float(pre_pos[2]))
+                before_sync = float(data.time)
                 viewer.sync()
+                if data.time < before_sync:
+                    contract.reset(data)
+                    previous_action.fill(0.)
+                    delay.clear()
+                    delay.extend(previous_action.copy() for _ in range(extras.action_delay_steps))
+                    if hasattr(adapter, "reset"):
+                        adapter.reset()
+                    else:
+                        adapter = StudentMapAdapter(contract, adapter.cfg, extras, args.seed)
                 if not viewer.is_running():
                     break
                 time.sleep(max(0., baseline.POLICY_DT - (time.perf_counter() - frame_start)))
@@ -301,7 +312,10 @@ def rollout(args, policy, provenance, identity):
     result = {**identity, "model_path": str(args.model.resolve()), "model_xml_sha256": sha256(args.model),
               "mujoco_version": mujoco.__version__, "terrain": args.terrain_config.summary(),
               "model_physics_summary": {"total_mass_kg": float(model.body_mass.sum()), "actuators": model.nu,
-                                        "robot_collision_geoms": int(((model.geom_bodyid != 0) & (model.geom_contype != 0)).sum()),
+                                        "robot_collision_geoms": int(sum(
+                                            model.geom_bodyid[i] != 0 and model.geom_contype[i] != 0
+                                            and not baseline.is_terrain_geom(model, i)
+                                            for i in range(model.ngeom))),
                                         "joint_order": list(baseline.JOINT_NAMES)},
               "noise_profile": args.noise_profile, **adapter.summary(), "seed": args.seed,
               "controller": "student_only", "teacher_executed_fraction": 0., "weights_updated": False,
@@ -368,6 +382,7 @@ def interactive_rollout(args, policy, provenance, identity):
 
     def enter(new_mode):
         nonlocal mode
+        keys.clear_motion()
         if new_mode == "policy" and mode != "policy":
             # V1 discards pre-handover sensor history like a new training episode.
             # V0 adapters retain their existing behavior without this hook.
@@ -377,6 +392,20 @@ def interactive_rollout(args, policy, provenance, identity):
         mode = new_mode
         transitions.append({"time_s": float(data.time), "mode": mode})
         print(f"[MODE] {mode} t={data.time:.2f}s", flush=True)
+
+    def reset_session():
+        nonlocal pending_policy, stand_initial, lie_initial, adapter
+        contract.reset(data, prone=True)
+        pending_policy = False
+        stand_initial = lie_initial = baseline.PRONE_JOINT_POS.copy()
+        clear_policy()
+        reset_sensor = getattr(adapter, "reset", None)
+        if reset_sensor is not None:
+            reset_sensor()
+        else:
+            # V0 has no reset method; reconstruct its delayed sensor state.
+            adapter = StudentMapAdapter(contract, adapter.cfg, extras, args.seed)
+        enter("prone")
 
     clear_policy()
     started = time.perf_counter()
@@ -388,11 +417,14 @@ def interactive_rollout(args, policy, provenance, identity):
             viewer.cam.distance, viewer.cam.elevation = 3.2, -18.
         terminal_active = terminal.start()
         print("[KEYS] Z stand | C student policy | W/S forward/back | A/D left/right | Q/E turn", flush=True)
-        print("[KEYS] X lie down | R damping | H map | Esc quit", flush=True)
+        print("[KEYS] X lie down | R damping | Backspace reset | H map | Esc quit", flush=True)
         print("[HEIGHTMAP] red=unknown, yellow=low confidence, green=high confidence", flush=True)
         print(f"[KEYS] Input: focused MuJoCo window{' or terminal' if terminal_active else ''}", flush=True)
         if keys._window_keys is None:
-            print("[KEYS] Window hold/release queries unavailable; use the focused terminal with key repeat", flush=True)
+            print("[KEYS] Limited press/timeout fallback; reliable held combinations require an X11 viewer", flush=True)
+        else:
+            print("[KEYS] Hold/combine W+A/Q in viewer or verified local terminal; release to brake", flush=True)
+        print(f"[KEYS] Gradual speed: {baseline.TELEOP_RISE_TIME:g}s to full, {baseline.TELEOP_STOP_TIME:g}s release braking", flush=True)
         print("[MODE] prone; press Z to stand, then C to enter the student policy", flush=True)
         while viewer.is_running() and (args.steps is None or step < args.steps):
             frame_start = time.perf_counter()
@@ -401,6 +433,8 @@ def interactive_rollout(args, policy, provenance, identity):
             for key in keys.take_events():
                 if key == "escape":
                     quit_requested = True
+                elif key == "reset":
+                    reset_session()
                 elif key == "h":
                     show_map = not show_map
                 elif key == "r":
@@ -521,7 +555,10 @@ def interactive_rollout(args, policy, provenance, identity):
             else:
                 with viewer.lock():
                     viewer.user_scn.ngeom = 0
+            before_sync = float(data.time)
             viewer.sync()
+            if data.time < before_sync:
+                reset_session()
             step += 1
             time.sleep(max(0., baseline.POLICY_DT - (time.perf_counter() - frame_start)))
     finally:

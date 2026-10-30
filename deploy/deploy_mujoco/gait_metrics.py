@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import mujoco
 import numpy as np
+from terrain_loader import static_terrain_flex_ids, terrain_contact_bodies
 
 LEG_NAMES = ("fl", "fr", "hl", "hr")
 
@@ -10,6 +11,7 @@ LEG_NAMES = ("fl", "fr", "hl", "hr")
 class GaitMetrics:
     def __init__(self, contract, dt=0.02, min_extension=0.30):
         self.contract, self.model, self.dt = contract, contract.model, dt
+        self.flex_ids = getattr(contract, "terrain_flex_ids", static_terrain_flex_ids(contract.model))
         self.hips = np.array([self.model.body(f"{leg}_hipy").id for leg in LEG_NAMES])
         self.knees = np.array([self.model.joint(f"{leg}_knee_joint").qposadr[0] for leg in LEG_NAMES])
         self.min_extension = min_extension
@@ -32,7 +34,7 @@ class GaitMetrics:
         wheels = self.contract.wheel_body_ids
         for i in range(data.ncon):
             contact = data.contact[i]
-            body1, body2 = self.model.geom_bodyid[[contact.geom1, contact.geom2]]
+            body1, body2 = terrain_contact_bodies(self.model, contact, self.flex_ids)
             if body1 != 0 and body2 != 0:
                 continue
             body = body2 if body1 == 0 else body1

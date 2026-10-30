@@ -143,6 +143,10 @@ class StairGuardedPPO(PPO):
             result.update(self.actor.take_rollout_metrics())
         return result
 
+    def auxiliary_actor_loss(self, observations):
+        """Task extension inside the same PPO optimizer step; legacy default is zero."""
+        return observations["policy"].new_zeros(())
+
     def save(self):
         state = super().save()
         if self.reference_actor is not None:
@@ -295,6 +299,8 @@ class StairGuardedPPO(PPO):
                 loss = loss+self.stop_regularization_coefficient*self.actor.stop_regularization()
             if self.motion_regularization_coefficient > 0 and self.guard_updates >= self.critic_warmup_iterations:
                 loss = loss+self.motion_regularization_coefficient*self.actor.motion_regularization()
+            if self.guard_updates >= self.critic_warmup_iterations:
+                loss = loss + self.auxiliary_actor_loss(batch.observations)
 
             # Symmetry loss
             if self.symmetry:

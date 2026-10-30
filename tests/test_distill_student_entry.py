@@ -25,10 +25,15 @@ class EntryTests(unittest.TestCase):
         for task, version in entry.TASK_VERSIONS.items():
             with self.subTest(task=task):
                 args = self.args('--task', task)
-                self.assertEqual(entry.configure_run(args, {}), version)
+                saved = {}
+                if task == entry.QUIET_STUDENT_TASK:
+                    from task_support.stair_quiet_v1.landing import LandingSettings, control_contract
+                    saved = {'m20_training_manifest': {'noise_refinement': {'control_contract': control_contract(LandingSettings())}}}
+                self.assertEqual(entry.configure_run(args, saved), version)
                 output_version = {
                     'Rough-Deeprobotics-M20-Student-v3': 'v3',
                     'Rough-Deeprobotics-M20-Student-v3.5': 'v3_5',
+                    entry.QUIET_STUDENT_TASK: 'stair_quiet_v1_student',
                 }.get(task, version)
                 self.assertEqual(args.log_root.name, 'deeprobotics_m20_student_' + output_version)
                 self.assertEqual(args.run_name, 'student_' + output_version)

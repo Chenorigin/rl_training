@@ -1,0 +1,55 @@
+{
+  "schema": "stair_quiet_v1.sound_profiles.v1",
+  "profiles": {
+    "illustrative_compact_panel": {
+      "name": "illustrative_compact_panel",
+      "calibration_status": "uncalibrated_simulation",
+      "parameter_basis": "Illustrative equivalent compact radiator; no measured M20, wheel, stair or room parameters. These values were not fitted to a reduction target.",
+      "sample_rate_hz": 48000,
+      "pre_roll_s": 1.0,
+      "pulse_duration_s": 0.004,
+      "air_density_kg_m3": 1.204,
+      "sound_speed_m_s": 343.0,
+      "receiver_position_m": [0.0, -2.0, 1.2],
+      "max_source_receiver_distance_m": 20.0,
+      "equivalent_source_radius_m": 0.01,
+      "nominal_band_limit_hz": 2000.0,
+      "lowpass_order": 6,
+      "max_nominal_ka": 0.5,
+      "minimum_distance_radii": 10.0,
+      "minimum_samples_per_pulse": 32,
+      "minimum_samples_per_band_period": 20,
+      "tail_envelope_fraction": 0.000001,
+      "max_source_duration_s": 180.0,
+      "max_render_duration_s": 200.0,
+      "max_events": 10000,
+      "modes": [
+        {
+          "frequency_hz": 120.0,
+          "modal_mass_kg": 1.2,
+          "damping_ratio": 0.04,
+          "force_participation": 1.0,
+          "radiating_area_m2": 0.0004
+        },
+        {
+          "frequency_hz": 340.0,
+          "modal_mass_kg": 0.4,
+          "damping_ratio": 0.06,
+          "force_participation": 0.7,
+          "radiating_area_m2": 0.0002
+        },
+        {
+          "frequency_hz": 780.0,
+          "modal_mass_kg": 0.15,
+          "damping_ratio": 0.08,
+          "force_participation": 0.4,
+          "radiating_area_m2": 0.0001
+        }
+      ],
+      "sensitivity": {
+        "pulse_duration_factors": [0.5, 1.0, 2.0],
+        "damping_factors": [0.5, 1.0, 2.0]
+      }
+    }
+  }
+}
