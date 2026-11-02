@@ -18,6 +18,8 @@ Isaac Lab training, teacher-to-student distillation, and MuJoCo playback for the
 
 Release: **`v0`** · Python package: **`0.1.0`** · Repository: [Chenorigin/rl_training](https://github.com/Chenorigin/rl_training).
 
+当前 CTS v26 直接使用窄双墙，并新增独立 C 接管停驻课程，说明见 [CTS 指南](docs/m20_cts.md#v26窄双墙与独立-c-接管)。验证和启动命令位于 `logs/evaluation/cts_v26_narrow_handover_20261101/`；训练效果待新一轮对照验收。
+
 ## Installation
 
 Use an existing, working Isaac Lab environment. The validation environment used Python 3.11, Isaac Sim 5.1.0, Isaac Lab 2.3.2, and `rsl-rl-lib==5.0.1`; installing this package alone does not install Isaac Sim or Isaac Lab.
@@ -279,3 +281,5 @@ python -m pytest -q -p no:cacheprovider \
 ## Attribution and licenses
 
 This project derives from [DeepRoboticsLab/rl_training](https://github.com/DeepRoboticsLab/rl_training), with the BSD 3-Clause terms in [LICENSE](LICENSE), and incorporates robot_lab work by Ziqi Fan under [LICENSE-robot_lab](LICENSE-robot_lab). The IdleStopMotion integration credits the pinned frider635-beep source above. Retain the existing per-file copyright and license notices. Isaac Lab, Isaac Sim, and robot assets remain subject to their respective upstream licenses.
+
+[CTS v21 直行航向与平台运动质量](docs/m20_cts.md#v21-直行航向与平台运动质量)：保留楼梯原位停车，更新航向验收和平台微动约束，续训采用新 run。

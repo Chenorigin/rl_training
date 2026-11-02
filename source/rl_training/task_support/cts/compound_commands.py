@@ -90,7 +90,8 @@ def tracking_rewards(state, geometry, legacy_linear, legacy_yaw):
     active = command.abs() > 1.e-4
     sigma = torch.maximum(command.abs()*cfg['relative_tracking_tolerance'], floor)
     sigma = torch.where(active, sigma, .25**.5)
-    normalized = ((measured-command)/sigma).square()
+    target = geometry['tracking_command'] if getattr(state, 'objectives', None) is not None else command
+    normalized = ((measured-target)/sigma).square()
     score = torch.exp(-normalized.amax(-1))
     use = ((state.course_ids >= 3) & (state.course_ids <= 7) & active.any(-1))
     return torch.where(use, score, legacy_linear), torch.where(use, score, legacy_yaw)

@@ -29,7 +29,13 @@ def reward(env):
     q = data.root_quat_w
     body_up = torch.stack((2*(q[:,1]*q[:,3]+q[:,0]*q[:,2]),
         2*(q[:,2]*q[:,3]-q[:,0]*q[:,1]),1-2*(q[:,1].square()+q[:,2].square())),-1)
-    tilt = (1-(body_up*g['root_normal']).sum(-1).clamp(-1.,1.)).clamp_min(0)
+    normal = g['root_normal']
+    hold = getattr(state,'stair_hold',None)
+    if hold is not None:
+        from task_support.student_v1.perception import quaternion_rotation
+        reference = quaternion_rotation(hold.quaternion)[:,:,2]
+        normal = torch.where(hold.active[:,None],reference,normal)
+    tilt = (1-(body_up*normal).sum(-1).clamp(-1.,1.)).clamp_min(0)
     delta = env.action_manager.action-env.action_manager.prev_action
     if not hasattr(state,'leg_ids'):
         state.leg_ids = env.scene['robot'].find_joints(env.cfg.leg_joint_names,preserve_order=True)[0]
@@ -49,15 +55,39 @@ def reward(env):
     if getattr(state, 'compound', False):
         from .compound_commands import tracking_rewards
         tracking, yaw_tracking = tracking_rewards(state, g, tracking, yaw_tracking)
-    if hasattr(state,'platform_risk'):
+    if hasattr(state,'platform_risk') and getattr(state, 'objectives', None) is None:
         stopping = torch.exp(-data.root_lin_vel_b[:,:2].square().sum(-1)/.25)
         tracking = torch.maximum(tracking,state.platform_risk*stopping)
+    stopped, stop_cost = g['stopped'], torch.zeros_like(tracking)
+    if state.recovery is not None and state.recovery.hold is not None:
+        tracking, yaw_tracking, stopped, stop_cost = state.recovery.hold.reward_terms(tracking, yaw_tracking, stopped)
+    if state.quality is not None:
+        tracking, yaw_tracking, stopped, quality_cost = state.quality.reward_terms(tracking, yaw_tracking, stopped)
+        stop_cost = stop_cost + quality_cost
+    success_weight = torch.full_like(tracking,cfg['success'])
+    if hold is not None:
+        tracking = torch.where(hold.active,hold.linear,tracking)
+        yaw_tracking = torch.where(hold.active,hold.angular,yaw_tracking)
+        stopped = torch.where(hold.active,hold.ready,stopped)
+        stop_cost += torch.where(hold.active,hold.cost,0.)
+        success_weight = torch.where(hold.active,hold.cfg['success_reward'],success_weight)
+    wall_hold = getattr(state, 'wall_hold', None)
+    if wall_hold is not None:
+        tracking = torch.where(wall_hold.active,wall_hold.linear,tracking)
+        yaw_tracking = torch.where(wall_hold.active,wall_hold.angular,yaw_tracking)
+        stopped = torch.where(wall_hold.active,wall_hold.ready,stopped)
+        stop_cost += torch.where(wall_hold.active,wall_hold.cost,0.)
+        success_weight = torch.where(wall_hold.active,wall_hold.cfg['success_reward'],success_weight)
     result = (cfg['linear']*tracking+cfg['yaw']*yaw_tracking
-        +cfg['progress']*state.progress/env.step_dt+cfg['success']*state.success/env.step_dt
-        +cfg['stop']*(~moving)*g['stopped']-cfg['tilt']*tilt
+        +cfg['progress']*state.progress/env.step_dt+success_weight*state.success/env.step_dt
+        +cfg['stop']*(~moving)*stopped-cfg['tilt']*tilt-stop_cost
         -cfg['action_rate']*delta.square().mean(-1)-cfg['effort']*data.applied_torque.square().mean(-1)
         -cfg['slip']*g['slip'].square().mean(-1)-cfg['impact']*impact/env.step_dt
         -cfg['failure']*state.failed/env.step_dt-flat_cost*flat)
+    if getattr(state,'stair_walls',None) is not None:
+        result = result-state.stair_walls.cost()
+    if getattr(state,'recovery',None) is not None:
+        result = result-state.recovery.cost()
     if state.walls is not None:
         result = result-state.walls.cost()
     if 'startup_stability' in state.cfg:

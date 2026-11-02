@@ -88,6 +88,7 @@ class CTSMetadataTests(unittest.TestCase):
         perception = student_settings()['perception']
         perception['zero_delay_probability'] = config['map_delay_mixture']['zero_delay_probability']
         perception['map_capture_padding_m'] = config['map_capture']['padding_m']
+        perception['support_surface_visibility'] = config['map_capture']['support_surface_visibility']
         perception['continuous_delay'] = config.get('all_terrain', {}).get('enabled', False)
         auxiliary = {'version': 1, 'config': deepcopy(config['auxiliary']),
                      'sensor_noise_std': validate_context(config['auxiliary'], perception),
@@ -211,6 +212,7 @@ class CTSAuxiliaryConfigurationTests(unittest.TestCase):
     def test_disabled_auxiliaries_have_no_additional_memory_reserve(self):
         config = default_settings()
         config.pop('straight_practice')  # This objective also has an autograd batch reserve.
+        config['all_terrain']['wall_stability']['enabled'] = False
         for key in ('temporal_loss_weight', 'spatial_loss_weight', 'retention_loss_weight'):
             config['auxiliary'][key] = 0.
         budget = entry.auxiliary_memory_budget(config)

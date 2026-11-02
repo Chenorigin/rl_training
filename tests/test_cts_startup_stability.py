@@ -12,6 +12,7 @@ from task_support.cts.stability import reset_supported_start_joints, stability_c
 
 def fake(n=256):
     cfg = default_settings()['all_terrain']
+    cfg.pop('wall_stability')  # This fixture exercises the pre-v18 objective.
     data = SimpleNamespace(default_joint_pos=torch.zeros(n, 16), joint_pos=torch.zeros(n, 16),
         joint_vel=torch.zeros(n, 16), root_ang_vel_b=torch.zeros(n, 3),
         soft_joint_pos_limits=torch.tensor([-1., 1.]).expand(n, 16, 2).clone())
@@ -29,7 +30,9 @@ def test_versioned_config_keeps_v13_readable_but_requires_v14_coverage():
     validate_config(cfg)
     assert 'm20_cts_action_latent_v13' in LEGACY_VERSIONS
     old = deepcopy(cfg)
-    for key in ('motion_stability', 'startup_stability', 'compound_commands', 'wall_practice'):
+    for key in ('wall_hold_practice','stair_hold_practice','motion_stability','startup_stability','compound_commands','wall_practice','hind_clearance',
+                'safety_learning','stair_recovery','obstacle_response','stair_walls','hind_ascent',
+                'front_descent','clutter_consistency','wall_stability','objective_consistency','stair_stop','motion_quality'):
         old['all_terrain'].pop(key)
     validate_config(old, legacy=True)
     with pytest.raises(ValueError, match='v14'):

@@ -87,7 +87,12 @@ def stability_costs(env, state, geometry):
     legs = robot.find_joints(env.cfg.leg_joint_names, preserve_order=True)[0]
     wheels = robot.find_joints(env.cfg.wheel_joint_names, preserve_order=True)[0]
     nonstairs = (~state.stairs).to(data.joint_pos.dtype)
-    idle = (geometry['command'].abs().amax(-1) <= 1.e-4).to(data.joint_pos.dtype)*nonstairs
+    from .wall_stability import settings, level_support
+    idle_support = nonstairs
+    if settings(state.cfg) is not None:
+        idle_support = torch.maximum(nonstairs, (state.stairs & level_support(state, geometry)).to(nonstairs.dtype))
+    # base_velocity is the raw command manager value; heading feedback lives in observations.
+    idle = (geometry['command'].abs().amax(-1) <= 1.e-4).to(data.joint_pos.dtype)*idle_support
     delta = env.action_manager.action-env.action_manager.prev_action
     q = data.joint_pos[:, legs]
     limits = data.soft_joint_pos_limits[:, legs]

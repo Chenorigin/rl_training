@@ -76,7 +76,7 @@ def replay_behavior_error(models, data, num_envs):
         mean, _ = models.mean(obs, data['teacher'][ids])
         means.append(mean)
     mean = torch.cat(means)
-    distribution = torch.distributions.Normal(mean, models.log_std.exp())
+    distribution = torch.distributions.Normal(mean, data.get('std', models.log_std.exp()))
     return float((distribution.log_prob(data['actions']).sum(-1)-data['log_prob']).abs().max())
 
 
@@ -160,10 +160,17 @@ class CTSRunner:
         ratio_error, episodes, checked_samples, gae_rollouts = 0., 0, 0, 0
         auxiliary_checks = []
         course = self.all_terrain_course()
+        wall_hold = getattr(course, 'wall_hold', None)
+        wall_hold_spawn = wall_hold.validate_initial() if wall_hold is not None else None
+        wall_hold_samples = torch.zeros(2, dtype=torch.long, device=self.alg.device)
+        wall_hold_command_max = 0.
+        hold_spawn = course.stair_hold.validate_initial() if course is not None and course.stair_hold is not None else None
         from .all_terrain_config import COURSES
         num_modes = course.num_modes if course is not None else 9
         course_samples = torch.zeros(2,len(COURSES),num_modes,dtype=torch.long,device=self.alg.device)
         course_delays = torch.zeros(2,len(COURSES),num_modes,2,dtype=torch.long,device=self.alg.device)
+        hold_samples = torch.zeros(2,2,dtype=torch.long,device=self.alg.device)
+        hold_command_max = 0.
         bands = len(self.metadata['config']['platform_practice']['height_bands'])
         platform_samples = torch.zeros(bands,2,3,dtype=torch.long,device=self.alg.device)
         sample_frames = torch.zeros(2,dtype=torch.long,device=self.alg.device)
@@ -173,14 +180,32 @@ class CTSRunner:
         from task_support.student_v1.environment import sensor_state
         from .perception import delay_diagnostics
         batched_ratio_error = 0.
+        stop_samples = 0
+        scale_error = 0.
         with torch.inference_mode():
             for _ in range(steps):
                 action = self.alg.act(obs)
+                stop_samples += int((obs['motion_control'].abs().amax(-1)<=1.e-4).sum())
+                scale_error = max(scale_error, float((self.alg.pending['std']-self.alg.action_std(obs)).abs().max()))
+                if scale_error != 0.:raise RuntimeError('CTS exploration collection/replay scale mismatch')
                 if course is not None:
                     cell = ((~self.alg.teacher_mask).long()*len(COURSES)+course.course_ids)*num_modes+course.mode
-                    course_samples.view(-1).add_(torch.bincount(cell,minlength=course_samples.numel()))
+                    original = torch.ones_like(course.teacher) if course.stair_hold is None else ~course.stair_hold.active
+                    if wall_hold is not None:original &= ~wall_hold.active
+                    course_samples.view(-1).add_(torch.bincount(cell[original],minlength=course_samples.numel()))
+                    if course.stair_hold is not None and course.stair_hold.active.any():
+                        ids=course.stair_hold.active.nonzero().flatten()
+                        hold_cell=(~course.teacher[ids]).long()*2+(course.course_ids[ids]==2).long()
+                        hold_samples.view(-1).add_(torch.bincount(hold_cell,minlength=4))
+                        hold_command_max=max(hold_command_max,float(obs['motion_control'][ids].abs().max()))
+                        if hold_command_max>1.e-4:raise RuntimeError('Stair hold delivered nonzero motion command')
+                    if wall_hold is not None:
+                        ids = wall_hold.active.nonzero().flatten()
+                        wall_hold_samples.add_(torch.bincount((~course.teacher[ids]).long(), minlength=2))
+                        wall_hold_command_max = max(wall_hold_command_max, float(obs['motion_control'][ids].abs().max()))
+                        if wall_hold_command_max > 1.e-4:raise RuntimeError('Wall hold delivered nonzero motion command')
                     zero = sensor_state(self.env.unwrapped).zero_delivery.long()
-                    course_delays.view(-1).add_(torch.bincount(cell*2+zero,minlength=course_delays.numel()))
+                    course_delays.view(-1).add_(torch.bincount((cell*2+zero)[original],minlength=course_delays.numel()))
                     if checked_samples % (self.alg.num_envs*self.alg.num_steps_per_env) == 0:
                         course.check_rays()
                 else:
@@ -206,7 +231,7 @@ class CTSRunner:
                 # Check every transition, including a validation shorter than
                 # one rollout; an unexecuted check must never report zero error.
                 mean, _ = self.alg.models.mean(self.alg.pending['obs'], self.alg.teacher_mask)
-                distribution = torch.distributions.Normal(mean, self.alg.models.log_std.exp())
+                distribution = torch.distributions.Normal(mean, self.alg.action_std(self.alg.pending['obs']))
                 error = (distribution.log_prob(action).sum(-1)-self.alg.pending['log_prob']).abs().max()
                 ratio_error = max(ratio_error, float(error))
                 checked_samples += self.alg.num_envs
@@ -221,7 +246,9 @@ class CTSRunner:
                     gae_rollouts += 1
                     data = self.alg._data()
                     mean, latent = self.alg.models.mean(data['obs'], data['teacher'])
-                    distribution = torch.distributions.Normal(mean, self.alg.models.log_std.exp())
+                    distribution = torch.distributions.Normal(mean, self.alg.action_std(data['obs']))
+                    if not torch.equal(distribution.scale, data['std']):
+                        raise RuntimeError('CTS stored exploration scale differs from behavior observations')
                     error = (distribution.log_prob(data['actions']).sum(-1)-data['log_prob']).abs().max()
                     batched_ratio_error = max(batched_ratio_error, float(error))
                     ratio_error = max(ratio_error, replay_behavior_error(self.alg.models, data, self.alg.num_envs))
@@ -242,6 +269,17 @@ class CTSRunner:
                     straight_loss,straight_diagnostics = straight_action_loss(self.alg.models,data,clean_target,self.alg.straight_cfg)
                     if not torch.isfinite(straight_loss):raise RuntimeError('Nonfinite CTS straight inference validation')
                     diagnostics.update(straight_diagnostics)
+                    from .clutter_consistency import loss as clutter_loss
+                    clutter, clutter_metrics = clutter_loss(self.alg.models,data,ids,selection['regular'],
+                        (self.alg.all_terrain_cfg or {}).get('clutter_consistency'),self.alg.action_safety)
+                    if not torch.isfinite(clutter):raise RuntimeError('Nonfinite CTS clutter inference validation')
+                    diagnostics.update(clutter_metrics)
+                    diagnostics['clutter_loss'] = float(clutter)
+                    from .wall_stability import settings as wall_settings, student_loss as wall_loss
+                    wall, wall_metrics = wall_loss(self.alg.models, data, ids, wall_settings(self.alg.all_terrain_cfg), self.alg.action_safety)
+                    if not torch.isfinite(wall):raise RuntimeError('Nonfinite CTS wall stability validation')
+                    diagnostics.update(wall_metrics)
+                    diagnostics['wall_stability_loss'] = float(wall)
                     ppo_retention, ppo_diagnostics = self.alg.auxiliary.retention_loss(detach_student=True)
                     if not torch.isfinite(loss) or not torch.isfinite(ppo_retention):
                         raise RuntimeError('Nonfinite CTS auxiliary inference validation')
@@ -252,6 +290,9 @@ class CTSRunner:
                         **self.alg.auxiliary.evaluate()})
                     self.alg.clear_rollout()
         self.alg.clear_rollout()
+        if wall_hold is not None and wall_hold.handover is not None:
+            if not (wall_hold.totals['handover_entries'][2:] > 0).all():
+                raise RuntimeError('C handover validation did not enter policy in both cohorts')
         if any(not torch.equal(value, self.alg.models.state_dict()[key]) for key,value in before.items()):
             raise RuntimeError('Inference validation changed CTS weights')
         delay_receipt = delay_diagnostics(sensor_state(self.env.unwrapped),self.alg.teacher_mask)
@@ -297,6 +338,10 @@ class CTSRunner:
                   'alternative_batch_log_prob_max_error': batched_ratio_error,
                   'gpu_cpu_export_max_action_error': gpu_cpu_export_error,
                   'behavior_log_prob_checked_samples': checked_samples,
+                  'exploration_stop_samples': stop_samples,
+                  'exploration_moving_samples': checked_samples-stop_samples,
+                  'exploration_stop_scale': self.alg.cfg.get('stop_exploration_scale', 1.),
+                  'exploration_scale_max_error': scale_error,
                   'gae_checked_rollouts': gae_rollouts,
                   'auxiliary_checked_rollouts': len(auxiliary_checks), 'auxiliary': auxiliary_checks,
                   'checkpoint_reload': 'passed', 'completed_episodes': episodes,
@@ -334,6 +379,26 @@ class CTSRunner:
             'source_grid_shape':list(sensor.capture_shape),'source_hit_shape':list(hits.shape),
             'packet_shape':list(sensor.packet_z.shape),'actor_points':187,
             'teacher_ray_shape':list(self.env.unwrapped.scene.sensors['height_scanner'].data.ray_hits_w.shape)}
+        if sensor.cfg.support_surface_visibility:
+            capture = self.env.unwrapped.scene.sensors['height_scanner_capture'].data
+            normals = capture.ray_normals_w
+            finite_hits = torch.isfinite(capture.ray_hits_w).all(-1)
+            measured = torch.isfinite(normals).all(-1) & (normals.norm(dim=-1) > 1.e-6)
+            if normals.shape != capture.ray_hits_w.shape or not measured[finite_hits].all():
+                raise RuntimeError('Student support normals are missing for measured acquisition hits')
+            result['support_surface_visibility'] = dict(enabled=True, normal_shape=list(normals.shape),
+                finite_hits=int(finite_hits.sum()), measured_normals=int(measured.sum()),
+                actor_channels_added=0, teacher_scanner_changed=False)
+        if hold_spawn is not None:
+            result['stair_hold_spawn'] = hold_spawn
+            result['stair_hold_rollout_frames'] = hold_samples.tolist()
+            result['stair_hold_command_max'] = hold_command_max
+            result['stair_hold_practice'] = course.stair_hold.diagnostics()
+        if wall_hold_spawn is not None:
+            result['wall_hold_spawn'] = wall_hold_spawn
+            result['wall_hold_rollout_frames'] = wall_hold_samples.tolist()
+            result['wall_hold_command_max'] = wall_hold_command_max
+            result['wall_hold_practice'] = wall_hold.diagnostics()
         result['map_delay_mixture'] = delay_receipt
         if course is not None:
             result['map_delay_mixture']['frames_cohort_course_command_delayed_zero'] = course_delays.tolist()

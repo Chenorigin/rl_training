@@ -104,10 +104,50 @@ def validate_all_terrain(cfg):
         raise ValueError('CTS all-terrain settings must be a dictionary')
     sections = {'enabled', 'fractions', 'geometry', 'curriculum', 'domain', 'commands', 'rewards', 'actor', 'simulation'}
     stability = {'motion_stability', 'startup_stability'} & set(cfg)
-    optional = stability | ({'hind_clearance', 'compound_commands', 'wall_practice'} & set(cfg))
+    optional = stability | ({'hind_clearance', 'compound_commands', 'wall_practice', 'safety_learning', 'stair_recovery', 'stair_stop', 'stair_hold_practice', 'wall_hold_practice', 'motion_quality', 'obstacle_response','stair_walls', 'hind_ascent', 'clutter_consistency', 'front_descent', 'wall_stability', 'objective_consistency'} & set(cfg))
     if stability and stability != {'motion_stability', 'startup_stability'}:
         raise ValueError('CTS stability curriculum and startup objectives must be versioned together')
     _keys(cfg, sections | optional, 'sections')
+    _geometry(cfg['geometry'])
+    if 'motion_quality' in cfg:
+        from .motion_quality import validate
+        validate(cfg['motion_quality'])
+        if cfg['motion_quality']['enabled'] and not cfg.get('objective_consistency', {}).get('enabled'):
+            raise ValueError('motion_quality requires objective consistency')
+    if 'stair_stop' in cfg:
+        from .stair_stop import validate
+        validate(cfg['stair_stop'])
+        if cfg['stair_stop']['enabled'] and not (
+                cfg.get('stair_recovery', {}).get('enabled') and cfg.get('objective_consistency', {}).get('enabled')):
+            raise ValueError('stair_stop requires recovery and objective consistency')
+    if 'objective_consistency' in cfg:
+        from .objective_consistency import validate
+        validate(cfg['objective_consistency'])
+        if cfg['objective_consistency']['enabled'] and not (cfg.get('hind_clearance', {}).get('enabled') and 'motion_stability' in cfg):
+            raise ValueError('Objective consistency requires support geometry and motion accounting')
+    if 'wall_stability' in cfg:
+        from .wall_stability import validate
+        validate(cfg['wall_stability'])
+        if cfg['wall_stability']['enabled'] and 'startup_stability' not in cfg:
+            raise ValueError('Wall stability requires startup stability objectives')
+    if 'clutter_consistency' in cfg:
+        from .clutter_consistency import validate
+        validate(cfg['clutter_consistency'])
+    if 'front_descent' in cfg:
+        from .front_descent import validate
+        validate(cfg['front_descent'])
+        if cfg['front_descent']['enabled'] and 'hind_clearance' not in cfg:
+            raise ValueError('Front descent requires the shared support tolerance contract')
+    if 'hind_ascent' in cfg:
+        from .hind_ascent import validate
+        validate(cfg['hind_ascent'], cfg)
+    from .recovery_config import validate_extensions
+    validate_extensions(cfg)
+    if 'stair_walls' in cfg:
+        from .stair_walls import validate
+        validate(cfg['stair_walls'],cfg['geometry'])
+        if cfg['stair_walls']['enabled'] and 'wall_practice' not in cfg:
+            raise ValueError('Stair walls require the whole-robot wall collision contract')
     if 'hind_clearance' in cfg:
         from .hind_clearance import validate_hind_clearance
         validate_hind_clearance(cfg['hind_clearance'])
@@ -120,7 +160,6 @@ def validate_all_terrain(cfg):
         _number(value, 'fractions', positive=True, maximum=1.)
     if not math.isclose(math.fsum(fractions), 1., rel_tol=0., abs_tol=1e-9):
         raise ValueError('All-terrain course fractions must sum to one')
-    _geometry(cfg['geometry'])
     if 'compound_commands' in cfg:
         from .compound_commands import validate_compound_commands
         validate_compound_commands(cfg)
@@ -148,6 +187,9 @@ def validate_all_terrain(cfg):
         _interval(commands[key], 'commands.' + key)
     for key in COMMAND_KEYS - {'forward_speed', 'backward_speed', 'yaw_rate'}:
         _number(commands[key], 'commands.' + key, positive=True)
+    if ('wall_stability' in cfg
+            and cfg['wall_stability']['stair_initial_hold_s'] < commands['initial_hold_s']):
+        raise ValueError('Wall stability cannot shorten the existing initial hold')
     if not 0 < commands['relative_tracking_tolerance'] < 1:
         raise ValueError('Relative tracking tolerance must distinguish no motion from commanded motion')
     if commands['success_hold_s'] > commands['stop_s']:
@@ -174,4 +216,10 @@ def validate_all_terrain(cfg):
     if stability:
         from .stability import validate_stability
         validate_stability(cfg)
+    if 'wall_hold_practice' in cfg:
+        from .wall_hold_practice import validate
+        validate(cfg['wall_hold_practice'], cfg)
+    if 'stair_hold_practice' in cfg:
+        from .stair_hold_practice import validate
+        validate(cfg['stair_hold_practice'], cfg)
     return cfg

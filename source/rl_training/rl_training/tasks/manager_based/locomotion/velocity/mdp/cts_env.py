@@ -119,6 +119,10 @@ class M20CTSAllTerrainEnv(M20StairQuietV1StudentEnv):
         if self.observation_manager.group_obs_dim.get('teacher_critic') != (285,):
             raise ValueError('All-terrain critic ABI changed')
         self._cts_failed_step = torch.zeros(self.num_envs,dtype=torch.bool,device=self.device)
+        from task_support.cts.c_handover import install_standing_execution
+        if self.cts_all_terrain.wall_hold is not None and self.cts_all_terrain.wall_hold.handover is not None:
+            install_standing_execution(self)
+        # Check final targets after the ready controller restores its targets.
         from task_support.cts.joint_limits_isaac import install
         install(self)
 
@@ -137,15 +141,24 @@ class M20CTSAllTerrainEnv(M20StairQuietV1StudentEnv):
     def step(self,action):
         from task_support.cts.all_terrain_course import course
         state = course(self)
+        if state.objectives is not None:
+            state.objectives.begin_step(self.obs_buf)
         tags = state.tags()
+        if state.quality is not None:state.quality.begin_step()
+        if state.recovery is not None:
+            state.recovery.begin_step(self.obs_buf)
         self._cts_failed_step.zero_()
         from task_support.cts.joint_limits_isaac import begin
-        result = super().step(begin(self, action))
+        handover = state.wall_hold.handover if state.wall_hold is not None else None
+        issued = handover.issued_action(action) if handover is not None else action
+        result = super().step(begin(self, issued))
         self.extras.setdefault('log', {}).update(getattr(self, '_cts_limit_step_metrics', {}))
         self.extras.update(tags)
         self.extras['student_v1']['terminated'] = self._cts_failed_step.clone()
         if self.common_step_counter % 24 == 0:
             self.extras.setdefault('log',{}).update({'CTSAllTerrain/'+k:v for k,v in state.diagnostics().items()})
+            if state.recovery is not None:
+                self.extras['log'].update({'CTSRecovery/'+k:v for k,v in state.recovery.diagnostics().items()})
             sensors = getattr(self, '_m20_student_v1_state', None)
             if hasattr(sensors, 'recovery_cfg'):
                 self.extras['log'].update({'CTSMapRecovery/'+k:v for k,v in sensors.diagnostics().items()})
@@ -161,3 +174,6 @@ class M20CTSAllTerrainEnv(M20StairQuietV1StudentEnv):
     def _finish_quiet_policy_step(self):
         from task_support.cts.joint_limits_isaac import snapshot
         snapshot(self)
+        hold = self.cts_all_terrain.wall_hold
+        if hold is not None and hold.handover is not None:
+            hold.handover.after_physics()

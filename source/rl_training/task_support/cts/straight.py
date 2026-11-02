@@ -80,6 +80,8 @@ def straight_action_loss(models, data, target_actions, cfg):
     ids = ids[torch.randperm(len(ids), device=ids.device)[:cfg['batch_size']]]
     action = models.student_action(data['obs']['policy'][ids], command[ids])
     residual = action-target_actions[ids].detach()
+    if 'safe_teacher_labels' in data:
+        residual = torch.where(data['safe_teacher_labels'][ids,None],residual,torch.zeros_like(residual))
     leg = residual[:, :12].square().mean()
     metrics.update(straight_leg_action_mse=float(leg.detach()),
                    straight_front_left_action_mse=float(residual[:, :3].square().mean().detach()),

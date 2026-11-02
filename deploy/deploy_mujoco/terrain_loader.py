@@ -18,11 +18,12 @@ import numpy as np
 TERRAIN_DIR = Path(__file__).resolve().parent / "terrains"
 PRESETS = {
     "flat": "flat.xml", "ascent": "stairs_ascent.xml", "descent": "stairs_descent.xml",
-    "ascent_open": "stairs_ascent_open.xml",
+    "ascent_open": "stairs_ascent_open.xml", "ascent_walls": "stairs_ascent_walls.xml",
+    "platform": "platform.xml",
     "slope_up": "slope_up.xml", "slope_down": "slope_down.xml", "rough": "rough.xml",
     "obstacles": "obstacles.xml", "hurdles": "hurdles.xml", "mixed": "mixed.xml",
 }
-KINDS = (set(PRESETS) - {"ascent_open"}) | {"custom"}
+KINDS = (set(PRESETS) - {"ascent_open", "ascent_walls"}) | {"custom"}
 STAIR_OVERRIDES = {"stair_height": "step_height", "tread_depth": "tread_depth",
                    "stair_count": "step_count", "stair_start": "start_x"}
 
@@ -47,7 +48,9 @@ class Terrain:
         result["spawn_mat"] = self.spawn_mat
         if self.parameters.get("open_risers") == [1.0]:
             result["open_risers"] = True
-            result["surface_collision"] = "world-fixed zero-radius triangular flex; no riser/side/bottom faces"
+            result["surface_collision"] = "treads: world-fixed zero-radius triangular flex; no riser/side/bottom faces"
+        if "walls_enabled" in self.parameters:
+            result["walls_enabled"] = self.parameters["walls_enabled"] == [1.0]
         return result
 
 
@@ -61,16 +64,27 @@ def static_terrain_flex_ids(model):
     return tuple(result)
 
 
-def terrain_ray(model, data, origin, direction, groups, flex_ids=None):
+def terrain_ray(model, data, origin, direction, groups, flex_ids=None, *, normal=None):
     """Nearest ordinary geom OR actual static flex face; mj_ray omits flexes."""
     geom = np.full(1, -1, dtype=np.int32)
-    distance = mujoco.mj_ray(model, data, origin, direction, groups, True, -1, geom)
+    if normal is None:
+        distance = mujoco.mj_ray(model, data, origin, direction, groups, True, -1, geom)
+    else:
+        normal[:] = np.nan
+        distance = mujoco.mj_ray(model, data, origin, direction, groups, True, -1, geom, normal)
     hit_geom, hit_flex = int(geom[0]), -1
     for flex in static_terrain_flex_ids(model) if flex_ids is None else flex_ids:
-        value = mujoco.mj_rayFlex(model, data, 0, False, False, True, False,
-                                  flex, origin, direction)
+        if normal is None:
+            value = mujoco.mj_rayFlex(model, data, 0, False, False, True, False,
+                                     flex, origin, direction)
+        else:
+            face_normal = np.full(3, np.nan)
+            value = mujoco.mj_rayFlex(model, data, 0, False, False, True, False,
+                                     flex, origin, direction, None, face_normal)
         if value >= 0 and (distance < 0 or value < distance):
             distance, hit_geom, hit_flex = value, -1, flex
+            if normal is not None:
+                normal[:] = face_normal
     return distance, hit_geom, hit_flex
 
 
@@ -142,6 +156,12 @@ def attach_terrain(robot_spec: mujoco.MjSpec, path: Path, overrides: dict | None
     open_risers = flag[0] == 1.0
     if open_risers and kind != "ascent":
         raise ValueError("open_risers requires terrain_kind=ascent")
+    wall_flag = p.get("walls_enabled", [0.0])
+    if len(wall_flag) != 1 or wall_flag[0] not in (0.0, 1.0):
+        raise ValueError("walls_enabled must be a single 0 or 1")
+    walls_enabled = wall_flag[0] == 1.0
+    if walls_enabled and kind != "ascent":
+        raise ValueError("walls_enabled requires terrain_kind=ascent")
     pending_surface = None
 
     def scalar(name: str, *, positive: bool = False, integer: bool = False) -> float:
@@ -261,20 +281,34 @@ def attach_terrain(robot_spec: mujoco.MjSpec, path: Path, overrides: dict | None
                     color=(0.53, 0.46, 0.36, 1))
         return start + length
 
-    if kind in {"flat", "custom"}:
+    if kind == "custom" and "corridor_length" in p:
+        length = scalar("corridor_length", positive=True)
+        height = scalar("wall_height", positive=True)
+        thickness = scalar("wall_thickness", positive=True)
+        if terrain_spec.worldbody.geoms and any(
+                g.type != mujoco.mjtGeom.mjGEOM_PLANE for g in terrain_spec.worldbody.geoms):
+            raise ValueError("Parameterized corridor must not contain native obstacles/walls")
+        for name, sign in (("wall_left", 1), ("wall_right", -1)):
+            box(name, -length / 2, length / 2, height,
+                y=sign * (width + thickness) / 2, box_width=thickness)
+        # Default mat follows the actual clear width. Explicit XML/CLI sizes
+        # retain their existing precedence and intersection validation.
+        p.setdefault("spawn_mat_size", [1.4, min(1.1, width * 0.8), 0.02])
+        goal = length / 2
+    elif kind in {"flat", "custom"}:
         goal = scalar("goal_x")
     else:
         start = scalar("start_x")
         if kind in {"ascent", "descent"}:
             h, depth = scalar("step_height", positive=True), scalar("tread_depth", positive=True)
             count = int(scalar("step_count", positive=True, integer=True))
+            if count > 10000:
+                raise ValueError("Staircase exceeds 10000 steps")
             platform = scalar("platform_length", positive=True)
             if open_risers:
                 approach = scalar("approach_length", positive=True)
                 if not (start-approach <= spawn[0] < start and abs(spawn[1]) < width/2):
                     raise ValueError("Open-stair spawn_xy must lie on the approach surface")
-                if count > 10000:
-                    raise ValueError("Open staircase exceeds 10000 steps")
                 goal = start + count * depth
                 spans = [(start-approach, start, 0.0)]
                 spans += [(start+i*depth, start+(i+1)*depth, (i+1)*h) for i in range(count)]
@@ -307,6 +341,35 @@ def attach_terrain(robot_spec: mujoco.MjSpec, path: Path, overrides: dict | None
                 goal = stairs("stair", start, h, depth, count, kind == "descent")
                 if kind == "ascent":
                     box("exit", goal, goal + platform, count * h)
+            if walls_enabled:
+                approach = scalar("approach_length", positive=True)
+                wall_height = scalar("wall_height", positive=True)
+                thickness = scalar("wall_thickness", positive=True)
+                gap = scalar("wall_gap")
+                if gap < 0:
+                    raise ValueError("wall_gap must be nonnegative")
+                # Continuous side walls from approach to the far end of the
+                # landing. Their inner faces never intrude into the tread.
+                # Wall tops track each adjacent tread; bottoms reach the floor,
+                # also when open treads sit above a lower catch plane.
+                wall_spans = [(start-approach, start, 0.0)]
+                wall_spans += [(start+i*depth, start+(i+1)*depth, (i+1)*h)
+                               for i in range(count)]
+                wall_spans += [(goal, goal+platform, count*h)]
+                for side, sign in (("left", 1), ("right", -1)):
+                    for i, (x0, x1, tread_z) in enumerate(wall_spans):
+                        top = tread_z + wall_height
+                        highest = max(highest, top)
+                        terrain_spec.worldbody.add_geom(
+                            name=f"wall_{side}_{i}", type=mujoco.mjtGeom.mjGEOM_BOX,
+                            pos=[(x0+x1)/2, sign*(width/2+gap+thickness/2), (floor_z+top)/2],
+                            size=[(x1-x0)/2, thickness/2, (top-floor_z)/2],
+                            rgba=[.78, .76, .70, 1], **common)
+        elif kind == "platform":
+            length = scalar("platform_length", positive=True)
+            height = scalar("platform_height", positive=True)
+            goal = start + length
+            box("platform", start, goal, height)
         elif kind in {"slope_up", "slope_down"}:
             length = scalar("ramp_length", positive=True)
             angle = scalar("slope_deg", positive=True)

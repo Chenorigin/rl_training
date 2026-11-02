@@ -69,6 +69,8 @@ def source_hashes():
         ROOT / default_settings()['sample_stairs']['terrain_xml'],
         ROOT / 'scripts/reinforcement_learning/rsl_rl/train_cts.py',
         ROOT / 'deploy/deploy_mujoco/deploy_cts_student.py',
+        ROOT / 'deploy/deploy_mujoco/deploy_mujoco.py',
+        ROOT / 'deploy/deploy_mujoco/terrain_loader.py',
         task / 'mdp/cts_env.py', cfg / 'cts_env_cfg.py',
         cfg / 'agents/cts_ppo_cfg.py', cfg / 'cts/__init__.py']
     for path in paths:
@@ -89,7 +91,10 @@ def validate_metadata(meta, *, resume=True):
     perception = meta.get('perception')
     if perception != meta.get('environment', {}).get('perception'):
         raise ValueError('CTS environment/perception metadata differ')
-    if meta['version'] in (VERSION, 'm20_cts_action_latent_v11', 'm20_cts_action_latent_v12', 'm20_cts_action_latent_v13', 'm20_cts_action_latent_v14', 'm20_cts_action_latent_v15'):
+    surface = meta['config'].get('map_capture', {}).get('support_surface_visibility', False)
+    if perception.get('support_surface_visibility', False) != surface:
+        raise ValueError('CTS support-surface sensing differs from saved configuration')
+    if meta['version'] in (VERSION, 'm20_cts_action_latent_v11', 'm20_cts_action_latent_v12', 'm20_cts_action_latent_v13', 'm20_cts_action_latent_v14', 'm20_cts_action_latent_v15', 'm20_cts_action_latent_v16', 'm20_cts_action_latent_v17', 'm20_cts_action_latent_v18', 'm20_cts_action_latent_v19', 'm20_cts_action_latent_v20', 'm20_cts_action_latent_v21', 'm20_cts_action_latent_v22', 'm20_cts_action_latent_v23', 'm20_cts_action_latent_v24', 'm20_cts_action_latent_v25'):
         from .perception import validate_perception_contract
         validate_perception_contract(meta['config']['map_delay_mixture'], perception)
         if perception.get('map_capture_padding_m') != meta['config']['map_capture']['padding_m']:
@@ -161,6 +166,7 @@ def prepare(args):
         env_settings = deepcopy(prior['environment']) if prior else environment_settings()
         env_settings['perception']['zero_delay_probability'] = config['map_delay_mixture']['zero_delay_probability']
         env_settings['perception']['map_capture_padding_m'] = config['map_capture']['padding_m']
+        env_settings['perception']['support_surface_visibility'] = config['map_capture'].get('support_surface_visibility', False)
         if all_terrain_settings(config) is not None:
             env_settings['perception']['continuous_delay'] = True
         meta = {'version': VERSION, 'task': TASK, 'num_envs': n, 'config': config,
@@ -231,6 +237,11 @@ def auxiliary_memory_budget(config):
         rows += auxiliary['retention_batch_size']
     if config.get('straight_practice'):
         rows += config['straight_practice']['batch_size']
+    from .wall_stability import settings as wall_settings
+    wall = wall_settings(config.get('all_terrain'))
+    if wall is not None:
+        # Clean/degraded pair plus the hard-idle student minibatch.
+        rows += 2*wall['batch_size'] + config['algorithm']['student_batch_size']
     # Current source ABI: policy789, command3, action16 and student512/256/128.
     # Eight float32 copies cover paired forwards, autograd and backend workspace;
     # three dataset copies cover deserialization, validation and device transfer.
@@ -272,10 +283,12 @@ def all_terrain_memory_budget(cfg, host):
     nx = math.ceil(2*geometry['field_half_length']/geometry['grid_resolution'])+2
     ny = math.ceil(geometry['tile_width']/geometry['grid_resolution'])+2
     boxes = 2*geometry['steps_range'][1]+geometry['obstacle_count_range'][1]+8
+    enclosed = cfg.get('stair_walls',{}).get('enabled',False)
+    if enclosed:boxes += 2*(2*geometry['steps_range'][1]+3)
     construction_bound = tiles*(nx*ny*96+boxes*480)*6
     if host.total-host.available+construction_bound+2*1024**3 > .85*host.total:
         raise RuntimeError('Insufficient host headroom to construct the all-terrain atlas')
-    atlas = build_atlas(cfg['geometry'],cfg.get('wall_practice'))
+    atlas = build_atlas(cfg['geometry'],cfg.get('wall_practice'),cfg.get('obstacle_response'),cfg.get('stair_walls'))
     payload = atlas.mesh.vertices.nbytes+atlas.mesh.faces.nbytes
     arrays = sum(getattr(atlas, name).nbytes for name in
                  ('origins','course_ids','geometry_levels','spawns','goals','bounds','local_bounds','goal_local'))
@@ -284,6 +297,11 @@ def all_terrain_memory_budget(cfg, host):
     # The surface query pads each tile's height and obstacle tables on device.
     padded = tiles*max(len(g[0]) for g in atlas.grids)*max(len(g[1]) for g in atlas.grids)*4
     padded += tiles*max(1, max(len(r) for r in atlas.rectangles))*5*4
+    if enclosed:
+        # Separate traversable-support and complete ray surfaces, plus wall ledger/envelopes.
+        wall_count=max(len(r.get('stair_wall_rectangles',[])) for r in atlas.records)
+        arrays += sum(len(r.get('stair_wall_rectangles',[]))*5*8 for r in atlas.records)
+        padded = 2*padded+tiles*wall_count*5*4*3
     # Eight mesh copies cover per-tile/concatenated CPU meshes, USD/PhysX and
     # raycasting conversion buffers; three surface copies include CPU and GPU.
     reserve = payload*8+(arrays+padded)*3
@@ -298,6 +316,10 @@ def all_terrain_memory_budget(cfg, host):
                                     max(r['height'] for r in records if r['course_id'] < 3)],
             'stair_depth_range_m':[min(r['depth'] for r in records if r['course_id'] < 3),
                                    max(r['depth'] for r in records if r['course_id'] < 3)]}
+    if enclosed:
+        from .stair_walls import LAYOUTS
+        info['stair_wall_tiles']={name:{layout:sum(r['course']==name and r.get('stair_wall_layout')==layout for r in records)
+            for layout in LAYOUTS} for name in COURSES[:3]}
     return reserve, info
 
 
@@ -417,6 +439,12 @@ def preflight(args, teacher, student, meta, resume_saved=None):
     capture_budget = capture_memory_budget(meta['perception'],n)
     from .map_recovery import memory_reserve
     recovery_bytes = memory_reserve(cfg.get('map_recovery'), meta['perception'], n)
+    # Normals, short recast XYZ/directions/results and visibility work, with
+    # 2x temporary headroom. The base sensor/queue budget already covers hits.
+    from task_support.student_v1.perception import capture_grid_shape
+    surface_rows, surface_cols = capture_grid_shape(meta['perception'].get('map_capture_padding_m', 0.))
+    surface_bytes = (n * surface_rows * surface_cols * 256
+                     if meta['perception'].get('support_surface_visibility', False) else 0)
     # Extra full-rollout clean action targets, transient clone, and pre-step bool tags.
     straight_target_bytes = n*cfg['num_steps_per_env']*(16*4*3+1)
     course_tag_bytes = n*cfg['num_steps_per_env']*9*3
@@ -425,7 +453,7 @@ def preflight(args, teacher, student, meta, resume_saved=None):
     collision_stack_bytes = (all_terrain['simulation']['collision_stack_mib']*1024**2
                              if all_terrain is not None else 0)
     allowance = (8*1024**3+n*4*1024**2+rollout*3+model_reserve+mesh_bytes
-                 +auxiliary_budget['auxiliary_reserve_bytes']+capture_budget['extra_capture_reserve_bytes']
+                 +auxiliary_budget['auxiliary_reserve_bytes']+capture_budget['extra_capture_reserve_bytes']+surface_bytes
                  +straight_target_bytes+course_tag_bytes+collision_stack_bytes+recovery_bytes)
     if host.total-host.available+allowance > .85*host.total:
         raise RuntimeError('Insufficient whole-host headroom for CTS')
@@ -437,6 +465,7 @@ def preflight(args, teacher, student, meta, resume_saved=None):
         'host_available_bytes': host.available, 'host_total_bytes': host.total,
         'swap_used_bytes': psutil.swap_memory().used, 'load_average': list(__import__('os').getloadavg()),
         'disk_free_bytes': disk, 'planned_increment_bytes': allowance,
+        'support_surface_reserve_bytes': surface_bytes,
         'checkpoint_estimate_bytes': checkpoint, 'required_free_bytes': required, 'min_free_disk_bytes': reserve,
         'basis': '8 GiB simulator + configured additional PhysX collision stack + 4 MiB/env + 3x float32 rollout tensors + 8x model + 8x terrain mesh copies + 3x retention data + 8x auxiliary batch activations + expanded source-map queue/work/ray reserve; 85% total occupancy cap',
         **capture_budget, 'rollout_bytes': rollout, 'terrain_mesh_reserve_bytes': mesh_bytes,
@@ -566,6 +595,10 @@ def main(argv=None):
             env.unwrapped.scene.terrain.validate_contacts()
         (directory/'resource_preflight.json').write_text(json.dumps(report, indent=2)+'\n')
         (directory/'provenance.json').write_text(json.dumps(meta, indent=2)+'\n')
+        practice = getattr(env.unwrapped.cts_all_terrain,'stair_hold',None) if all_terrain_settings(meta['config']) is not None else None
+        if practice is not None:practice.validate_initial()
+        wall_hold = getattr(env.unwrapped.cts_all_terrain,'wall_hold',None) if all_terrain is not None else None
+        if wall_hold is not None:wall_hold.validate_initial()
         print('CTS_RUN_DIR='+str(directory), flush=True)
         if args.validate_only:
             return runner.validate(args.validation_steps)

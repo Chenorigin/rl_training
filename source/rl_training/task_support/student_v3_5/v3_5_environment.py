@@ -28,7 +28,8 @@ def student_observation(env):
     rotation = quaternion_rotation(robot.data.root_quat_w)
     yaw = torch.atan2(rotation[:, 1, 0], rotation[:, 0, 0])
     return base.sensor_state(env).observe(base.clean_teacher_proprio(env, raw_motion_control(env)),
-        base.capture_hits(env), robot.data.root_pos_w, yaw, rotation, int(env.common_step_counter))
+        base.capture_hits(env), robot.data.root_pos_w, yaw, rotation, int(env.common_step_counter),
+        surface_normals=base.capture_normals(env))
 
 
 def reset_feedback(env, env_ids):

@@ -7,11 +7,25 @@
   <compiler angle="radian"/>
   <custom>
     <text name="terrain_kind" data="ascent"/>
+    <!-- 独立开关：open_risers=1 改为无踢面踏板；walls_enabled=1 加左右实体墙。 -->
+    <numeric name="open_risers" data="0"/>
+    <numeric name="walls_enabled" data="1"/>
+    <!-- 两墙内侧净宽 = width + 2 * wall_gap；墙高从相邻踏面向上量。 -->
+    <numeric name="wall_gap" data="0.0"/>
+    <numeric name="wall_height" data="1.0"/>
+    <numeric name="wall_thickness" data="0.18"/>
+    <!-- 首阶前起步区长度；open 模式的出生点须在起步区内。
+         floor_height 仅控制 open 模式的防坠底面，实心模式仍为 z=0。 -->
+    <numeric name="approach_length" data="2.0"/>
+    <numeric name="floor_height" data="-0.5"/>
     <!-- 公共参数：长度单位 m；世界 +X 为路线前进方向，+Y 为左，+Z 为上。 -->
     <!-- width：路线宽度；生成障碍之外保留 z=0 无限平面，方便自由操控。 -->
     <numeric name="width" data="1.0"/>
+    <!-- 出生垫完整长/宽/厚。窄于本模板通道，避免 open 越界或有墙时穿墙。
+         缩窄通道、旋转/移动垫子时需重新留出支撑边距。 -->
+    <numeric name="spawn_mat_size" data="1.4 0.9 0.02"/>
     <!-- friction：滑动 / 扭转 / 滚动摩擦；应用于生成的地面和障碍。 -->
-    <numeric name="friction" data="0.0003 0.0001 0.0001"/>
+    <numeric name="friction" data="1.0 0.01 0.01"/>
     <!-- spawn_xy：机器人出生世界坐标 x y；z 自动射线查询 + 站立/趴下偏置。 -->
     <numeric name="spawn_xy" data="-1.0 0.0"/>
     <!-- spawn_yaw_deg：出生偏航角，单位度；0 表示朝 +X。 -->
@@ -21,7 +35,7 @@
     <!-- step_height：单级台阶高度；测试训练范围可改 0.10 至 0.25。 -->
     <numeric name="step_height" data="0.15"/>
     <!-- tread_depth：水平踏面深度；step_count：级数，正整数。 -->
-    <numeric name="tread_depth" data="0.25"/>
+    <numeric name="tread_depth" data="0.30"/>
     <numeric name="step_count" data="20"/>
     <!-- platform_length：上楼出口 / 下楼出生平台长度，平台高度=级数×级高。 -->
     <numeric name="platform_length" data="10.0"/>

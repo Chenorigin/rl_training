@@ -67,7 +67,7 @@ def test_true_long_mesh_contact_profiles_and_boundary_timing():
 
 def test_course_validation_fails_short_patch_and_rejects_missing_training_contract():
     cfg=default_settings();validate_config(cfg)
-    assert VERSION.endswith('_v16') and 'm20_cts_action_latent_v12' in LEGACY_VERSIONS
+    assert VERSION.endswith('_v26') and 'm20_cts_action_latent_v12' in LEGACY_VERSIONS
     old=deepcopy(cfg);old.pop('straight_practice');validate_config(old,legacy=True)
     with pytest.raises(ValueError):validate_config(old)
     for key,value in [('fraction',.25),('patch_length',10.),('move_s',3.),('move_s',100.),('batch_size',True),('leg_action_loss_weight',float('nan'))]:

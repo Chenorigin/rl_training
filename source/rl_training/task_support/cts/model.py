@@ -45,12 +45,12 @@ def actor_settings(all_terrain_cfg):
     return cfg
 
 
-def idle_network(input_dim, hidden_dims):
+def idle_network(input_dim, hidden_dims, output_dim=12):
     # Deterministic construction lets strict resume verify the frozen reference
     # teacher, without consuming or depending on the caller's RNG state.
     with torch.random.fork_rng(devices=[]):
         torch.random.default_generator.manual_seed(130013)
-        dimensions = [input_dim, *hidden_dims, 12]
+        dimensions = [input_dim, *hidden_dims, output_dim]
         layers = []
         for index, (before, after) in enumerate(zip(dimensions, dimensions[1:])):
             layers.append(nn.Linear(before, after))
@@ -83,7 +83,7 @@ class AllTerrainTeacher(SafeResidualActor):
 
 
 class SharedDecoder(nn.Module):
-    def __init__(self, hidden_dims, bounds, idle_leg_scale=0.):
+    def __init__(self, hidden_dims, bounds, idle_leg_scale=0., idle_wheels=False):
         super().__init__()
         if len(bounds) != 16 or any(float(v) <= 0 for v in bounds):
             raise ValueError("CTS decoder requires 16 positive action bounds")
@@ -99,6 +99,7 @@ class SharedDecoder(nn.Module):
         self.register_buffer("bounds", torch.tensor(bounds, dtype=torch.float32))
         self.idle_leg_scale = float(idle_leg_scale)
         self.idle_mlp = idle_network(57+16, hidden_dims) if idle_leg_scale > 0 else None
+        self.idle_wheel_mlp = idle_network(57+16, hidden_dims, 4) if idle_wheels else None
 
     def forward(self, common: torch.Tensor, latent: torch.Tensor, raw_command: torch.Tensor) -> torch.Tensor:
         correction = torch.tanh(self.network(torch.cat((common, latent), -1))) * self.bounds
@@ -108,6 +109,11 @@ class SharedDecoder(nn.Module):
             idle = torch.tanh(self.idle_mlp(torch.cat((common, latent), -1)))
             legs = idle * self.bounds[:12] * self.idle_leg_scale * ~moving
             mean = mean + torch.cat((legs, torch.zeros_like(latent[:, 12:])), -1)
+        if self.idle_wheel_mlp is not None:
+            # Identity at migration; learned gain in (0,2), not a hard stop.
+            gain = 2*torch.sigmoid(self.idle_wheel_mlp(torch.cat((common, latent), -1)))
+            wheels = torch.where(moving, mean[:, 12:], mean[:, 12:]*gain)
+            mean = torch.cat((mean[:, :12], wheels), -1)
         return mean
 
 
@@ -227,8 +233,10 @@ def build_models(saved_teacher, saved_student, cfg, device="cpu", *, all_terrain
     student.load_state_dict(student_state, strict=True)
     student.distribution.requires_grad_(False)
     critic = LatentCritic(saved_teacher["critic_state_dict"])
+    from .wall_stability import settings as wall_settings
     decoder = SharedDecoder(cfg["decoder_hidden_dims"], cfg["decoder_bound"],
-                            settings["idle_leg_scale"] if settings is not None else 0.)
+                            settings["idle_leg_scale"] if settings is not None else 0.,
+                            idle_wheels=wall_settings(all_terrain_cfg) is not None)
     log_std = saved_teacher["actor_state_dict"]["distribution.log_std_param"]
     if log_std.shape != (16,) or not torch.isfinite(log_std).all() or not (log_std.exp() > 0).all():
         raise ValueError("Invalid source teacher action standard deviation")
@@ -250,21 +258,25 @@ def transfer_state(models, source):
     if not isinstance(source, dict):
         raise ValueError("Invalid CTS transfer state")
     missing = set(expected)-set(source)
-    idle_keys = {key for key in expected if key.startswith(
-        ("teacher.idle_mlp.", "reference_teacher.idle_mlp.", "decoder.idle_mlp."))}
-    if set(source)-set(expected) or (missing and missing != idle_keys):
-        raise ValueError("CTS transfer may add only complete zero-output idle heads")
+    families = (('teacher.idle_mlp.', 'reference_teacher.idle_mlp.', 'decoder.idle_mlp.'),
+                ('decoder.idle_wheel_mlp.',))
+    allowed = set()
+    for prefixes in families:
+        group = {key for key in expected if key.startswith(prefixes)}
+        absent = missing & group
+        if absent and absent != group:
+            raise ValueError('CTS transfer requires complete zero-output idle heads')
+        allowed |= group
+    if set(source)-set(expected) or missing-allowed:
+        raise ValueError('CTS transfer may add only complete zero-output idle heads')
     for key, value in source.items():
         if (not isinstance(value, torch.Tensor) or value.layout != torch.strided
                 or value.shape != expected[key].shape or value.dtype != expected[key].dtype
                 or not torch.isfinite(value).all()):
             raise ValueError("Invalid CTS transfer tensor: " + key)
-    if missing:
-        # Prevent accidentally using a previously trained target's idle heads
-        # when a legacy transfer is supposed to preserve its source behavior.
-        for module in (models.teacher, models.reference_teacher, models.decoder):
-            if not hasattr(module, "idle_mlp") or module.idle_mlp is None:
-                raise ValueError("CTS transfer target has no idle adaptation")
-            if torch.count_nonzero(module.idle_mlp[-1].weight) or torch.count_nonzero(module.idle_mlp[-1].bias):
-                raise ValueError("CTS legacy transfer requires zero-output idle heads")
+    for name, module in models.named_modules():
+        if name in ('teacher.idle_mlp', 'reference_teacher.idle_mlp', 'decoder.idle_mlp', 'decoder.idle_wheel_mlp'):
+            if any(key.startswith(name+'.') for key in missing):
+                if torch.count_nonzero(module[-1].weight) or torch.count_nonzero(module[-1].bias):
+                    raise ValueError('CTS legacy transfer requires zero-output idle heads')
     return {**expected, **source}

@@ -313,7 +313,7 @@ def _field_tile(rng, name, level, sample, bounds, resolution, cfg):
     return (x, y, z), rects, record, goal
 
 
-def build_atlas(cfg, wall_practice=None):
+def build_atlas(cfg, wall_practice=None, obstacle_response=None, stair_walls=None):
     """Build reproducible continuous geometry/material draws without Isaac.
 
     Required defaults: 10 courses x 7 levels x 16 continuous samples. Integer
@@ -358,6 +358,8 @@ def build_atlas(cfg, wall_practice=None):
     resolution = _number(cfg, 'grid_resolution', .10, .025)
     if resolution > .25:
         raise ValueError('Atlas resolution above 0.25 m misses small obstacles')
+    from .stair_walls import enabled as enclosed, validate as validate_walls
+    if enclosed(stair_walls):validate_walls(stair_walls,cfg)
     rng = np.random.default_rng(seed)
     jobs = [(c,name,g,s) for c,name in enumerate(COURSES) for g in range(levels) for s in range(samples)]
     if wall_practice and wall_practice.get("enabled"):
@@ -377,7 +379,7 @@ def build_atlas(cfg, wall_practice=None):
         bounds = (-cfg['start_backward'], length-cfg['start_backward'], -width/2, width/2) if course < 3 else (-cfg['field_half_length'], cfg['field_half_length'], -width/2, width/2)
         if name.startswith("wall_"):
             from .wall_practice import tile
-            grid,rects,record,goal = tile(rng,name[5:],level,sample,levels,bounds,wall_practice)
+            grid,rects,record,goal = tile(rng,name[5:],level,sample,levels,bounds,wall_practice,obstacle_response)
             spawn_z = 0.
         elif course < 3:
             rects, record, spawn_z, goal = _stair_tile(rng, name, level, sample, bounds, cfg)
@@ -385,10 +387,14 @@ def build_atlas(cfg, wall_practice=None):
         else:
             grid, rects, record, goal = _field_tile(rng, name, level, sample, bounds, resolution, cfg)
             spawn_z = record['height'] if name == 'platform' else 0.
+        side_walls=[]
+        if course<3 and enclosed(stair_walls):
+            from .stair_walls import geometry as wall_geometry
+            side_walls=wall_geometry(stair_walls,cfg,course,level,sample,bounds,rects,record)
         x, y, z = grid
         base = (_box(*bounds, 0., -cfg['ground_thickness']) if z.shape == (2, 2) and not np.any(z)
                 else _heightfield_mesh(x, y, z, cfg['ground_thickness']))
-        pieces = [base]+[_box(*rect, -cfg['ground_thickness']) for rect in rects]
+        pieces = [base]+[_box(*rect, -cfg['ground_thickness']) for rect in (*rects,*side_walls)]
         mesh = trimesh.util.concatenate(pieces)
         mesh.apply_translation(offset)
         meshes.append(mesh)
@@ -439,7 +445,7 @@ class TorchSurface:
     than inventing traversable ground. At an exactly vertical face, the highest
     touching tread is used (the vertical-ray upper envelope).
     """
-    def __init__(self, atlas, device, dtype=torch.float32):
+    def __init__(self, atlas, device, dtype=torch.float32, *, include_stair_walls=True):
         self.device = torch.device(device)
         self.dtype = dtype
         self.origins = torch.as_tensor(atlas.origins[:, :2], device=device, dtype=dtype)
@@ -456,10 +462,14 @@ class TorchSurface:
             sizes.append((len(x), len(y)))
         self.height_table = torch.as_tensor(table, device=device, dtype=dtype)
         self.sizes = torch.tensor(sizes, device=device, dtype=torch.long)
-        max_rect = max(1, max(len(rects) for rects in atlas.rectangles))
+        rectangles = atlas.rectangles
+        if include_stair_walls and hasattr(atlas,'records'):
+            rectangles = [np.concatenate((r,np.asarray(meta.get('stair_wall_rectangles',[])).reshape(-1,5)),axis=0)
+                          for r,meta in zip(rectangles,atlas.records)]
+        max_rect = max(1, max(len(rects) for rects in rectangles))
         rect_table = np.zeros((len(atlas.rectangles), max_rect, 5))
         rect_table[..., 4] = -np.inf
-        for index, rects in enumerate(atlas.rectangles):
+        for index, rects in enumerate(rectangles):
             rect_table[index, :len(rects)] = rects
         self.rectangles = torch.as_tensor(rect_table, device=device, dtype=dtype)
         # USD/Warp convert already-translated mesh vertices to float32. Form

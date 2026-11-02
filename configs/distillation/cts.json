@@ -209,7 +209,8 @@
     ],
     "anchor_coefficient": 0.5,
     "entropy_coef": 0.0,
-    "desired_kl": 0.01
+    "desired_kl": 0.01,
+    "stop_exploration_scale": 0.2
   },
   "map_delay_mixture": {
     "zero_delay_probability": 0.2
@@ -236,7 +237,8 @@
     "ramp_probability": 0.5
   },
   "map_capture": {
-    "padding_m": 0.6
+    "padding_m": 0.6,
+    "support_surface_visibility": true
   },
   "straight_practice": {
     "fraction": 0.05,
@@ -585,7 +587,248 @@
       "target_delta_scale": 0.02,
       "collision_geometry": "configs/distillation/m20_collision_envelope.json",
       "collision_geometry_sha256": "9e6f3905ba4d4d9497a746618220649671142e85fc79cbe398e658abb59979e6",
-      "minimum_turn_rate": 0.12
+      "minimum_turn_rate": 0.12,
+      "corridor_width_m": 1.0
+    },
+    "safety_learning": {
+      "enabled": true,
+      "teacher_weight": 0.2,
+      "student_tail_weight": 0.2,
+      "tail_fraction": 0.1
+    },
+    "stair_recovery": {
+      "enabled": true,
+      "near_start_probability": 0.65,
+      "front_extent_m": 0.65,
+      "start_gap_m": [
+        0.05,
+        0.3
+      ],
+      "speed_m_s": [
+        0.12,
+        0.65
+      ],
+      "pause_probability": 0.6,
+      "pause_step": [
+        0,
+        2
+      ],
+      "settle_s": 0.4,
+      "pause_timeout_s": 3.0,
+      "heading_weight": 1.0,
+      "lateral_weight": 0.5,
+      "heading_scale_rad": 0.2,
+      "lateral_scale_m": 0.2,
+      "stall_s": 5.0,
+      "progress_epsilon_m": 0.02,
+      "stall_weight": 0.5,
+      "perturb_probability": 0.35,
+      "perturb_yaw_rate_rad_s": 0.25,
+      "perturb_lateral_m_s": 0.08
+    },
+    "obstacle_response": {
+      "enabled": true,
+      "finite_wall_half_length_m": 0.6,
+      "post_half_width_m": 0.16,
+      "leg_delta_weight": 0.1,
+      "leg_jerk_weight": 0.05
+    },
+    "stair_walls": {
+      "enabled": true,
+      "height_range_m": [
+        0.9,
+        1.3
+      ],
+      "side_gap_range_m": [
+        0.0,
+        0.15
+      ],
+      "thickness_m": 0.15
+    },
+    "hind_ascent": {
+      "enabled": true,
+      "settle_s": 0.12,
+      "slip_tolerance_m_s": 0.04,
+      "slip_scale_m_s": 0.25,
+      "landing_slip_m_s": 0.1,
+      "edge_margin_m": 0.01,
+      "step_reward_budget": 2.0,
+      "progress_reward_budget": 0.5,
+      "slip_weight": 0.25,
+      "min_settle_samples": 2,
+      "settle_tread_fraction": 0.5
+    },
+    "clutter_consistency": {
+      "enabled": true,
+      "weight": 0.15,
+      "batch_size": 128,
+      "probability": 0.5,
+      "height_min_m": 0.6,
+      "height_max_m": 1.4,
+      "flat_tolerance_m": 0.04,
+      "protected_half_length_m": 0.5,
+      "protected_half_width_m": 0.35,
+      "min_valid_fraction": 0.6
+    },
+    "front_descent": {
+      "enabled": true,
+      "command_min_m_s": 0.08,
+      "min_drop_m": 0.06,
+      "approach_m": 0.05,
+      "exit_margin_m": 0.5,
+      "contact_confirm_s": 0.04,
+      "swing_grace_s": 0.25,
+      "swing_grace_max_s": 0.8,
+      "tread_time_fraction": 0.5,
+      "air_ramp_s": 0.3,
+      "air_weight": 0.5,
+      "stall_grace_s": 2.0,
+      "stall_ramp_s": 1.0,
+      "stall_weight": 0.3,
+      "progress_epsilon_m": 0.01
+    },
+    "wall_stability": {
+      "enabled": true,
+      "quality_weight": 0.15,
+      "wheel_consistency_weight": 0.05,
+      "idle_output_weight": 0.02,
+      "batch_size": 128,
+      "probability": 0.5,
+      "protected_half_width_m": 0.35,
+      "flat_tolerance_m": 0.04,
+      "min_valid_fraction": 0.6,
+      "minimum_supports": 3,
+      "minimum_upright": 0.98,
+      "idle_speed_m_s": 0.1,
+      "idle_yaw_rad_s": 0.15,
+      "stair_initial_hold_s": 2.0,
+      "preview_start_m": 0.5
+    },
+    "objective_consistency": {
+      "enabled": true
+    },
+    "stair_stop": {
+      "enabled": true,
+      "backward_m": 0.06,
+      "lateral_m": 0.08,
+      "forward_base_m": 0.04,
+      "braking_m_s2": 1.0,
+      "forward_max_m": 0.18,
+      "tread_fraction": 0.5,
+      "yaw_rad": 0.12,
+      "position_scale_m": 0.08,
+      "speed_scale_m_s": 0.1,
+      "yaw_rate_scale_rad_s": 0.15,
+      "roll_pitch_rate_rad_s": 0.3,
+      "slip_tolerance_m_s": 0.03,
+      "slip_scale_m_s": 0.1,
+      "position_weight": 2.0,
+      "slip_weight": 0.5,
+      "support_weight": 0.5,
+      "posture_weight": 0.25,
+      "rear_slip_multiplier": 2.0,
+      "retreat_weight": 0.5
+    },
+    "motion_quality": {
+      "enabled": true,
+      "heading_scale_rad": 0.1,
+      "heading_peak_rad": 0.25,
+      "rate_scale_rad_s": 0.1,
+      "rate_filter_s": 0.3,
+      "stop_speed_m_s": 0.03,
+      "stop_yaw_rad_s": 0.05,
+      "position_m": 0.06,
+      "position_scale_m": 0.05,
+      "braking_m_s2": 1.0,
+      "braking_max_m": 0.2,
+      "position_weight": 1.0,
+      "transition_weight": 1.0,
+      "lateral_scale_m_s": 0.1,
+      "slip_scale_m_s": 0.15,
+      "posture_scale_rad_s": 0.5,
+      "transition_margin_m": 0.15,
+      "landing_s": 0.12,
+      "idle_terminal_hold": true
+    },
+    "stair_hold_practice": {
+      "enabled": true,
+      "episode_fraction": 0.3,
+      "settle_grace_s": 0.3,
+      "timeout_s": 4.0,
+      "hold_s_range": [
+        0.4,
+        1.2
+      ],
+      "spawn_clearance_m": 0.003,
+      "max_pitch_rad": 0.65,
+      "rear_step_max": 4,
+      "back_edge_margin_m": 0.025,
+      "riser_margin_m": 0.015,
+      "minimum_spawn_interval_m": 0.015,
+      "lateral_spawn_m": 0.03,
+      "wheel_centers_body_m": [
+        [
+          0.3141,
+          0.226576,
+          -0.47766824
+        ],
+        [
+          0.3141,
+          -0.226576,
+          -0.47766824
+        ],
+        [
+          -0.3141,
+          0.226576,
+          -0.47766824
+        ],
+        [
+          -0.3141,
+          -0.226576,
+          -0.47766824
+        ]
+      ],
+      "motion_deadband_m_s": 0.01,
+      "position_deadband_m": 0.005,
+      "motion_weight": 0.5,
+      "success_reward": 0.25,
+      "attitude_tolerance_rad": 0.3,
+      "hold_speed_m_s": 0.03,
+      "hold_yaw_rate_rad_s": 0.05
+    },
+    "wall_hold_practice": {
+      "enabled": true,
+      "motion_environment_fraction": 0.5,
+      "settle_grace_s": 0.3,
+      "timeout_s": 6.0,
+      "hold_s_range": [
+        3.0,
+        5.0
+      ],
+      "position_m": 0.02,
+      "position_deadband_m": 0.003,
+      "speed_m_s": 0.02,
+      "yaw_rad": 0.08,
+      "yaw_rate_rad_s": 0.05,
+      "roll_pitch_rate_rad_s": 0.2,
+      "slip_m_s": 0.03,
+      "position_scale_m": 0.02,
+      "speed_scale_m_s": 0.05,
+      "slip_scale_m_s": 0.1,
+      "position_weight": 2.0,
+      "motion_weight": 1.0,
+      "slip_weight": 0.5,
+      "support_weight": 0.5,
+      "posture_weight": 0.25,
+      "success_reward": 0.25,
+      "handover": {
+        "fraction": 0.5,
+        "standing_s_range": [
+          0.6,
+          1.4
+        ],
+        "blend_s": 0.3
+      }
     }
   },
   "joint_limits": {

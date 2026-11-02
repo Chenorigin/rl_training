@@ -72,7 +72,7 @@ class RecoveryObservationState(StudentObservationState):
     def _ticks(self, key, count, extra=0.):
         return ((self._draw(key, count) + extra) / self.step_dt).ceil().long()
 
-    def _acquisition_hits(self, hits, base, yaw, rotation, step, active):
+    def _acquisition_hits(self, hits, base, yaw, rotation, step, active, surface_normals=None):
         cfg = self.recovery_cfg
         ids = (self.recovery_needs_reset & active).nonzero().flatten()
         if ids.numel():
@@ -105,19 +105,21 @@ class RecoveryObservationState(StudentObservationState):
         # Evaluate occlusion using the COMPLETE surface before removing returns:
         # dropping an occluder must not reveal cells behind it in the surrogate.
         retained &= terrain_visibility(hits[ids], base[ids], yaw[ids], rotation[ids],
-                                       self.cfg, self.capture_shape)
+                                       self.cfg, self.capture_shape,
+                                       surface_normals=None if surface_normals is None else surface_normals[ids])
         result = hits.clone()
         result[ids] = torch.where(retained[..., None], hits[ids], torch.nan)
         return result
 
-    def observe(self, clean_proprio, hits, base, yaw, rotation, step):
+    def observe(self, clean_proprio, hits, base, yaw, rotation, step, *, surface_normals=None):
         if self.last_step == step and self.last_obs is not None:
             return self.last_obs.clone()
         enabled = self.recovery_cfg['enabled'] and self.recovery_cfg['episode_probability'] > 0
         active = self.observed_step != step
         if enabled:
-            hits = self._acquisition_hits(hits, base, yaw, rotation, step, active)
-        output = super().observe(clean_proprio, hits, base, yaw, rotation, step)
+            hits = self._acquisition_hits(hits, base, yaw, rotation, step, active, surface_normals)
+        output = super().observe(clean_proprio, hits, base, yaw, rotation, step,
+                                 surface_normals=surface_normals)
         valid = self.last_channels[1].bool()
         count = valid.sum(-1)
         self.recovery_transitions += (active & (self.recovery_previous_count == 0) & (count > 0)).long()

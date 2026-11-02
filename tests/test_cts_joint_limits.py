@@ -118,7 +118,7 @@ def test_bad_limit_contracts_are_rejected(change):
 
 def test_old_v14_remains_readable_but_new_training_requires_limits():
     cfg = default_settings()
-    assert VERSION.endswith('_v16') and 'm20_cts_action_latent_v14' in LEGACY_VERSIONS
+    assert VERSION.endswith('_v26') and 'm20_cts_action_latent_v14' in LEGACY_VERSIONS
     validate_config(cfg)
     cfg.pop('joint_limits')
     validate_config(cfg, legacy=True)

@@ -22,8 +22,11 @@ def settings():
 
 @pytest.fixture(scope='module')
 def source(settings):
+    settings = deepcopy(settings)
     geometry = dict(settings['all_terrain']['geometry'], samples_per_level=3, grid_resolution=.25)
-    settings['all_terrain'].pop('wall_practice', None)  # Freeze pre-wall mode/geometry contract.
+    # This fixture represents the pre-wall v15 contract, not current defaults.
+    for key in ('wall_hold_practice','stair_hold_practice','wall_practice','safety_learning','stair_recovery','obstacle_response','stair_walls','hind_ascent','front_descent','clutter_consistency','objective_consistency','motion_quality'):
+        settings['all_terrain'].pop(key,None)
     return settings, build_atlas(geometry)
 
 

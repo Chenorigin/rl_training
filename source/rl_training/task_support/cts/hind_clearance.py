@@ -86,7 +86,12 @@ def clearance_signals(position, axis, force, supported, support_height, edges,
     # additional height earns nothing; existing effort/impact/limits still act.
     clearance = (deficit/(rise+cfg['margin_m'])).clamp(0., 1.).square()
     near_face = active & (distance.abs() <= reach) & (bottom < selected[..., 4])
-    riser = near_face * (-force[..., 0]/cfg['force_scale_N']).clamp(0., 1.).square()
+    raw_finite = torch.isfinite(torch.cat((position, axis, force), -1)).all(-1) & torch.isfinite(support_height)
+    force_cost = (-torch.nan_to_num(force[..., 0])/cfg['force_scale_N']).clamp(0., 1.).square()
+    riser = torch.where(near_face, force_cost, 0.)
+    invalid = moving[:, None] & ~raw_finite
+    clearance = torch.where(invalid, 1., torch.nan_to_num(clearance, nan=1.).clamp(0.,1.))
+    riser = torch.where(invalid, 1., riser)
     rear_task = active[:, 2:].any(-1)
     support = rear_task & ~supported[:, 2:].any(-1)
     return dict(active=active, bottom=bottom, target=target, deficit=deficit,
@@ -102,7 +107,8 @@ def signals(env):
         state._hind_edges = rising_edges(state.surface.rectangles, cfg['min_rise_m'])
     g = state.observe()
     edges, valid = state._hind_edges
-    origin = state.origins[state.tile]
+    origin = state.origins[state.tile].clone()
+    origin[:,2] = 0.  # Atlas rectangles use absolute physical Z; spawn Z is not a terrain offset.
     position = g['position']-origin[:, None]
     height = g['height']-origin[:, 2, None]
     moving = state.stairs & (g['command'][:, 0] > cfg['command_min_m_s'])
@@ -112,11 +118,11 @@ def signals(env):
 
 
 def hind_step_clearance(env):
-    return -signals(env)['clearance'][:, 2:].mean(-1)
+    return torch.nan_to_num(-signals(env)['clearance'][:, 2:].mean(-1), nan=-1., posinf=-1., neginf=-1.)
 
 
 def hind_riser_contact(env):
-    return -signals(env)['riser'][:, 2:].mean(-1)
+    return torch.nan_to_num(-signals(env)['riser'][:, 2:].mean(-1), nan=-1., posinf=-1., neginf=-1.)
 
 
 def hind_support_transfer(env):

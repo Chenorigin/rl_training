@@ -97,7 +97,14 @@ class GeometryTests(unittest.TestCase):
 
     def test_missing_riser_really_allows_passage_where_solid_wall_contacts(self):
         for path,expect_wall in ((OPEN,False),(SOLID,True)):
-            model,data,terrain=probe_model(path)
+            # Filenames are editable presets: explicitly select the compared
+            # collision mode, independently of the user's current switches.
+            with tempfile.TemporaryDirectory() as directory:
+                tree=ET.parse(path)
+                tree.find("./custom/numeric[@name='open_risers']").set('data',str(int(not expect_wall)))
+                tree.find("./custom/numeric[@name='walls_enabled']").set('data','0')
+                comparison=Path(directory)/'comparison.xml';tree.write(comparison)
+                model,data,terrain=probe_model(comparison)
             # A sphere overlaps the middle of the first riser, far from both
             # horizontal treads/edges. Thin boxes or a convex stair hull fail.
             data.qpos[:3]=[terrain.parameters['start_x'][0]-.015,0,.1]

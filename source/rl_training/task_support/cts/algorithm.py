@@ -17,6 +17,8 @@ from .model import OBS_DIMS, actor_settings, teacher_observations
 from .configuration import TEACHER_TRAINING_KEYS, train_teacher_base
 
 
+OPTIONAL_CONFIG_KEYS = {'stop_exploration_scale'}
+
 CONFIG_KEYS = {"teacher_fraction", "cohort_seed", "learning_rate", "student_learning_rate", "gamma", "lam", "clip_param",
                "num_learning_epochs", "num_mini_batches", "value_loss_coef", "max_grad_norm",
                "student_learning_epochs", "student_batch_size", "latent_loss_weight", "decoder_hidden_dims",
@@ -24,13 +26,16 @@ CONFIG_KEYS = {"teacher_fraction", "cohort_seed", "learning_rate", "student_lear
 
 
 def validate_config(cfg):
-    unknown = set(cfg)-CONFIG_KEYS-TEACHER_TRAINING_KEYS
+    unknown = set(cfg)-CONFIG_KEYS-TEACHER_TRAINING_KEYS-OPTIONAL_CONFIG_KEYS
     if unknown:
         raise ValueError(f"Unknown CTS algorithm configuration: {sorted(unknown)}")
     missing = CONFIG_KEYS-set(cfg)
     if missing:
         raise ValueError(f"Missing CTS algorithm configuration: {sorted(missing)}")
     train_teacher_base(cfg)
+    if "stop_exploration_scale" in cfg:
+        from .exploration import validate_scale
+        validate_scale(cfg["stop_exploration_scale"])
     if not 0 < cfg["teacher_fraction"] < 1:
         raise ValueError("CTS requires nonempty teacher and student cohorts")
     if type(cfg["cohort_seed"]) is not int or cfg["cohort_seed"] < 0:
@@ -173,6 +178,10 @@ class CTSAlgorithm:
         self.provenance = {}
         from .auxiliary import AuxiliaryObjectives
         self.auxiliary = AuxiliaryObjectives(models, auxiliary_cfg, perception, device)
+        from .action_safety import ActionSafety
+        safety = (all_terrain_cfg or {}).get('safety_learning')
+        self.action_safety = ActionSafety(self.joint_limits, safety) if safety and safety['enabled'] else None
+        self.auxiliary.action_safety = self.action_safety
 
     def _checked_obs(self, obs):
         result = {}
@@ -183,17 +192,22 @@ class CTSAlgorithm:
             result[key] = value
         return result
 
+    def action_std(self, obs):
+        from .exploration import action_std
+        return action_std(self.models, obs, self.cfg)
+
     @torch.no_grad()
     def act(self, obs):
         if self.pending is not None or len(self.rollout) >= self.num_steps_per_env:
             raise RuntimeError("CTS rollout sequencing error")
         obs = self._checked_obs(obs)
         mean, latent = self.models.mean(obs, self.teacher_mask)
-        distribution = Normal(mean, self.models.log_std.exp())
+        distribution = Normal(mean, self.action_std(obs))
         actions = distribution.sample()
         values = self.models.value(obs, latent)
         self.pending = {"obs": {key: ordinary_clone(value) for key, value in obs.items()},
                         "actions": ordinary_clone(actions), "mean": ordinary_clone(mean),
+                        "std": ordinary_clone(distribution.scale),
                         "values": ordinary_clone(values),
                         "log_prob": ordinary_clone(distribution.log_prob(actions).sum(-1))}
         return actions
@@ -215,7 +229,11 @@ class CTSAlgorithm:
             # Matches installed RSL 5.0.1 / Isaac timeout semantics: post-step
             # observations are reset states, so bootstrap with pre-step V.
             reward += self.cfg["gamma"]*self.pending["values"]*timeouts
-        regular = self.auxiliary.regular_phase(extras, self.num_envs)
+        active = extras.get('cts_policy_active', torch.ones_like(dones, dtype=torch.bool))
+        if not isinstance(active, torch.Tensor) or active.shape != dones.shape or active.dtype != torch.bool:
+            raise ValueError('Invalid C handover policy-active mask')
+        self.pending['policy_active'] = ordinary_clone(active.to(self.device))
+        regular = self.auxiliary.regular_phase(extras, self.num_envs) & active.to(self.device)
         straight = extras.get('cts_straight') if self.straight_cfg is not None else torch.zeros_like(dones,dtype=torch.bool)
         if not isinstance(straight,torch.Tensor) or straight.shape != dones.shape or straight.dtype != torch.bool:
             raise ValueError('CTS straight supervision requires pre-step course tags')
@@ -226,6 +244,24 @@ class CTSAlgorithm:
         if (not isinstance(course, torch.Tensor) or course.shape != dones.shape or course.dtype != torch.long
                 or (self.all_terrain_cfg is not None and ((course < 0) | (course >= self.num_courses)).any())):
             raise ValueError('CTS all-terrain requires pre-step cts_course integer tags')
+        clutter_enabled = (self.all_terrain_cfg or {}).get('clutter_consistency',{}).get('enabled',False)
+        from .wall_stability import settings as wall_settings
+        wall_enabled = wall_settings(self.all_terrain_cfg) is not None
+        if clutter_enabled or wall_enabled:
+            phase = extras.get('student_v1',{}).get('phase')
+            if (not isinstance(phase,torch.Tensor) or phase.shape != dones.shape
+                    or phase.dtype not in (torch.int32,torch.int64) or not ((phase >= 0) & (phase <= 3)).all()):
+                raise ValueError('CTS clutter requires valid pre-step phase tags')
+            regular = regular & (phase.to(self.device) == 0)
+        clutter = extras.get('cts_clutter') if clutter_enabled else torch.zeros_like(dones,dtype=torch.bool)
+        if not isinstance(clutter,torch.Tensor) or clutter.shape != dones.shape or clutter.dtype != torch.bool:
+            raise ValueError('CTS clutter requires pre-step cts_clutter boolean tags')
+        for key in ('wall_quality', 'wall_idle'):
+            value = extras.get('cts_'+key) if wall_enabled else torch.zeros_like(dones,dtype=torch.bool)
+            if not isinstance(value,torch.Tensor) or value.shape != dones.shape or value.dtype != torch.bool:
+                raise ValueError('CTS wall stability requires pre-step cts_'+key+' boolean tags')
+            self.pending[key] = ordinary_clone(value.to(self.device) & regular)
+        self.pending.update(clutter=ordinary_clone(clutter.to(self.device)))
         self.pending.update(rewards=reward, dones=ordinary_clone(dones.bool()), regular_phase=ordinary_clone(regular),
                             straight=ordinary_clone(straight.to(self.device) & regular),
                             anchor=ordinary_clone(anchor.to(self.device)), course=ordinary_clone(course.to(self.device)))
@@ -250,27 +286,35 @@ class CTSAlgorithm:
         self.returns = ordinary_clone(torch.stack(list(reversed(returns))))
         advantages = self.returns-torch.stack([s["values"] for s in self.rollout])
         # Normalize separately: different cohorts need not have equal reward scales.
+        active = torch.stack([s['policy_active'] for s in self.rollout])
         for mask in (self.teacher_mask, ~self.teacher_mask):
-            values = advantages[:, mask]
-            advantages[:, mask] = (values-values.mean())/(values.std(unbiased=False)+1.e-8)
+            selected = active & mask[None, :]
+            values = advantages[selected]
+            if len(values):
+                advantages[selected] = (values-values.mean())/(values.std(unbiased=False)+1.e-8)
+        advantages[~active] = 0.
         self.advantages = ordinary_clone(advantages)
 
     def _data(self):
         if self.returns is None:
             raise RuntimeError("CTS update requires computed returns")
         return {"obs": {key: torch.cat([step["obs"][key] for step in self.rollout]) for key in OBS_DIMS},
-                **{key: torch.cat([step[key] for step in self.rollout]) for key in ("actions", "mean", "values", "log_prob")},
+                **{key: torch.cat([step[key] for step in self.rollout]) for key in ("actions", "mean", "std", "values", "log_prob")},
                 "returns": self.returns.flatten(), "advantages": self.advantages.flatten(),
                 "teacher": self.teacher_mask.repeat(self.num_steps_per_env),
-                **{key: torch.cat([step[key] for step in self.rollout]) for key in ('straight', 'anchor', 'course')}}
+                **{key: torch.cat([step[key] for step in self.rollout]) for key in ('straight', 'anchor', 'course', 'clutter', 'wall_quality', 'wall_idle', 'policy_active')}}
 
     def ppo_update(self):
         data, cfg = self._data(), self.cfg
-        teacher_ids = data["teacher"].nonzero().flatten()
-        student_ids = (~data["teacher"]).nonzero().flatten()
+        teacher_ids = (data["teacher"] & data["policy_active"]).nonzero().flatten()
+        student_ids = (~data["teacher"] & data["policy_active"]).nonzero().flatten()
         batches = min(cfg["num_mini_batches"], len(teacher_ids), len(student_ids))
+        if batches == 0:
+            raise RuntimeError('No active teacher/student samples for CTS PPO')
         metrics = {key: 0. for key in ("policy_loss", "value_loss", "anchor_loss", "kl")}
         updates = 0
+        kl_stop_max = kl_move_max = 0.
+        early_stop = False
         self.student_optimizer.zero_grad(set_to_none=True)
         for _ in range(cfg["num_learning_epochs"]):
             teachers = teacher_ids[torch.randperm(len(teacher_ids), device=self.device)].tensor_split(batches)
@@ -279,14 +323,18 @@ class CTSAlgorithm:
                 ids = torch.cat((tids, sids))
                 obs, mask = {key: value[ids] for key, value in data["obs"].items()}, data["teacher"][ids]
                 mean, latent = self.models.mean(obs, mask, detach_student=True)
-                distribution = Normal(mean, self.models.log_std.exp())
+                distribution = Normal(mean, data["std"][ids])
                 log_prob = distribution.log_prob(data["actions"][ids]).sum(-1)
                 with torch.no_grad():
-                    kl = .5*((mean-data["mean"][ids])/self.models.log_std.exp()).square().sum(-1)
+                    kl = .5*((mean-data["mean"][ids])/data["std"][ids]).square().sum(-1)
                     scalar_kl = float(balanced_mean(kl, mask))
+                    stop = obs["motion_control"].abs().amax(-1) <= 1.e-4
+                    if stop.any():kl_stop_max = max(kl_stop_max, float(kl[stop].mean()))
+                    if (~stop).any():kl_move_max = max(kl_move_max, float(kl[~stop].mean()))
                 # Check the already accumulated policy change BEFORE another
                 # optimizer step, rather than crossing the gate once more.
                 if scalar_kl > 2*cfg["desired_kl"]:
+                    early_stop = True
                     break
                 surrogate = clipped_policy_objective(log_prob, data["log_prob"][ids], data["advantages"][ids], cfg["clip_param"])
                 policy_loss = balanced_mean(surrogate, mask)
@@ -298,19 +346,36 @@ class CTSAlgorithm:
                     target = self.models.reference_teacher(teacher_observations(obs))
                 teacher_proposal = self.models.teacher_latent(obs)
                 teacher_mean = self.models.teacher_action(obs, teacher_proposal)
-                anchor_error = ((teacher_mean-target)/self.models.log_std.exp().clamp_min(.05)).square().mean(-1)
+                anchor_target = target
+                if self.action_safety is not None:
+                    anchor_target = torch.where(self.action_safety.accept(target)[:,None],target,teacher_mean.detach())
+                anchor_error = ((teacher_mean-anchor_target)/self.models.log_std.exp().clamp_min(.05)).square().mean(-1)
                 anchor = domain_anchor_loss(anchor_error, data['anchor'][ids],
                     self.actor_cfg['new_domain_anchor_scale'] if self.actor_cfg is not None else 1.)
+                safe_loss = mean.new_zeros(())
+                if self.action_safety is not None:
+                    safe_loss = self.action_safety.cfg['teacher_weight'] * self.action_safety.tail_cost(teacher_mean)
                 entropy = distribution.entropy().sum(-1).mean()
                 retention_loss, retention_metrics = self.auxiliary.retention_loss(detach_student=True)
-                loss = (policy_loss+cfg["value_loss_coef"]*value_loss+cfg["anchor_coefficient"]*anchor
-                        -cfg["entropy_coef"]*entropy+retention_loss)
+                from .wall_stability import settings as wall_settings, eligible as wall_eligible, idle_loss
+                wall_cfg = wall_settings(self.all_terrain_cfg)
+                wall_idle = mean.new_zeros(())
+                if wall_cfg is not None:
+                    selected = wall_eligible(data, ids, wall_cfg, 'wall_idle')
+                    wall_idle = idle_loss(mean, selected, wall_cfg)
+                    metrics['ppo_wall_idle_samples'] = metrics.get('ppo_wall_idle_samples',0.) + int(selected.sum())
+                    metrics['ppo_wall_idle_output_loss'] = metrics.get('ppo_wall_idle_output_loss',0.) + float(wall_idle.detach())
+                loss = (wall_idle+policy_loss+cfg["value_loss_coef"]*value_loss+cfg["anchor_coefficient"]*anchor
+                        -cfg["entropy_coef"]*entropy+retention_loss+safe_loss)
                 if not torch.isfinite(loss):
                     raise RuntimeError("Nonfinite CTS PPO loss")
                 self.optimizer.zero_grad(set_to_none=True)
                 loss.backward()
                 nn.utils.clip_grad_norm_(self.ppo_parameters, cfg["max_grad_norm"], error_if_nonfinite=True)
                 self.optimizer.step()
+                if self.action_safety is not None:
+                    metrics['teacher_limit_tail_loss'] = metrics.get('teacher_limit_tail_loss', 0.) + float(safe_loss.detach())
+                    metrics['reference_rejected_fraction'] = metrics.get('reference_rejected_fraction', 0.) + float((~self.action_safety.accept(target)).float().mean())
                 for key, value in (("policy_loss", policy_loss), ("value_loss", value_loss), ("anchor_loss", anchor), ("kl", scalar_kl)):
                     metrics[key] += float(value)
                 for key, value in retention_metrics.items():
@@ -326,7 +391,8 @@ class CTSAlgorithm:
                   'decoder_critic_learning_rate': self.optimizer.param_groups[1]['lr']}
                  if train_teacher_base(cfg) else {})
         return {**{key: value/max(updates, 1) for key, value in metrics.items()},
-                "ppo_minibatches": updates, **rates}
+                "ppo_minibatches": updates, "ppo_kl_early_stop": int(early_stop),
+                "ppo_stop_kl_max": kl_stop_max, "ppo_move_kl_max": kl_move_max, **rates}
 
     def distill_update(self):
         # Auxiliaries must differentiate THROUGH the complete shared decoder,
@@ -355,21 +421,41 @@ class CTSAlgorithm:
             straight_targets = (ordinary_clone(straight_teacher_actions(self.models,data['obs'],target))
                                 if self.straight_cfg is not None else target_actions)
         selection = self.auxiliary.prepare(self.rollout)
+        safe_labels = self.action_safety.accept(target_actions) if self.action_safety is not None else None
+        if safe_labels is not None:
+            pair_safe = safe_labels[selection['pairs_current']] & safe_labels[selection['pairs_previous']]
+            selection['pair_safe_fraction'] = float(pair_safe.float().mean()) if pair_safe.numel() else 0.
+            for key in ('pairs_current', 'pairs_previous'):
+                selection[key] = selection[key][pair_safe]
+            data['safe_teacher_labels'] = self.action_safety.accept(straight_targets)
         total, updates, metrics = 0., 0, {}
         n = len(target)
         for _ in range(cfg["student_learning_epochs"]):
-            order = torch.randperm(n, device=self.device)
+            valid = data['policy_active'].nonzero().flatten()
+            order = valid[torch.randperm(len(valid), device=self.device)]
             for ids in order.split(cfg["student_batch_size"]):
                 obs = {key: value[ids] for key, value in data["obs"].items()}
                 predicted = self.models.student_latent(obs)
-                latent_loss = cfg["latent_loss_weight"]*(predicted-target[ids]).square().mean()
+                labels = target[ids]
+                if safe_labels is not None:
+                    labels = torch.where(safe_labels[ids,None],labels,predicted.detach())
+                residual = (predicted-labels).square().mean(-1)
+                latent_loss = cfg['latent_loss_weight']*residual.mean()
                 auxiliary_loss, auxiliary_metrics = self.auxiliary.loss(data, ids, target_actions, selection)
                 from .straight import straight_action_loss
                 straight_loss, straight_metrics = straight_action_loss(self.models,data,straight_targets,self.straight_cfg)
                 limit_loss = (self.joint_limits.student_loss(
                     self.models.student_action(obs['policy'], obs['motion_control']))
                     if self.joint_limits is not None else latent_loss.new_zeros(()))
-                loss = latent_loss + auxiliary_loss + straight_loss + limit_loss
+                if self.action_safety is not None:
+                    limit_loss = limit_loss + self.action_safety.cfg['student_tail_weight'] * self.action_safety.tail_cost(
+                        self.models.student_action(obs['policy'], obs['motion_control']))
+                from .clutter_consistency import loss as clutter_loss
+                clutter, clutter_metrics = clutter_loss(self.models, data, ids, selection['regular'],
+                    (self.all_terrain_cfg or {}).get('clutter_consistency'), self.action_safety)
+                from .wall_stability import settings as wall_settings, student_loss as wall_loss
+                wall, wall_metrics = wall_loss(self.models, data, ids, wall_settings(self.all_terrain_cfg), self.action_safety)
+                loss = latent_loss + auxiliary_loss + straight_loss + limit_loss + clutter + wall
                 if not torch.isfinite(loss):
                     raise RuntimeError("Nonfinite CTS student supervision/auxiliary loss")
                 self.student_optimizer.zero_grad(set_to_none=True)
@@ -377,12 +463,13 @@ class CTSAlgorithm:
                 nn.utils.clip_grad_norm_(self.student_parameters, cfg["max_grad_norm"], error_if_nonfinite=True)
                 self.student_optimizer.step()
                 total += float(latent_loss.detach())
-                for name, value in {**auxiliary_metrics, **straight_metrics, 'joint_limit_loss': float(limit_loss.detach()), 'total_loss': float(loss.detach())}.items():
+                for name, value in {**auxiliary_metrics, **straight_metrics, **clutter_metrics, **wall_metrics, 'joint_limit_loss': float(limit_loss.detach()), 'total_loss': float(loss.detach())}.items():
                     metrics[name] = metrics.get(name, 0.) + value
                 updates += 1
         return {"latent_loss": total/max(updates, 1), "student_minibatches": updates,
                 **{name: value/max(updates, 1) for name, value in metrics.items()},
                 'temporal_pair_count': selection['pairs_current'].numel(),
+                'unsafe_teacher_fraction': 0. if safe_labels is None else float((~safe_labels).float().mean()),
                 **self.auxiliary.evaluate()}
 
     def update(self):

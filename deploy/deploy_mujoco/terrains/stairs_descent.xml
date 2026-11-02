@@ -11,7 +11,7 @@
     <!-- width：路线宽度；生成障碍之外保留 z=0 无限平面，方便自由操控。 -->
     <numeric name="width" data="4.0"/>
     <!-- friction：滑动 / 扭转 / 滚动摩擦；应用于生成的地面和障碍。 -->
-    <numeric name="friction" data="1.0 0.01 0.01"/>
+    <numeric name="friction" data="0.0003 0.00001 0.00001"/>
     <!-- spawn_xy：机器人出生世界坐标 x y；z 自动射线查询 + 站立/趴下偏置。 -->
     <numeric name="spawn_xy" data="-1.0 0.0"/>
     <!-- spawn_yaw_deg：出生偏航角，单位度；0 表示朝 +X。 -->
@@ -19,9 +19,9 @@
     <!-- start_x：第一段地形起点的世界 X 坐标。 -->
     <numeric name="start_x" data="0.5"/>
     <!-- step_height：单级台阶高度；测试训练范围可改 0.10 至 0.25。 -->
-    <numeric name="step_height" data="0.25"/>
+    <numeric name="step_height" data="0.15"/>
     <!-- tread_depth：水平踏面深度；step_count：级数，正整数。 -->
-    <numeric name="tread_depth" data="0.20"/>
+    <numeric name="tread_depth" data="0.25"/>
     <numeric name="step_count" data="10"/>
     <!-- platform_length：上楼出口 / 下楼出生平台长度，平台高度=级数×级高。 -->
     <numeric name="platform_length" data="10.0"/>

@@ -129,7 +129,7 @@ def test_training_capture_sensor_and_budget_preserve_teacher():
 
 def test_current_cts_ledger_and_invalid_capture_options():
     settings=default_settings();validate_config(settings)
-    assert VERSION.endswith('_v16') and 'm20_cts_action_latent_v10' in LEGACY_VERSIONS
+    assert VERSION.endswith('_v26') and 'm20_cts_action_latent_v10' in LEGACY_VERSIONS
     for value in (-1.,float('nan'),float('inf'),True,3.,'0.6'):
         with pytest.raises(ValueError):cfg(value).validate()
         with pytest.raises(ValueError):validate_capture({'padding_m':value})
@@ -138,8 +138,9 @@ def test_current_cts_ledger_and_invalid_capture_options():
     assert capture_grid_shape(.61) == (25,31)
 
 
-def test_mujoco_capture_returns_unknown_for_missing_collision_terrain():
+def test_mujoco_capture_returns_unknown_for_missing_collision_terrain(monkeypatch):
     import mujoco
+    monkeypatch.syspath_prepend(str(Path(__file__).resolve().parents[1]/'deploy/deploy_mujoco'))
     from deploy_mujoco import M20Contract
     model=mujoco.MjModel.from_xml_string('<mujoco><worldbody><geom name="floor" type="box" size=".5 .5 .05" pos="0 0 -.05"/><body name="base" pos="0 0 .5"/></worldbody></mujoco>')
     data=mujoco.MjData(model);mujoco.mj_forward(model,data)

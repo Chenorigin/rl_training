@@ -198,7 +198,9 @@ def test_actual_environment_constructor_installs_state_before_parent_uses_sensor
                 if isinstance(x, ast.ClassDef) and x.name == 'M20CTSAllTerrainEnv')
     init = next(x for x in node.body if isinstance(x, ast.FunctionDef) and x.name == '__init__')
     # Joint-limit installation requires Isaac and is independently tested.
-    init.body = init.body[:-2]
+    isaac_start = next(i for i, stmt in enumerate(init.body)
+                       if isinstance(stmt, ast.ImportFrom) and stmt.module == 'task_support.cts.c_handover')
+    init.body = init.body[:isaac_start]
     node.body = [init]
     class Parent:
         def __init__(self, cfg, **kwargs):

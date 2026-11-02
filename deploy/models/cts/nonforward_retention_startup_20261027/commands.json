@@ -1,0 +1,42 @@
+{
+  "schema": "m20_cts_retention_commands_v1",
+  "classes": [
+    "backward",
+    "left",
+    "right",
+    "yaw_left",
+    "yaw_right"
+  ],
+  "commands": [
+    [
+      -0.699999988079071,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.5,
+      0.0
+    ],
+    [
+      0.0,
+      -0.5,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.6000000238418579
+    ],
+    [
+      0.0,
+      0.0,
+      -0.6000000238418579
+    ]
+  ],
+  "retention_manifest_sha256": "b774e08914ed5f30cebd628fb38b48fabd7661fcb984dd92980daa8eeee43ddf",
+  "payload_sha256": "f2c4108d8f69fa8a78ef46f756789d33b0cef2df8b7d241fbe968dc895de97b8",
+  "source_checkpoint_sha256": "1f6f14857776b64200f6a2d4c81ad7af48e738604bbcec67acb8c7113a6dae73",
+  "source_plan": "/home/ubuntu/cyq_shixi_projects/rl_training/logs/evaluation/cts_backward_20261027/collection_final/collection_plan.json",
+  "source_plan_sha256": "df6837a46017c1d1795bab0c811c57b2645b2099e83a55d1dda28572e8b36090"
+}

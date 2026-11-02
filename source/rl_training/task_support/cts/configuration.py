@@ -6,9 +6,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[4]
 TASK = "Rough-Deeprobotics-M20-CTS"
 CONFIG_PATH = ROOT / "configs/distillation/cts.json"
-VERSION = "m20_cts_action_latent_v16"
+VERSION = "m20_cts_action_latent_v26"
 LEGACY_VERSION = "m20_cts_action_latent_v2"
-LEGACY_VERSIONS = (LEGACY_VERSION, "m20_cts_action_latent_v3", "m20_cts_action_latent_v4", "m20_cts_action_latent_v5", "m20_cts_action_latent_v6", "m20_cts_action_latent_v7", "m20_cts_action_latent_v8", "m20_cts_action_latent_v9", "m20_cts_action_latent_v10", "m20_cts_action_latent_v11", "m20_cts_action_latent_v12", "m20_cts_action_latent_v13", "m20_cts_action_latent_v14", "m20_cts_action_latent_v15")
+LEGACY_VERSIONS = (LEGACY_VERSION, "m20_cts_action_latent_v3", "m20_cts_action_latent_v4", "m20_cts_action_latent_v5", "m20_cts_action_latent_v6", "m20_cts_action_latent_v7", "m20_cts_action_latent_v8", "m20_cts_action_latent_v9", "m20_cts_action_latent_v10", "m20_cts_action_latent_v11", "m20_cts_action_latent_v12", "m20_cts_action_latent_v13", "m20_cts_action_latent_v14", "m20_cts_action_latent_v15", "m20_cts_action_latent_v16", "m20_cts_action_latent_v17", "m20_cts_action_latent_v18", "m20_cts_action_latent_v19", "m20_cts_action_latent_v20", "m20_cts_action_latent_v21", "m20_cts_action_latent_v22", "m20_cts_action_latent_v23", "m20_cts_action_latent_v24", "m20_cts_action_latent_v25")
 
 
 TEACHER_TRAINING_KEYS = {'train_teacher_base', 'teacher_learning_rate'}
@@ -56,6 +56,8 @@ def validate_config(config, *, legacy=False):
     algorithm_keys = set(expected['algorithm'])
     if legacy and isinstance(config.get('algorithm'), dict) and not TEACHER_TRAINING_KEYS.intersection(config['algorithm']):
         algorithm_keys -= TEACHER_TRAINING_KEYS
+    if legacy and 'stop_exploration_scale' not in config.get('algorithm', {}):
+        algorithm_keys.discard('stop_exploration_scale')
     if (not isinstance(config, dict) or set(config) != keys
             or not isinstance(config['algorithm'], dict)
             or set(config['algorithm']) != algorithm_keys):

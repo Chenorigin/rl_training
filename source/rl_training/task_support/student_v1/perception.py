@@ -68,7 +68,8 @@ def query_grid(current, anchor, grid, source_shape=(GRID_ROWS, GRID_COLS)):
     return torch.stack((gx/half_x, gy/half_y), -1).reshape(-1, GRID_ROWS, GRID_COLS, 2), inside
 
 
-def terrain_visibility(hits, base, yaw, rotation, cfg, source_shape=(GRID_ROWS, GRID_COLS)):
+def terrain_visibility(hits, base, yaw, rotation, cfg, source_shape=(GRID_ROWS, GRID_COLS),
+                       surface_normals=None):
     """Same front/rear FOV and height-field line of sight in both simulators.
 
     No reflectivity, beam angular sampling, overhangs or robot self-shadow.
@@ -77,6 +78,14 @@ def terrain_visibility(hits, base, yaw, rotation, cfg, source_shape=(GRID_ROWS, 
     rows,cols = source_shape
     half_x,half_y = (cols-1)*GRID_RESOLUTION/2,(rows-1)*GRID_RESOLUTION/2
     finite = torch.isfinite(hits).all(-1)
+    if cfg.support_surface_visibility:
+        if surface_normals is None or surface_normals.shape != hits.shape:
+            raise ValueError('Support-surface sensing requires measured mesh normals matching hits')
+        norm = surface_normals.norm(dim=-1)
+        normal_valid = torch.isfinite(surface_normals).all(-1) & (norm > 1.e-6)
+        normals = torch.nan_to_num(surface_normals) / norm.nan_to_num().clamp_min(1.e-6)[..., None]
+        # Downward rays select the upper face. Normalize importer winding.
+        normals = torch.where(normals[..., 2:3] < 0, -normals, normals)
     safe = torch.where(finite[..., None], hits, base[:, None])
     visible = torch.zeros_like(finite)
     z = torch.where(finite, hits[..., 2], 0.).reshape(-1, 1, rows, cols)
@@ -91,6 +100,11 @@ def terrain_visibility(hits, base, yaw, rotation, cfg, source_shape=(GRID_ROWS, 
         elevation = torch.atan2(body[..., 2], horizontal)
         distance = delta.norm(dim=-1)
         candidate = finite & (distance >= cfg.lidar_min_range_m) & (distance <= cfg.lidar_max_range_m)
+        if cfg.support_surface_visibility:
+            # Front-face visibility, not a height cutoff: visible rising ramps
+            # may be above the sensor, whereas horizontal wall tops cannot be.
+            candidate &= normal_valid & (normals[..., 2] > 1.e-6)
+            candidate &= ((origin[:, None]-safe)*normals).sum(-1) > 1.e-6
         if cfg.lidar_horizontal_fov_deg < 360:
             candidate &= (horizontal > 1e-8) & (angle <= math.radians(cfg.lidar_horizontal_fov_deg/2)+1e-7)
         candidate &= (elevation >= math.radians(cfg.vertical_fov_min_deg)) & (elevation <= math.radians(cfg.vertical_fov_max_deg))
@@ -271,7 +285,7 @@ class StudentObservationState:
                                                (ids.numel(),), device=self.device)
         self.needs_reset[ids] = False
 
-    def observe(self, clean_proprio, hits, base, yaw, rotation, step):
+    def observe(self, clean_proprio, hits, base, yaw, rotation, step, *, surface_normals=None):
         if self.last_step == step and self.last_obs is not None:
             return self.last_obs.clone()
         if clean_proprio.shape != (self.num_envs, 57) or hits.shape != (self.num_envs, self.capture_grid.shape[0], 3):
@@ -289,7 +303,8 @@ class StudentObservationState:
         updated_drift = alpha*self.drift + torch.randn_like(self.drift)*drift_std*math.sqrt(1-alpha*alpha)
         self.drift[active] = updated_drift[active]
         pose_error = (self.bias+self.drift)*scale[:, None]
-        self.capture_visibility = terrain_visibility(hits, base, yaw, rotation, cfg,self.capture_shape)
+        self.capture_visibility = terrain_visibility(hits, base, yaw, rotation, cfg,self.capture_shape,
+                                                     surface_normals=surface_normals)
         self.last_visibility = self.capture_visibility[:,self.output_indices]
         redraw = self.next_occlusion <= step
         self.occluded[redraw] = torch.rand(int(redraw.sum()), device=self.device) < (cfg.occlusion_probability*scale[redraw]).clamp_max(1)

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 独立矩形实心平台：从平地沿 +X 上台、通过台面、再下台。
+     经现有 terrain_loader.py 加载，修改 data 后重启。
+     所有长度单位 m，使用全尺寸，不是原生 geom 的半尺寸。 -->
+<mujoco model="platform_terrain">
+  <compiler angle="radian"/>
+  <custom>
+    <text name="terrain_kind" data="platform"/>
+    <!-- 高度：平台顶面相对 z=0 地面的高度，必须为正。 -->
+    <numeric name="platform_height" data="0.40"/>
+    <!-- 全长沿 X；全宽沿 Y；平台横向中心固定 y=0。 -->
+    <numeric name="platform_length" data="3.0"/>
+    <numeric name="width" data="2.0"/>
+    <!-- 平台前缘 X，后缘和越线统计终点自动取 start_x + platform_length。 -->
+    <numeric name="start_x" data="0.50"/>
+    <numeric name="friction" data="1.0 0.01 0.01"/>
+    <!-- 默认在平台前方地面出生。也可将 XY 改到台面内部测试下台；
+         竖直高度自动查询，需为整个机体留足边缘余量。 -->
+    <numeric name="spawn_xy" data="-1.0 0.0"/>
+    <numeric name="spawn_yaw_deg" data="0"/>
+  </custom>
+</mujoco>

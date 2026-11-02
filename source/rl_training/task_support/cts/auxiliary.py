@@ -211,6 +211,10 @@ class AuxiliaryObjectives:
         else:
             actions = self.models.student_action(policy, command)
         residual = actions-labels
+        safety = getattr(self, 'action_safety', None)
+        accepted = safety.accept(labels) if safety is not None else None
+        if accepted is not None:
+            residual = torch.where(accepted[:, None], residual, torch.zeros_like(residual))
         weights = (cfg['leg_loss_weight'], cfg['wheel_loss_weight'])
         value = action_group_mse(residual, *weights)
         metrics = dict(retention_mse=float(value.detach()), retention_training_samples=len(classes))
@@ -219,7 +223,11 @@ class AuxiliaryObjectives:
             if startup is not None:
                 for phase, mask in (('startup', startup), ('later', ~startup)):
                     metrics[f'retention_{name}_{phase}_mse'] = float(action_group_mse(residual[(classes == index) & mask], *weights).detach())
-        return cfg['retention_loss_weight']*value, metrics
+        penalty = value.new_zeros(())
+        if accepted is not None:
+            metrics['retention_rejected_fraction'] = float((~accepted).float().mean())
+            penalty = safety.cfg['student_tail_weight']*safety.tail_cost(actions)
+        return cfg['retention_loss_weight']*value + penalty, metrics
 
     def loss(self, data, ids, target_actions, selection):
         cfg, models = self.cfg, self.models
@@ -234,6 +242,7 @@ class AuxiliaryObjectives:
             both = torch.cat((current, previous))
             actions = models.student_action(data['obs']['policy'][both], data['obs']['motion_control'][both])
             value = temporal_residual_loss(*actions.chunk(2), target_actions[current], target_actions[previous], *weights)
+            value = value*selection.get('pair_safe_fraction',1.)
             total = total + cfg['temporal_loss_weight']*value
             metrics.update(temporal_residual_mse=float(value.detach()), temporal_samples=len(selected))
         if cfg['spatial_loss_weight']:

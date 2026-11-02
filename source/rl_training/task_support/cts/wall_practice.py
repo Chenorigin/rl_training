@@ -44,6 +44,8 @@ def validate(cfg):
         'offset_fraction','turn_width','stop_margin','timeout_s','safe_margin','penetration_limit',
         'clearance_weight','leg_delta_weight','leg_jerk_weight','target_delta_scale',
         'collision_geometry','collision_geometry_sha256'}
+    if isinstance(cfg, dict) and 'corridor_width_m' in cfg:
+        keys.add('corridor_width_m')
     if not isinstance(cfg,dict) or set(cfg) != keys or type(cfg['enabled']) is not bool:
         raise ValueError('Unknown or missing wall practice configuration')
     for key in ('width_range','wall_height_range','speed_range'):
@@ -60,6 +62,8 @@ def validate(cfg):
         raise ValueError('Wall practice must retain non-wall motion episodes')
     if not 0 < cfg['offset_fraction'] <= 1 or not cfg['width_range'][0] <= cfg['initial_min_width'] <= cfg['width_range'][1]:
         raise ValueError('Invalid wall width curriculum or lateral offset')
+    if 'corridor_width_m' in cfg and not cfg['width_range'][0] <= cfg['corridor_width_m'] <= cfg['width_range'][1]:
+        raise ValueError('Fixed corridor width outside the validated envelope')
     if cfg['width_range'][0] <= 2*(cfg['spawn_half_width']+cfg['spawn_margin']):
         raise ValueError('Narrow wall course cannot contain the supported spawn envelope')
     if cfg['turn_width'] <= 2*(math.hypot(cfg['spawn_half_length'],cfg['spawn_half_width'])+cfg['spawn_margin']):
@@ -81,7 +85,7 @@ def validate(cfg):
     return cfg
 
 
-def tile(rng, kind, level, sample, levels, bounds, cfg):
+def tile(rng, kind, level, sample, levels, bounds, cfg, response=None):
     """Real solid walls on level ground; route avoids every wall interior."""
     from .all_terrain_geometry import _coverage_fraction
     strength = level/max(levels-1,1)
@@ -89,14 +93,23 @@ def tile(rng, kind, level, sample, levels, bounds, cfg):
     if kind == 'corner': low = max(low,cfg['turn_width'])
     fraction = _coverage_fraction(rng,sample,cfg['samples_per_kind_level'])
     width = cfg['width_range'][1]-(cfg['width_range'][1]-low)*fraction
+    if kind == 'corridor' and 'corridor_width_m' in cfg:
+        width = cfg['corridor_width_m']
     height = float(rng.uniform(*cfg['wall_height_range']))
     t = cfg['wall_thickness']
     rects = []
     def box(x0,x1,y0,y1): rects.append((x0,x1,y0,y1,height))
+    variant = 'wall'
     if kind == 'single_wall':
-        sign = -1 if sample % 2 else 1
-        if sign > 0: box(-4.,4.,width/2,width/2+t)
-        else: box(-4.,4.,-width/2-t,-width/2)
+        half_length, thickness = 4., t
+        if enabled(response):
+            variant = ('wall','finite_wall','post','post')[sample % 4]
+            if variant != 'wall':
+                half_length = response['finite_wall_half_length_m'] if variant == 'finite_wall' else response['post_half_width_m']
+                thickness = t if variant == 'finite_wall' else 2*response['post_half_width_m']
+        sign = (-1 if rng.random() < .5 else 1) if enabled(response) else (-1 if sample % 2 else 1)
+        if sign > 0: box(-half_length,half_length,width/2,width/2+thickness)
+        else: box(-half_length,half_length,-width/2-thickness,-width/2)
     elif kind in ('corridor','doorway','front_stop'):
         outer = width if kind != 'doorway' else cfg['width_range'][1]
         box(-4.,4.,outer/2,outer/2+t)
@@ -120,7 +133,7 @@ def tile(rng, kind, level, sample, levels, bounds, cfg):
         route = [(x,-y) for x,y in route]
     record = dict(wall_kind=kind,wall_width=width,wall_lower_width=low,wall_rectangles=rects,
         wall_route=route,width=width,motion_variant='wall_'+kind,
-        wall_boundary=fraction >= .8)
+        wall_boundary=fraction >= .8, obstacle_variant=variant)
     grid = (np.array(bounds[:2]),np.array(bounds[2:]),np.zeros((2,2)))
     return grid,rects,record,(*route[-1],0.)
 
@@ -232,7 +245,9 @@ class WallPractice:
         state,env,cfg = self.state,self.state.env,self.cfg
         if self.command_tick == env.common_step_counter:return self.command_cache
         d = env.scene['robot'].data
-        ids = self.active.nonzero().flatten()
+        holding = getattr(state, 'wall_hold', None)
+        eligible = self.active if holding is None else self.active & ~holding.active
+        ids = eligible.nonzero().flatten()
         result = torch.zeros_like(self.command_cache)
         if ids.numel():
             routes = self.routes[state.tile[ids]]
@@ -294,5 +309,10 @@ class WallPractice:
         self.measure()
         cfg = self.cfg
         proximity = ((cfg['safe_margin']-self.clearance)/cfg['safe_margin']).clamp(0,4).square()
+        response = self.state.cfg.get('obstacle_response',{})
+        delta_weight, jerk_weight = cfg['leg_delta_weight'], cfg['leg_jerk_weight']
+        if enabled(response):
+            delta_weight += response['leg_delta_weight']
+            jerk_weight += response['leg_jerk_weight']
         return self.active*(cfg['clearance_weight']*proximity+
-            cfg['leg_delta_weight']*self.delta_cost.clamp(max=16)+cfg['leg_jerk_weight']*self.jerk_cost.clamp(max=16))
+            delta_weight*self.delta_cost.clamp(max=16)+jerk_weight*self.jerk_cost.clamp(max=16))

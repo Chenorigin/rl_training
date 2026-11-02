@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 双墙直线通道，沿 +X 前进，地面 z=0，两端开放，无顶棚。
+     只改 width 即可调整两墙内侧净宽，默认出生垫宽度也会同步缩放。
+     corridor_length 为墙体全长，范围 [-length/2, length/2]。
+     wall_height、wall_thickness 分别为墙的完整高度和厚度；单位均为米。
+     出生点默认在通道中心，朝 +X；终点统计自动取 length/2。
+     地面是无限碰撞平面，长度只控制墙体。
+     这是参数化模板，须通过项目部署程序的 terrain-xml 参数加载。
+     修改后重启部署。显式 XML spawn_mat_size 或命令行出生垫尺寸优先，
+     若显式配置超过通道宽度，仍会按原规则拒绝，不会静默修改。
+-->
+<mujoco model="straight_corridor">
+  <compiler angle="radian"/>
+  <custom>
+    <text name="terrain_kind" data="custom"/>
+    <!-- 唯一净宽参数；无需再计算墙坐标。 -->
+    <numeric name="width" data="1.0"/>
+    <numeric name="corridor_length" data="20.0"/>
+    <numeric name="wall_height" data="1.2"/>
+    <numeric name="wall_thickness" data="0.2"/>
+    <numeric name="friction" data="1.0 0.01 0.01"/>
+    <numeric name="spawn_xy" data="0.0 0.0"/>
+    <numeric name="spawn_yaw_deg" data="0"/>
+  </custom>
+</mujoco>

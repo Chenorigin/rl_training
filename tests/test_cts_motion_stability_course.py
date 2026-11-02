@@ -24,7 +24,9 @@ STABILITY = dict(lateral_speed=[.08, .35], lateral_travel_m=.6,
 def sources():
     settings = json.loads((Path(__file__).resolve().parents[1]/'configs/distillation/cts.json').read_text())
     settings['all_terrain'].pop('compound_commands', None)
-    settings['all_terrain'].pop('wall_practice', None)  # Freeze pre-wall mode/geometry contract.
+    # Pin the v14 fixture; later optional objectives have separate tests.
+    for key in ('wall_hold_practice','stair_hold_practice','wall_practice','safety_learning','stair_recovery','obstacle_response','stair_walls','hind_ascent','front_descent','wall_stability','clutter_consistency','objective_consistency','motion_quality'):
+        settings['all_terrain'].pop(key,None)
     current = deepcopy(settings)
     settings['all_terrain'].pop('motion_stability', None)
     settings['all_terrain'].pop('startup_stability', None)

@@ -213,7 +213,7 @@ def test_stair_mask_view_and_resume_reject_unknown_or_negative_motion_accounting
 
 def test_v8_deploy_schema_remains_supported_and_current_config_requires_real_motion():
     cfg=default_settings();validate_config(cfg)
-    assert VERSION.endswith('_v16') and 'm20_cts_action_latent_v8' in LEGACY_VERSIONS
+    assert VERSION.endswith('_v26') and 'm20_cts_action_latent_v8' in LEGACY_VERSIONS
     cfg.pop('motion_practice');cfg.pop('straight_practice');validate_config(cfg,legacy=True)
     with pytest.raises(ValueError):validate_config(cfg)
     for key,value in (('patch_width',1.),('patch_length',1.),('fraction',True),('slope_degrees',[6,12]),

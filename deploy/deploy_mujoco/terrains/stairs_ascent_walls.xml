@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 小区安全通道式直跑楼梯：起步走廊、楼梯、顶部平台，两侧实体墙。
+     经现有 terrain_loader.py 加载；本模板不含机器人，不是折返楼梯。
+     修改 custom 中的 data 后重启部署。尺寸单位 m，均为全尺寸。
+     两个开关相互独立，复用 stairs_ascent / stairs_ascent_open 的同一生成器。 -->
+<mujoco model="ascent_stairwell_terrain">
+  <compiler angle="radian"/>
+  <custom>
+    <text name="terrain_kind" data="ascent"/>
+    <!-- 0：实心带踢面；1：open，仅水平踏板，没有竖直踢面。 -->
+    <numeric name="open_risers" data="0"/>
+    <!-- 0：无墙；1：左右两侧都有实体碰撞墙，出入口不封堵。 -->
+    <numeric name="walls_enabled" data="1"/>
+    <!-- width 是踏面全宽；两墙内侧净宽 = width + 2 * wall_gap。 -->
+    <numeric name="width" data="1.4"/>
+    <numeric name="wall_gap" data="0.0"/>
+    <!-- wall_height 是每段墙高出相邻踏面的高度；wall_thickness 是墙厚。
+         墙底延伸至地面，墙顶随阶高升高，覆盖起步区与整个顶部平台。 -->
+    <numeric name="wall_height" data="2.0"/>
+    <numeric name="wall_thickness" data="0.18"/>
+    <!-- 摩擦三项：滑动 / 扭转 / 滚动；作用于踏面、墙和底面。 -->
+    <numeric name="friction" data="1.0 0.01 0.01"/>
+    <!-- 世界 +X 上楼，+Y 左侧。z 自动根据实际支撑面计算。 -->
+    <numeric name="spawn_xy" data="-1.0 0.0"/>
+    <numeric name="spawn_yaw_deg" data="0"/>
+    <numeric name="start_x" data="0.25"/>
+    <!-- approach_length：首阶之前的走廊长度；open 模式出生点必须在此范围内。 -->
+    <numeric name="approach_length" data="2.0"/>
+    <numeric name="step_height" data="0.17"/>
+    <numeric name="tread_depth" data="0.30"/>
+    <numeric name="step_count" data="12"/>
+    <!-- 顶部平台与末阶同高，总高度 = step_height * step_count。 -->
+    <numeric name="platform_length" data="2.0"/>
+    <!-- 仅 open 模式使用的防坠底面；实心模式地面固定 z=0。 -->
+    <numeric name="floor_height" data="-0.5"/>
+  </custom>
+</mujoco>

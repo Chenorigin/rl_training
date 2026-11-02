@@ -19,7 +19,7 @@ class AllTerrainImporterCfg(TerrainImporterCfg):
 class AllTerrainImporter(TerrainImporter):
     def __init__(self,cfg):
         from .all_terrain_geometry import build_atlas
-        self.atlas = build_atlas(cfg.settings['geometry'],cfg.settings.get('wall_practice'))
+        self.atlas = build_atlas(cfg.settings['geometry'],cfg.settings.get('wall_practice'),cfg.settings.get('obstacle_response'),cfg.settings.get('stair_walls'))
         super().__init__(cfg)
         from .practice import cohort_mask
         from .all_terrain_curriculum import allocate_courses
@@ -114,8 +114,25 @@ class AllTerrainImporter(TerrainImporter):
             if not receipt['face_start'] <= face < receipt['face_end']:
                 raise RuntimeError(f'Physical terrain face/material order mismatch on tile {index}: {face}')
             max_error = max(max_error,error)
+        from .stair_walls import physical_probes
+        wall_probes=0
+        wall_error=0.
+        for index,point,height in physical_probes(self.atlas):
+            receipt=self.contact_receipt[index]
+            hit=query.raycast_closest((*point,height+1.),(0.,0.,-1.),
+                height-float(self.atlas.tile_meshes[index].bounds[0,2])+2.)
+            if (not hit.get('hit') or str(hit.get('collision'))!=receipt['collision_path']
+                    or str(hit.get('material'))!=receipt['material_path']):
+                raise RuntimeError(f'Physical stair wall missing or material changed: tile {index}, {hit}')
+            position=hit['position']
+            z=float(position.z if hasattr(position,'z') else position[2])
+            error=abs(z-height)
+            if not np.isfinite(error) or error>2.e-4:
+                raise RuntimeError(f'Physical stair wall height mismatch: tile {index}, {error}')
+            wall_error=max(wall_error,error);wall_probes+=1
         self.contact_validation = dict(tiles_checked=len(xy),height_error_max_m=max_error,
-            collision_meshes=len(self.contact_receipt),material_subsets=0,cooked_materials_verified=True)
+            collision_meshes=len(self.contact_receipt),material_subsets=0,cooked_materials_verified=True,
+            stair_wall_probes=wall_probes,stair_wall_height_error_max_m=wall_error)
         return dict(self.contact_validation)
 
 
@@ -190,6 +207,14 @@ def configure_all_terrain(cfg,settings,algorithm):
         from .stability import reset_supported_start_joints
         cfg.events.startup_joints = EventTermCfg(func=reset_supported_start_joints, mode='reset')
     cfg.observations.locomotion_scan.scan.func = terms.locomotion_scan
+    if settings.get('front_descent',{}).get('enabled'):
+        from . import front_descent
+        for name in ('front_descent_air','front_descent_stall'):
+            setattr(cfg.rewards,name,RewardTermCfg(func=getattr(front_descent,name),weight=1.))
+    if settings.get('hind_ascent',{}).get('enabled'):
+        from . import hind_ascent
+        for name in ('hind_stable_step','hind_supported_progress','hind_ascent_slip'):
+            setattr(cfg.rewards,name,RewardTermCfg(func=getattr(hind_ascent,name),weight=1.))
     cfg.observations.safety.safety.func = terms.teacher_safety
     cfg.observations.teacher.velocity_commands.func = terms.clean_commands
     cfg.observations.teacher_critic.material_friction.func = terms.material_friction
@@ -206,8 +231,11 @@ def configure_all_terrain(cfg,settings,algorithm):
     cfg.sim.physx.gpu_collision_stack_size = settings['simulation']['collision_stack_mib']*1024**2
     # Each route has its own timeout; this only bounds the manager's metadata.
     geom,cmd = settings['geometry'],settings['commands']
+    recovery = settings.get('stair_recovery',{})
+    minimum_speed = recovery['speed_m_s'][0] if recovery.get('enabled') else cmd['forward_speed'][0]
+    pause_budget = recovery['pause_timeout_s'] if recovery.get('enabled') else 0.
     cfg.episode_length_s = (2*geom['steps_range'][1]*geom['depth_range'][1]+geom['platform_length_range'][1]
-        +geom['route_start']+geom['goal_landing'])/cmd['forward_speed'][0]+cmd['route_time_margin_s']+cmd['stop_s']
+        +geom['route_start']+geom['goal_landing'])/minimum_speed+cmd['route_time_margin_s']+cmd['stop_s']+pause_budget
 
 
 def make_env(cfg):

@@ -3,11 +3,13 @@ import math
 
 
 def validate_capture(cfg):
-    if not isinstance(cfg,dict) or set(cfg) != {'padding_m'}:
+    if not isinstance(cfg,dict) or set(cfg) not in ({'padding_m'}, {'padding_m', 'support_surface_visibility'}):
         raise ValueError('Unknown or missing CTS map capture setting')
     p = cfg['padding_m']
     if type(p) not in (float,int) or not math.isfinite(p) or not 0 <= p <= 2.:
         raise ValueError('CTS map capture padding must be finite in [0,2]')
+    if 'support_surface_visibility' in cfg and type(cfg['support_surface_visibility']) is not bool:
+        raise ValueError('support_surface_visibility must be boolean')
     return cfg
 
 

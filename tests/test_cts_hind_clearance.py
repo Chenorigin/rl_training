@@ -133,6 +133,38 @@ def test_invalid_configuration_fails_closed(key):
 def test_new_defaults_and_old_checkpoint_config_remain_readable():
     c = default_settings()
     assert validate_config(c) is c
+    c['all_terrain'].pop('stair_stop', None)
+    c['all_terrain'].pop('wall_hold_practice', None)
+    c['all_terrain'].pop('stair_hold_practice', None)
+    c['all_terrain'].pop('motion_quality', None)
+    c['all_terrain'].pop('objective_consistency')  # Pre-feature checkpoint.
+    c['all_terrain'].pop('hind_ascent')
+    c['all_terrain'].pop('front_descent')
     c['all_terrain'].pop('hind_clearance')
     assert validate_config(c) is c
     assert validate_hind_clearance({**cfg(), 'enabled':False})['enabled'] is False
+
+
+def test_spawn_height_is_not_subtracted_from_absolute_tread_geometry():
+    a=sample(force_x=-150.)
+    g=dict(position=a['position'],axis=a['axis'],force=a['force'],supported=a['supported'],
+           height=a['support_height'],command=torch.tensor([[.3,0,0]]))
+    rect=torch.tensor([[[1.,1.3,-.6,.6,.2],[1.3,3.,-.6,.6,.4]]])
+    state=SimpleNamespace(cfg={'hind_clearance':cfg()},surface=SimpleNamespace(rectangles=rect),
+          observe=lambda:g,origins=torch.tensor([[0.,0.,3.]]),tile=torch.zeros(1,dtype=torch.long),stairs=torch.ones(1,dtype=torch.bool))
+    env=SimpleNamespace(cfg=SimpleNamespace(stair_tail=SimpleNamespace(wheel_radius=.09,wheel_half_length=.027)))
+    with patch('task_support.cts.all_terrain_course.course',return_value=state):
+        at_height=hind_step_clearance(env)
+        state.origins[:,2]=0.
+        torch.testing.assert_close(at_height,hind_step_clearance(env))
+        g['force'][:,2,0]=torch.nan
+        assert torch.isfinite(hind_riser_contact(env)).all() and (hind_riser_contact(env)<0).all()
+
+
+@pytest.mark.parametrize('value',[float('nan'),float('inf'),-float('inf')])
+@pytest.mark.parametrize('moving',[True,False])
+def test_invalid_force_never_leaks_nan_through_inactive_riser_mask(value,moving):
+    a=sample(command=moving);a['force'][...,0]=value
+    result=clearance_signals(**a)
+    assert torch.isfinite(result['riser']).all() and torch.isfinite(result['clearance']).all()
+    assert (result['riser']==int(moving)).all()

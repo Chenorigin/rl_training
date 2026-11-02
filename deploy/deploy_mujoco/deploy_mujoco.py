@@ -263,7 +263,7 @@ class M20Contract:
             scan[i] = np.clip(base_pos[2] - hit_z - SCAN_OFFSET, -1.0, 1.0)
         return scan
 
-    def capture_height_scan(self, data, grid):
+    def capture_height_scan(self, data, grid, *, return_normals=False):
         """Additional measured terrain rays; missed outer rays remain unknown."""
         rotation = data.xmat[self.base_id].reshape(3,3)
         base = data.xpos[self.base_id]
@@ -272,14 +272,16 @@ class M20Contract:
         xy = np.column_stack((base[0]+co*grid[:,0]-si*grid[:,1],
                               base[1]+si*grid[:,0]+co*grid[:,1]))
         hits = np.column_stack((xy,np.full(len(grid),np.nan)))
+        normals = np.full_like(hits, np.nan) if return_normals else None
         origin = np.array([0.,0.,max(base[2]+SCAN_HEIGHT,self.terrain.ray_top)])
         for i,point in enumerate(xy):
             origin[:2] = point
             distance,geom,flex = terrain_ray(self.model,data,origin,np.array([0.,0.,-1.]),
-                                             self.terrain_group,self.terrain_flex_ids)
+                                             self.terrain_group,self.terrain_flex_ids,
+                                             normal=normals[i] if return_normals else None)
             if distance >= 0 and (flex >= 0 or geom in self.terrain_geom_ids):
                 hits[i,2] = origin[2]-distance
-        return hits
+        return (hits, normals) if return_normals else hits
 
     def observe(self, data: mujoco.MjData, command: np.ndarray, previous_action: np.ndarray) -> np.ndarray:
         body_velocity = np.zeros(6, dtype=np.float64)

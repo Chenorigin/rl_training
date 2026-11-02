@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 无踢面上楼梯：仅水平零厚度三角面，无竖直面、侧面或底面。
+<!-- 无踢面上楼梯：踏板仅水平零厚度三角面，本体无踢面、侧面或底面。
+     可通过 walls_enabled 单独启用两侧实体墙。
      通过 deploy_mujoco.py / terrain_loader.py 生成静态 rigid flex 碰撞面。
      本机 MuJoCo 3.10 已验证 radius=0 的 rigid flex 可碰撞承重。
      显示 site 的顶面与碰撞面同坐标，永不参与物理碰撞或高度扫描。
@@ -10,6 +11,12 @@
     <!-- 沿世界 +X 上楼；保留 ascent 类型以复用控制和终线逻辑。 -->
     <text name="terrain_kind" data="ascent"/>
     <numeric name="open_risers" data="1"/>
+    <!-- 可将 open_risers 改为 0 恢复实心楼梯；独立切换左右实体墙。 -->
+    <numeric name="walls_enabled" data="0"/>
+    <!-- 两墙内侧净宽 = width + 2 * wall_gap；墙高从相邻踏面向上量。 -->
+    <numeric name="wall_gap" data="0.0"/>
+    <numeric name="wall_height" data="2.0"/>
+    <numeric name="wall_thickness" data="0.18"/>
     <!-- width：踏板左右全宽；friction：滑动/扭转/滚动摩擦。 -->
     <numeric name="width" data="4.0"/>
     <numeric name="friction" data="1.0 0.01 0.01"/>

@@ -44,7 +44,8 @@ def test_every_shipped_terrain_has_visible_physical_mat_at_reset(tmp_path, name)
     assert model.geom_bodyid[mat] == 0 and model.geom_group[mat] == 0
     assert model.geom_contype[mat] and model.geom_conaffinity[mat]
     assert model.geom_rgba[mat, 3] == 1.
-    np.testing.assert_allclose(model.geom_size[mat]*2, DEFAULT_SIZE)
+    expected_size = contract.terrain.parameters.get('spawn_mat_size', DEFAULT_SIZE)
+    np.testing.assert_allclose(model.geom_size[mat]*2, expected_size)
     np.testing.assert_allclose(data.qpos[:2], model.geom_pos[mat, :2])
     assert mat in contract.terrain_geom_ids
     assert contract.ground_height(data, *contract.terrain.spawn_xy) == pytest.approx(contract.terrain.spawn_mat["top_z"])

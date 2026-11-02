@@ -33,7 +33,8 @@ class AllTerrainCourse:
         self.curriculum = CourseCurriculum(self.cfg['curriculum'], num_courses=len(COURSES)*self.num_groups)
         self.rng = np.random.default_rng(self.cfg['geometry']['seed']+927)
         self.atlas = env.scene.terrain.atlas
-        self.surface = TorchSurface(self.atlas, device)
+        self.surface = TorchSurface(self.atlas, device, include_stair_walls=False)
+        self.ray_surface = (TorchSurface(self.atlas,device) if self.cfg.get('stair_walls',{}).get('enabled') else self.surface)
         self.origins = torch.as_tensor(self.atlas.origins, device=device, dtype=torch.float32)
         self.goals = torch.as_tensor(self.atlas.goals, device=device, dtype=torch.float32)
         self.bounds = torch.as_tensor(self.atlas.bounds, device=device, dtype=torch.float32)
@@ -62,6 +63,7 @@ class AllTerrainCourse:
         self.finished = self.success.clone()
         self.foot_passed = torch.zeros(n,4,dtype=torch.bool,device=device)
         self.stable_age = torch.zeros(n,device=device)
+        self.stable_steps = torch.zeros(n,dtype=torch.long,device=device)
         self.best_x = self.stable_age.clone()
         self.progress = self.stable_age.clone()
         self.tracking_error = torch.zeros(n,2,device=device)
@@ -105,6 +107,37 @@ class AllTerrainCourse:
         if self.has_walls:
             from .wall_practice import WallPractice
             self.walls = WallPractice(self)
+        self.recovery = None
+        if self.cfg.get('stair_recovery',{}).get('enabled'):
+            from .stair_recovery import StairRecovery
+            self.recovery = StairRecovery(self)
+        self.stair_hold = None
+        if self.cfg.get('stair_hold_practice',{}).get('enabled'):
+            from .stair_hold_practice import StairHoldPractice
+            self.stair_hold = StairHoldPractice(self)
+        self.wall_hold = None
+        if self.cfg.get('wall_hold_practice', {}).get('enabled'):
+            from .wall_hold_practice import WallHoldPractice
+            self.wall_hold = WallHoldPractice(self)
+        self.stair_walls = None
+        if self.cfg.get('stair_walls',{}).get('enabled'):
+            from .stair_walls import StairWalls
+            self.stair_walls = StairWalls(self)
+        self.front_descent = None
+        if self.cfg.get('front_descent',{}).get('enabled'):
+            from .front_descent import FrontDescent
+            self.front_descent = FrontDescent(self)
+        self.hind_ascent = None
+        if self.cfg.get('hind_ascent',{}).get('enabled'):
+            from .hind_ascent import HindAscent
+            self.hind_ascent = HindAscent(self)
+        from .objective_consistency import enabled, ObjectiveConsistency
+        self.objectives = ObjectiveConsistency(self) if enabled(self.cfg) else None
+        from .motion_quality import MotionQuality
+        self.quality = MotionQuality(self) if self.cfg.get('motion_quality', {}).get('enabled') else None
+        if self.objectives is not None:
+            self.failure_counts.update({key:torch.zeros_like(self.episodes) for key in
+                                        ('goal', 'linear_tracking', 'yaw_tracking')})
         self.physics = None
         self.update_id = 0
         self.last_tick = -1
@@ -112,6 +145,8 @@ class AllTerrainCourse:
         self.ray_error_max = 0.
         self.ray_checks = 0
         self.ray_checks_by_course = torch.zeros(len(COURSES),dtype=torch.long,device=device)
+        if self.quality is not None:
+            self.failure_counts.update({key:torch.zeros_like(self.episodes) for key in ('heading', 'hold_quality')})
         self.platform_risk = torch.zeros(n,device=device)
         self.measure_tick = -1
         self.straight_frames = torch.zeros(2, device=device, dtype=torch.long)
@@ -130,23 +165,31 @@ class AllTerrainCourse:
     def raw_command(self):
         age = self.env.episode_length_buf.double()*self.env.step_dt
         cfg = self.cfg['commands']
-        active = (age >= cfg['initial_hold_s']) & torch.where(self.stairs, ~self.reached,
-                   age < cfg['initial_hold_s']+self.move_duration)
+        from .wall_stability import initial_hold
+        hold = initial_hold(self)
+        active = (age >= hold) & torch.where(self.stairs, ~self.reached,
+                   age < cfg['initial_hold_s']+self.move_duration.double())
         if self.motion_stability is None:
-            return self.command_value*active[:,None]
-        sequence = command_sequence(self.command_value, age-cfg['initial_hold_s'],
+            result = self.command_value*active[:,None]
+            result = self.recovery.command(result) if self.recovery is not None else result
+            result = self.objectives.command(result) if self.objectives is not None else result
+            return torch.where(self.wall_hold.active[:,None], 0., result) if self.wall_hold is not None else result
+        sequence = command_sequence(self.command_value, age-hold,
             self.move_duration, self.command_ramp, self.arc_transition)
         if self.compound:
             from .compound_commands import compound_sequence
             combined = (self.command_value.abs() > 0).sum(-1) == 2
-            replacement = compound_sequence(self.command_value, age-cfg['initial_hold_s'],
+            replacement = compound_sequence(self.command_value, age-hold,
                 self.move_duration, self.command_ramp, self.arc_transition, self.compound_secondary_last)
             sequence = torch.where(combined[:, None], replacement, sequence)
         practice = (self.course_ids >= 3) & (self.course_ids <= 7)
         result = torch.where(practice[:,None],sequence,self.command_value)*active[:,None]
         if self.walls is not None:
             result = torch.where(self.walls.active[:,None],self.walls.command(),result)
-        return result
+        if self.recovery is not None:
+            result = self.recovery.command(result)
+        result = self.objectives.command(result) if self.objectives is not None else result
+        return torch.where(self.wall_hold.active[:,None], 0., result) if self.wall_hold is not None else result
 
     def tags(self):
         cmd = self.raw_command()
@@ -154,11 +197,24 @@ class AllTerrainCourse:
         anchor = (self.course_ids == 3) | (self.course_ids == 8) | (self.course_ids == 9)
         anchor |= self.stairs & (self.geometry_level == 0)
         if self.walls is not None:anchor &= ~self.walls.active
-        return {'cts_straight':straight.clone(), 'cts_anchor':anchor.clone(), 'cts_course':self.course_ids.clone()}
+        if self.stair_hold is not None:anchor &= ~self.stair_hold.active
+        tags = {'cts_straight':straight.clone(), 'cts_anchor':anchor.clone(), 'cts_course':self.course_ids.clone()}
+        if self.cfg.get('clutter_consistency',{}).get('enabled'):
+            flat = self.flat_tiles[self.tile].clone()
+            if self.walls is not None: flat |= self.walls.active
+            g = self.observe()
+            tags['cts_clutter'] = (flat & ~self.failed & (g['supported'].sum(-1) >= 3)).clone()
+        from .wall_stability import settings, collection_tags
+        if settings(self.cfg) is not None:
+            tags.update(collection_tags(self, self.observe(), cmd))
+        if self.wall_hold is not None and self.wall_hold.handover is not None:
+            tags['cts_policy_active'] = self.wall_hold.handover.policy_active().clone()
+        return tags
 
     def reset(self, ids):
         env, cfg = self.env, self.cfg['commands']
         if not len(ids):return
+        if self.stair_hold is not None:self.stair_hold.select(ids)
         mode = (self.resets[ids]+self.rank[ids]) % self.base_num_modes
         mode[self.stairs[ids] | (self.course_ids[ids] == 8)] = 0
         platform = self.course_ids[ids] == 9
@@ -171,20 +227,25 @@ class AllTerrainCourse:
                 self.cfg['wall_practice']['episode_fraction'],device=ids.device)
             kind = (self.resets[ids]+self.rank[ids]) % len(KINDS)
             mode[wall] = MODE_START+kind[wall]
+        if self.wall_hold is not None:
+            mode[self.wall_hold.active[ids]] = 20  # existing physical corridor geometry
         self.mode[ids] = mode
         groups = torch.tensor(MODE_GROUPS[:self.num_modes],device=ids.device)[mode]
         self.group[ids] = self.course_ids[ids]*self.num_groups+groups
         tiles, levels, domains, versions, roles = [], [], [], [], []
-        for c, group, current_mode in zip(self.course_ids[ids].tolist(),self.group[ids].tolist(),mode.tolist()):
-            draw = self.curriculum.sample(group)
-            g = draw['geometry_level'];pool = self.pools[c,g]
+        for i,c,group,current_mode in zip(ids.tolist(),self.course_ids[ids].tolist(),self.group[ids].tolist(),mode.tolist()):
+            holding = self.stair_hold is not None and bool(self.stair_hold.active[i])
+            wall_holding = self.wall_hold is not None and bool(self.wall_hold.active[i])
+            scheduler = self.wall_hold.curriculum if wall_holding else self.stair_hold.curriculum if holding else self.curriculum
+            draw = scheduler.sample(int(self.wall_hold.group[i]) if wall_holding else int(c == 2) if holding else group)
+            g = draw['geometry_level'];pool = self.stair_hold.pools[c,g] if holding else self.pools[c,g]
             if self.has_walls and c == 3:
                 from .wall_practice import KINDS, MODE_START
                 kind = KINDS[current_mode-MODE_START] if current_mode >= MODE_START else None
                 pool = np.array([i for i in pool if self.atlas.records[i].get('wall_kind') == kind],dtype=np.int64)
                 if not len(pool):raise ValueError('Wall course has no matching physical geometry pool')
             # Explicit boundary exposure, still sampling actual continuously generated geometry.
-            edge = np.array([i for i in pool if self.atlas.records[i]['boundary']],dtype=np.int64)
+            edge = np.array([j for j in pool if (bool(self.stair_hold.boundary_tiles[j]) if holding else self.atlas.records[j]['boundary'])],dtype=np.int64)
             choices = edge if len(edge) and self.rng.random() < .25 else pool
             tiles.append(int(self.rng.choice(choices)))
             levels.append(g);domains.append(draw['dr_level']);versions.append(draw['version']);roles.append(draw['role'])
@@ -316,16 +377,24 @@ class AllTerrainCourse:
             self.command_value[chosen] = torch.stack((self.walls.speed[chosen],
                 torch.zeros_like(self.walls.speed[chosen]),torch.zeros_like(self.walls.speed[chosen])),-1)
             self.arc_transition[chosen] = False
+        if self.recovery is not None:
+            self.recovery.reset(ids,position)
+        if self.stair_hold is not None:self.stair_hold.reset(ids,position,quat)
+        if self.wall_hold is not None:self.wall_hold.reset(ids,position,quat)
         robot.write_root_pose_to_sim(torch.cat((position,quat),-1),env_ids=ids)
         robot.write_root_velocity_to_sim(torch.zeros(len(ids),6,device=ids.device),env_ids=ids)
         route = (self.goals[self.tile[ids],0]-origin[:,0]).clamp_min(0)
         self.timeout[ids] = torch.where(self.stairs[ids], route/cfg['forward_speed'][0]+cfg['route_time_margin_s'],
             self.move_duration[ids]+cfg['initial_hold_s']+cfg['stop_s'])
+        if self.recovery is not None:
+            minimum = self.recovery.cfg['speed_m_s'][0]
+            self.timeout[ids] = torch.where(self.recovery.active[ids],
+                route/minimum+cfg['route_time_margin_s']+self.recovery.cfg['pause_timeout_s'],self.timeout[ids])
         if self.physics is None:
             from .all_terrain_physics import ContinuousPhysics
             self.physics = ContinuousPhysics(env,self.cfg['domain'])
         self.physics.apply(ids,self.dr_level[ids])
-        for tensor in (self.success,self.failed,self.reached,self.finished,self.foot_passed,self.stable_age,
+        for tensor in (self.success,self.failed,self.reached,self.finished,self.foot_passed,self.stable_age,self.stable_steps,
                        self.progress,self.tracking_error,self.tracking_frames):
             tensor[ids] = 0
         if self.motion_stability is not None:
@@ -336,10 +405,28 @@ class AllTerrainCourse:
             self.command_energy[ids] = 0.
             self.tracking_ok[ids] = self.stop_ok[ids] = False
             self.displacement_ok[ids] = (mode != 9) & (mode != 10)
+        from .wall_stability import initial_hold
+        hold = initial_hold(self)
+        if isinstance(hold, torch.Tensor):
+            self.timeout[ids] += hold[ids]-cfg['initial_hold_s']
+        if self.stair_hold is not None:
+            chosen = ids[self.stair_hold.active[ids]]
+            self.timeout[chosen] = self.stair_hold.cfg['timeout_s']
+        if self.wall_hold is not None:
+            self.timeout[ids[self.wall_hold.active[ids]]] = self.wall_hold.cfg['timeout_s']
+        if self.wall_hold is not None and self.wall_hold.handover is not None:
+            h = self.wall_hold.handover
+            chosen = ids[h.active[ids]]
+            self.timeout[chosen] += h.cfg['standing_s_range'][1]
         self.best_x[ids] = position[:,0]
         self.resets[ids] += 1
         self.measure_tick = -1
         self.geometry = None
+        if self.objectives is not None:self.objectives.reset(ids)
+        if self.quality is not None:self.quality.reset(ids)
+        if self.stair_walls is not None:self.stair_walls.reset(ids)
+        if self.front_descent is not None:self.front_descent.reset(ids)
+        if self.hind_ascent is not None:self.hind_ascent.reset(ids)
 
     def observe(self):
         """Pure current geometry, safe during observation-manager construction/reset."""
@@ -368,14 +455,25 @@ class AllTerrainCourse:
         slip = tangent.norm(dim=-1)*supported
         root_height, root_normal = self.surface.sample(self.tile,d.root_pos_w[:,:2])
         cmd = env.command_manager.get_command('base_velocity')
+        if self.quality is not None:
+            q = self.quality
+            executed = q.selected & q.valid & (q.begin_tick == env.common_step_counter-1)
+            cmd = torch.where(executed[:,None],q.pre_command,cmd)
         error = (d.root_lin_vel_b[:,:2]-cmd[:,:2]).square().sum(-1)
-        yaw_error = (d.root_ang_vel_b[:,2]-cmd[:,2]).square()
+        yaw_command = cmd[:,2]
+        if self.recovery is not None:
+            yaw_command = torch.where(self.stairs & self.recovery.command_valid,
+                self.recovery.effective_command[:,2],yaw_command)
+        if self.objectives is not None:
+            yaw_command = torch.where(self.objectives.command_valid, self.objectives.command_seen[:,2], yaw_command)
+        yaw_error = (d.root_ang_vel_b[:,2]-yaw_command).square()
         cc = self.cfg['commands']
         stopped = (d.root_lin_vel_b[:,:2].norm(dim=-1) <= cc['stop_speed_m_s']) & (d.root_ang_vel_b[:,2].abs() <= cc['stop_yaw_rad_s'])
         self.geometry = {'position':pos,'normal':normal,'height':height,'clearance':torch.nan_to_num(clearance),
             'supported':supported,'force':force,'force_n':force_n,'velocity':velocity,'axis':axis,
             'slip':torch.nan_to_num(slip),'root_normal':root_normal,'root_height':root_height,
             'error':error,'yaw_error':yaw_error,'stopped':stopped,'command':cmd.clone(),
+            'tracking_command':torch.cat((cmd[:,:2],yaw_command[:,None]),-1),
             'measured_velocity':torch.cat((d.root_lin_vel_b[:, :2], d.root_ang_vel_b[:, 2:3]), -1)}
         self.measure_tick = env.common_step_counter
         return self.geometry
@@ -403,6 +501,9 @@ class AllTerrainCourse:
         if self.walls is not None:
             self.walls.measure()
             self.failed |= self.walls.active & (self.walls.clearance < -self.walls.cfg['penetration_limit'])
+        if self.stair_walls is not None:
+            self.failed |= self.stair_walls.failure()
+            self.stair_walls.frame()
         self.failed |= outside | low | (upright < rw['min_upright']) | ~torch.isfinite(root).all(-1) | ~torch.isfinite(root_height)
         platform = self.course_ids == 9
         from .platform import height_risk
@@ -414,28 +515,49 @@ class AllTerrainCourse:
         platform_drop = root[:,2] < self.origins[self.tile,2]+d.default_root_state[:,2]-self.heights[self.tile]*.5
         self.failed |= platform & (height_risk_value > .5) & platform_drop
         self.progress = (root[:,0]-self.best_x).clamp_min(0)*self.stairs
+        if self.objectives is not None:
+            self.progress *= (g['command'][:,0] > 1.e-4)
+            self.objectives.advance(g,height_risk_value)
+        if self.quality is not None:self.quality.advance(g)
         self.best_x = torch.maximum(root[:,0],self.best_x)
         passed = pos[...,0] > self.goals[self.tile,0,None]+.03
         self.foot_passed = (self.foot_passed | (passed & supported)) & passed
-        self.reached |= self.stairs & self.foot_passed.all(-1)
+        traversal = self.stairs if self.stair_hold is None else self.stairs & ~self.stair_hold.active
+        self.reached |= traversal & self.foot_passed.all(-1)
         cmd,error,yaw_error = g['command'],g['error'],g['yaw_error']
         age = env.episode_length_buf.double()*env.step_dt
         cc = self.cfg['commands']
-        moving_phase = (age >= cc['initial_hold_s']) & torch.where(self.stairs,~self.reached,age < cc['initial_hold_s']+self.move_duration)
+        from .wall_stability import initial_hold
+        moving_phase = (age >= initial_hold(self)) & torch.where(self.stairs,~self.reached,age < cc['initial_hold_s']+self.move_duration.double())
         if self.walls is not None:
             moving_phase = torch.where(self.walls.active,cmd.abs().amax(-1) > 1.e-4,moving_phase)
+        if self.recovery is not None:
+            moving_phase &= ~self.stairs | (cmd.abs().amax(-1) > 1.e-4)
+        if self.objectives is not None:
+            moving_phase &= ~self.objectives.high_platform | (cmd.abs().amax(-1) > 1.e-4)
+        tracking_cmd = g['tracking_command'] if self.objectives is not None else cmd
         self.tracking_error += torch.stack((error,yaw_error),-1)*moving_phase[:,None]
         self.tracking_frames += moving_phase
         stopped = g['stopped']
         stable = stopped & (upright > .85) & (supported.sum(-1) >= 2) & ~self.failed
-        stop_phase = torch.where(self.stairs,self.reached,age >= cc['initial_hold_s']+self.move_duration)
+        if self.quality is not None:stable = self.quality.stable(stable)
+        if self.recovery is not None:
+            self.recovery.advance(g,stable)
+        stop_phase = torch.where(self.stairs,self.reached,age >= cc['initial_hold_s']+self.move_duration.double())
         if self.walls is not None:
             stop_phase = torch.where(self.walls.active,self.walls.done,stop_phase)
-        self.stable_age = torch.where(stable & stop_phase,self.stable_age+env.step_dt,0.)
+        if self.objectives is not None:
+            stop_phase = self.objectives.stop_phase(g,stop_phase)
+        if self.quality is not None:
+            stop_phase &= (self.course_ids != 9) | self.quality.holding
+        from .timing import advance_steps, required_steps
+        self.stable_steps = advance_steps(self.stable_steps, stable & stop_phase)
+        self.stable_age = self.stable_steps.to(self.stable_age.dtype)*env.step_dt
+        stop_complete = self.stable_steps >= required_steps(cc["success_hold_s"], env.step_dt)
         tolerance = torch.stack(((self.command_value[:,:2].norm(dim=-1)*cc['relative_tracking_tolerance']+cc['tracking_floor_m_s']).clamp(max=cc['tracking_rms_m_s']),
                                  (self.command_value[:,2].abs()*cc['relative_tracking_tolerance']+cc['yaw_tracking_floor_rad_s']).clamp(max=cc['yaw_tracking_rms_rad_s'])),-1)
         if self.motion_stability is not None:
-            self.command_energy += torch.stack((cmd[:,:2].square().sum(-1),cmd[:,2].square()),-1)*moving_phase[:,None]
+            self.command_energy += torch.stack((tracking_cmd[:,:2].square().sum(-1),tracking_cmd[:,2].square()),-1)*moving_phase[:,None]
             # Straight segments must not dilute yaw error enough that never
             # turning passes a turning sequence. Tighten only this new case;
             # fixed-command and all legacy course tolerances are unchanged.
@@ -451,9 +573,14 @@ class AllTerrainCourse:
             tolerance = torch.where(self.walls.active[:,None],wall_tolerance,tolerance)
         if self.compound:
             measured = g['measured_velocity']
-            self.axis_tracking_error += (measured-cmd).square()*moving_phase[:, None]
-            self.axis_command_energy += cmd.square()*moving_phase[:, None]
-        good_tracking = ((self.tracking_error/self.tracking_frames.clamp_min(1)[:,None]).sqrt() <= tolerance).all(-1)
+            self.axis_tracking_error += (measured-tracking_cmd).square()*moving_phase[:, None]
+            self.axis_command_energy += tracking_cmd.square()*moving_phase[:, None]
+        tracking_axes_ok = (self.tracking_error/self.tracking_frames.clamp_min(1)[:,None]).sqrt() <= tolerance
+        if self.objectives is not None:
+            self.objectives.linear_ok.copy_(tracking_axes_ok[:,0])
+            self.objectives.yaw_ok.copy_(tracking_axes_ok[:,1])
+        quality_axes = self.quality.tracking(tracking_axes_ok) if self.quality is not None else tracking_axes_ok
+        good_tracking = quality_axes.all(-1)
         if self.compound:
             from .compound_commands import axis_tracking_ok
             use = (self.course_ids >= 3) & (self.course_ids <= 7) & (self.mode != 8)
@@ -484,26 +611,40 @@ class AllTerrainCourse:
                 (torch.minimum(self.lateral_actual,self.lateral_support_actual) >=
                  self.lateral_expected*(1-cc['relative_tracking_tolerance'])))
             good_tracking &= self.displacement_ok
-            self.stop_ok.copy_(self.stable_age >= cc['success_hold_s'])
+            self.stop_ok.copy_(stop_complete)
         high_stop = (height_risk_value > .5) & (self.platform_risk > .5) & stopped
         descended = (height_risk_value <= .5) & (
             pos[...,0] > self.origins[self.tile,0,None]+self.ends[self.tile,None]).all(-1)
         platform_complete = torch.where(self.mode == 8,good_tracking,high_stop | (descended & good_tracking))
+        if self.objectives is not None:
+            platform_complete = self.objectives.goal_ok & (self.objectives.high_platform | good_tracking)
         good_tracking = torch.where(platform,platform_complete,good_tracking)
         complete = torch.where(self.stairs,self.reached,good_tracking & (self.tracking_frames > 0))
         if self.walls is not None:
             complete &= ~self.walls.active | self.walls.done
-        self.success |= complete & (self.stable_age >= cc['success_hold_s']) & ~self.failed
+        if self.stair_hold is not None:
+            complete &= ~self.stair_hold.active
+            self.progress *= ~self.stair_hold.active
+            self.stair_hold.advance(g)
+        if self.wall_hold is not None:
+            complete &= ~self.wall_hold.active
+            self.progress *= ~self.wall_hold.active
+            self.wall_hold.advance(g)
+        self.success |= complete & (stop_complete) & ~self.failed
         flat = ((~self.teacher).long()*len(COURSES)+self.course_ids)*self.num_modes+self.mode
-        self.frames.view(-1).add_(torch.bincount(flat,minlength=self.frames.numel()))
+        original = torch.ones_like(self.success) if self.stair_hold is None else ~self.stair_hold.active
+        if self.wall_hold is not None:original &= ~self.wall_hold.active
+        self.frames.view(-1).add_(torch.bincount(flat[original],minlength=self.frames.numel()))
         contact_cell = (~self.teacher).long()*len(COURSES)+self.course_ids
-        self.contact_frames.view(-1).add_(torch.bincount(contact_cell[supported.any(-1)],
+        self.contact_frames.view(-1).add_(torch.bincount(contact_cell[supported.any(-1) & original],
             minlength=self.contact_frames.numel()))
         for index,cohort in enumerate((self.teacher,~self.teacher)):
             selected = cohort & (self.course_ids == 8) & (cmd[:,0] > 0)
             self.straight_frames[index] += selected.sum()
             self.straight_clearance[index] += g['clearance'][selected].clamp_min(0).double().sum(0)
             self.straight_airborne[index] += ((g['clearance'][selected] > rw['flat_clearance_free_m']) & ~supported[selected]).double().sum(0)
+        if self.front_descent is not None:self.front_descent.advance(g)
+        if self.hind_ascent is not None:self.hind_ascent.advance(g)
         self.last_tick = env.common_step_counter
 
     def record(self, ids):
@@ -512,6 +653,8 @@ class AllTerrainCourse:
         ids = ids[done[ids] & ~self.finished[ids] & (self.env.episode_length_buf[ids] > 0)]
         from task_support.student_v1.environment import sensor_state
         delayed = ~sensor_state(self.env).zero_delivery
+        if self.stair_hold is not None:ids = self.stair_hold.record(ids,delayed)
+        if self.wall_hold is not None:ids = self.wall_hold.record(ids,delayed)
         for i in ids.tolist():
             success = bool(self.success[i] and not self.failed[i])
             cohort,c,mode = int(not self.teacher[i]),int(self.course_ids[i]),int(self.mode[i])
@@ -526,6 +669,23 @@ class AllTerrainCourse:
                         'displacement':~self.displacement_ok[i],
                         'stop':~self.failed[i] & ~self.stop_ok[i],
                         'timeout':self.env.termination_manager.time_outs[i]}
+                    if self.objectives is not None:
+                        o = self.objectives
+                        required = ~o.high_platform[i]
+                        conditions['tracking'] &= required
+                        conditions.update(goal=~o.goal_ok[i],
+                            linear_tracking=required & (self.tracking_frames[i]>0) & ~o.linear_ok[i],
+                            yaw_tracking=required & (self.tracking_frames[i]>0) & ~o.yaw_ok[i])
+                    if self.quality is not None:
+                        q = self.quality
+                        heading = q.selected[i] & (self.mode[i] == 0) & required
+                        conditions['yaw_tracking'] &= ~heading
+                        conditions['heading'] = heading & ~q.heading_ok[i]
+                        conditions['hold_quality'] = q.holding[i] & ~q.hold_ok[i]
+                        if c == 9 and mode == 8 and q.cfg.get('idle_terminal_hold', False):
+                            # Historical RMS is logged, but no longer an idle acceptance gate.
+                            conditions['linear_tracking'] = False
+                            conditions['yaw_tracking'] = False
                     for key,condition in conditions.items():
                         self.failure_counts[key][cell] += bool(condition)
                 rms = (self.tracking_error[i]/self.tracking_frames[i].clamp_min(1)).sqrt()
@@ -543,11 +703,13 @@ class AllTerrainCourse:
                     self.sequence_counts[prefix+'_successes'][cell] += selected and success
             self.curriculum.record(int(self.group[i]),success,bool(self.teacher[i]),int(self.role[i]),
                 int(self.version[i]),self.update_id,boundary=bool(self.boundary_tiles[self.tile[i]]),delayed=bool(delayed[i]))
+        if self.stair_walls is not None:self.stair_walls.record(ids)
+        if self.recovery is not None and self.recovery.hold is not None:self.recovery.hold.record(ids)
         self.finished[ids] = True
 
     def check_rays(self):
         hits = self.env.scene.sensors['height_scanner'].data.ray_hits_w
-        expected,_ = self.surface.sample(self.tile,hits[...,:2])
+        expected,_ = self.ray_surface.sample(self.tile,hits[...,:2])
         valid = torch.isfinite(hits).all(-1) & torch.isfinite(expected)
         if valid.any():
             per_env = valid.sum(-1)
@@ -617,8 +779,24 @@ class AllTerrainCourse:
                 last = state['last_window']
                 out[prefix+'last_success_rate'] = last['successes']/last['episodes'] if last else -1.
                 out[prefix+'consecutive_windows'] = state['consecutive_windows']
+        if self.stair_hold is not None:
+            out.update({'stair_hold/'+k:v for k,v in self.stair_hold.diagnostics().items()})
+        if self.wall_hold is not None:
+            out.update({'wall_hold/'+k:v for k,v in self.wall_hold.diagnostics().items()})
+        if self.quality is not None:
+            out.update({'motion_quality/'+k:v for k,v in self.quality.diagnostics().items()})
         if self.physics is not None:
             out.update({'physics/'+key:value for key,value in self.physics.diagnostics().items()})
+        if self.stair_walls is not None:
+            out.update({'stair_walls/'+k:v for k,v in self.stair_walls.diagnostics().items()})
+        if self.front_descent is not None:
+            out.update({'front_descent/'+k:v for k,v in self.front_descent.diagnostics().items()})
+        if self.hind_ascent is not None:
+            out.update({'hind_ascent/'+k:v for k,v in self.hind_ascent.diagnostics().items()})
+        if self.recovery is not None:
+            out.update({'recovery/'+key:float(value) for key,value in self.recovery.diagnostics().items()})
+            if self.recovery.hold is not None:
+                out.update({'stair_stop/'+key:value for key,value in self.recovery.hold.diagnostics().items()})
         if self.walls is not None:
             out['walls/active_environments'] = int(self.walls.active.sum())
             out['walls/envelope_min_clearance_m'] = float(self.walls.clearance[self.walls.active].min()) if self.walls.active.any() else 0.
@@ -646,6 +824,14 @@ class AllTerrainCourse:
         if self.motion_stability is not None:
             result['motion_stability'] = {name:{key:value.cpu().clone() for key,value in getattr(self,name).items()}
                 for name in ('failure_counts','motion_totals','sequence_counts')}
+        if self.stair_hold is not None:result['stair_hold_practice'] = self.stair_hold.snapshot()
+        if self.wall_hold is not None:result['wall_hold_practice'] = self.wall_hold.snapshot()
+        if self.quality is not None:result['motion_quality'] = self.quality.snapshot()
+        if self.stair_walls is not None:result['stair_walls']=self.stair_walls.snapshot()
+        if self.front_descent is not None:result['front_descent']=self.front_descent.snapshot()
+        if self.hind_ascent is not None:result['hind_ascent']=self.hind_ascent.snapshot()
+        if self.recovery is not None and self.recovery.hold is not None:
+            result['stair_stop'] = self.recovery.hold.snapshot()
         return result
 
     def restore(self, saved):
@@ -677,11 +863,31 @@ class AllTerrainCourse:
                                 and (value < 0).any())):
                         raise ValueError('Invalid all-terrain motion snapshot '+name+'/'+key)
                     motion_checked[name][key] = value.to(self.env.device)
+        stair_wall_counts = self.stair_walls.checked_snapshot(saved['stair_walls']) if self.stair_walls is not None else None
+        front_counts = self.front_descent.checked_snapshot(saved['front_descent']) if self.front_descent is not None else None
+        hind_counts = self.hind_ascent.checked_snapshot(saved['hind_ascent']) if self.hind_ascent is not None else None
+        stop_counts = (self.recovery.hold.checked_snapshot(saved['stair_stop'])
+                       if self.recovery is not None and self.recovery.hold is not None else None)
+        quality_counts = self.quality.checked_snapshot(saved['motion_quality']) if self.quality is not None else None
+        hold_saved = self.stair_hold.checked_snapshot(saved['stair_hold_practice']) if self.stair_hold is not None else None
+        wall_hold_saved = self.wall_hold.checked_snapshot(saved['wall_hold_practice']) if self.wall_hold is not None else None
         self.curriculum.load_state_dict(saved['curriculum'])
         self.rng.bit_generator.state = deepcopy(saved['rng'])
         for name,value in checked.items():getattr(self,name).copy_(value)
         for name,values in motion_checked.items():
             for key,value in values.items():getattr(self,name)[key].copy_(value)
+        if stair_wall_counts is not None:
+            for key,value in stair_wall_counts.items():self.stair_walls.counts[key].copy_(value)
+        if front_counts is not None:
+            for key,value in front_counts.items():self.front_descent.totals[key].copy_(value)
+        if hind_counts is not None:
+            for key,value in hind_counts.items():self.hind_ascent.totals[key].copy_(value)
+        if stop_counts is not None:
+            for key,value in stop_counts.items():self.recovery.hold.totals[key].copy_(value)
+        if quality_counts is not None:
+            for key,value in quality_counts.items():self.quality.totals[key].copy_(value)
+        if hold_saved is not None:self.stair_hold.restore(hold_saved)
+        if wall_hold_saved is not None:self.wall_hold.restore(wall_hold_saved)
         self.update_id = saved['update_id']
         # Physics histories are intentionally restarted. In-flight episodes are
         # not counted as successes or failures at a checkpoint boundary.

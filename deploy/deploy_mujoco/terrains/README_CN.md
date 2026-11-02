@@ -9,6 +9,8 @@
 | `flat.xml` | 无限平地 | 摩擦、出生位置、统计终点 |
 | `stairs_ascent.xml` | 上楼梯及顶部平台 | `step_height`、`tread_depth`、`step_count`、`platform_length` |
 | `stairs_ascent_open.xml` | 无踢面上楼梯，仅水平碰撞面 | 同上，另有低平台长度 `approach_length`、防坠底面 `floor_height` |
+| `stairs_ascent_walls.xml` | 小区安全通道式双墙直跑楼梯及顶部平台 | `open_risers`、`walls_enabled`、阶高/踏深/级数、墙高/墙厚/间距 |
+| `platform.xml` | 平地上的独立实心矩形平台 | `platform_height`、`platform_length`、`width`、`start_x` |
 | `stairs_descent.xml` | 高平台下楼梯 | 同上；出生位置须在高平台内部 |
 | `slope_up.xml` | 连续上坡及顶部平台 | `slope_deg`、`ramp_length`、`ramp_thickness`、`platform_length` |
 | `slope_down.xml` | 高平台连续下坡 | 同上；出生位置须在高平台内部 |
@@ -34,6 +36,76 @@
 `rough` 固定种子时可复现相同几何；修改种子生成另一组方块。方块之间有平地间隙，不模拟碎石移动。
 
 `mixed` 沿世界 +X 拼接全部地形段；路线终点随各段长度自动更新。`flat/custom` 则由 `goal_x` 指定统计终点。
+
+## 上楼梯：开放踏板与双侧墙独立切换
+
+三个上楼模板共用同一个生成器，都可以直接改 XML 中以下两项：
+
+```xml
+<numeric name="open_risers" data="0"/>
+<numeric name="walls_enabled" data="1"/>
+```
+
+| `open_risers` | `walls_enabled` | 生成结果 |
+| --- | --- | --- |
+| 0 | 0 | 普通实心楼梯，无墙 |
+| 1 | 0 | 开放踏板楼梯，无墙 |
+| 0 | 1 | 普通实心楼梯，左右实体墙 |
+| 1 | 1 | 开放踏板楼梯，左右实体墙 |
+
+`open` 指没有竖直踢面，不是“没有围墙”。`stairs_ascent_walls.xml` 默认是双墙实心楼梯，
+模拟安全通道中的一段直跑楼梯，包含起步走廊和顶部平台，不包含折返段或天花板。
+原 `stairs_ascent.xml` / `stairs_ascent_open.xml` 保留各自尺寸、摩擦和无墙默认值。
+它们是不同预设；若要仅对比开关效果，请在同一 XML 中切换，避免混入原预设的尺寸/摩擦差异。
+
+- `width`：踏面全宽；`wall_gap`：踏面每侧到墙内侧的净距。两墙内侧净宽 = `width + 2 * wall_gap`。
+- `wall_height`：每段墙高出相邻踏面的高度；`wall_thickness`：墙的完整厚度。墙不会侵占踏面宽度。
+- `approach_length`：首阶前的起步区长度；墙从此处连续延伸至顶部平台末端，出入口保持开放。
+- `step_height` / `tread_depth` / `step_count`：阶高、踏深、正整数级数；顶部高度自动联动。
+- `platform_length`：顶部平台长度。墙的长度和顶部高度随上述参数一起重算。
+- `floor_height`：仅开放踏板模式使用的下方防坠平面。实心模式使用 z=0 地面。
+
+墙是参与碰撞和扫描的真实 box，墙顶随台阶逐段升高。开放踏板本身仍只有水平碰撞面，
+新增墙体独立存在；没有用隐藏踢面替代 open 模式。
+开放模式出生点应位于起步区内；缩窄通道或更改出生点时为机器人和可选出生垫留足空间。
+窄版 `stairs_ascent.xml` 已通过 `spawn_mat_size` 显式配置适合其通道的出生垫，
+直接切换两个开关即可保留垫子。修改通道宽度、起步区长度、垫子位置或朝向后，
+仍须保证整个垫子处于同一平面内且不碰墙；命令行 `--spawn-mat-size` 会覆盖 XML 尺寸。
+
+在现有部署命令中替换地形选项，二选一：
+
+```bash
+--terrain-xml deploy/deploy_mujoco/terrains/stairs_ascent_walls.xml
+# 或
+--terrain ascent_walls
+```
+
+## 可调矩形平台
+
+`platform.xml` 生成从 z=0 地面升起的固定实心平台，默认在前方地面出生。
+修改以下 XML 参数后重启即可，不需要改 Python：
+
+| 参数 | 含义 |
+| --- | --- |
+| `platform_height` | 台面距离地面的高度 |
+| `platform_length` | 沿 X 的完整长度 |
+| `width` | 沿 Y 的完整宽度，横向中心为 y=0 |
+| `start_x` | 平台前缘的世界 X；后缘自动取前缘加长度 |
+| `spawn_xy` / `spawn_yaw_deg` | 机器人出生位置、朝向；竖直高度自动按实际支撑面计算 |
+| `friction` | 平台与地面的滑动、扭转、滚动摩擦 |
+
+高度、长度、宽度必须为正数，尺寸单位均为米，填写全尺寸而非半尺寸。
+平台前后都是竖直边缘，没有自动生成斜坡或楼梯。可将出生点改到台面内测试下台，
+但必须为整个机体留足边缘余量；沿 +X 的越线统计终点自动设在平台后缘。
+
+```bash
+--terrain-xml deploy/deploy_mujoco/terrains/platform.xml
+# 或
+--terrain platform
+```
+
+建议纯地形对比时加 `--no-spawn-mat`。这些参数化 XML 需要通过现有部署加载器生成场景，
+不能直接用通用 MuJoCo 查看器打开模板来查看生成结果。
 
 ## 围墙迷宫与敏感性对比
 
@@ -104,7 +176,8 @@ python deploy/deploy_mujoco/deploy_mujoco.py \
 出口平台高度和统计终点会随梯数、阶高及踏深自动重算。
 
 碰撞使用固定在 world 的原生二维 `flex`，每个踏面两个水平三角形，半径为零。
-起步和出口平台也只有水平面，不存在踢面、侧面、底面、斜撑或隐藏墙。
+起步和出口平台也只有水平面，不存在踢面、侧面、底面或斜撑；
+`walls_enabled=0` 时不生成墙，改成 1 时单独添加上节描述的两侧实体墙。
 下方独立防坠平面高度由 `floor_height` 指定；零厚度边缘仍可能发生正常边缘接触。
 采用的是 [MuJoCo 原生 flex](https://mujoco.readthedocs.io/en/3.10.0/XMLreference.html#deformable-flex)，
 本机 MuJoCo 3.10 已实测 rigid 二维 flex 可用零半径编译和承重；不自动回退为薄盒子。

@@ -35,7 +35,10 @@ def test_new_config_preserves_all_existing_v15_features(config):
         assert config['all_terrain'][key]['enabled']
     assert config['map_recovery']['enabled']
     old = deepcopy(config)
+    old['all_terrain'].pop('wall_hold_practice', None)
     old['all_terrain'].pop('wall_practice')
+    old['all_terrain'].pop('obstacle_response',None)
+    old['all_terrain'].pop('stair_walls',None)
     validate_config(old)
 
 
@@ -167,6 +170,12 @@ def test_zero_or_reversing_motion_cannot_complete_route(config,atlas):
 
 
 def test_actual_course_all_v15_features_reset_advance_and_failure(config,atlas,monkeypatch):
+    config=deepcopy(config)
+    config['all_terrain'].pop('stair_stop', None)
+    config['all_terrain'].pop('wall_hold_practice', None)
+    config['all_terrain'].pop('stair_hold_practice', None)
+    config['all_terrain'].pop('motion_quality', None)
+    config['all_terrain'].pop('objective_consistency',None)  # Pin the legacy course.
     import test_cts_all_terrain_course as helpers
     names=list(dict.fromkeys(g['body'] for g in collision_document(config['all_terrain']['wall_practice'])['primitives']))
     wheel_names=['fl_wheel','fr_wheel','hl_wheel','hr_wheel'];wi=[names.index(n) for n in wheel_names]

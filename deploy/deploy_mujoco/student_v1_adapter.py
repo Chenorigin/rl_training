@@ -91,13 +91,19 @@ class StudentMapAdapter:
         base = data.xpos[self.contract.base_id]
         rotation = data.xmat[self.contract.base_id].reshape(3, 3)
         yaw = math.atan2(rotation[1, 0], rotation[0, 0])
-        hits = (self.contract.capture_height_scan(data,self.capture_grid)
-                if self.cfg.map_capture_padding_m else self.contract.last_scan_hits)
+        normals = None
+        if self.cfg.support_surface_visibility:
+            hits, normals = self.contract.capture_height_scan(data, self.capture_grid, return_normals=True)
+            normals = torch.as_tensor(normals[None], dtype=torch.float32)
+        else:
+            hits = (self.contract.capture_height_scan(data,self.capture_grid)
+                    if self.cfg.map_capture_padding_m else self.contract.last_scan_hits)
         obs = self.map.observe(torch.as_tensor(clean[None, :57], dtype=torch.float32),
                                 torch.as_tensor(hits[None], dtype=torch.float32),
                                 torch.as_tensor(base[None], dtype=torch.float32),
                                 torch.tensor([yaw], dtype=torch.float32),
-                                torch.as_tensor(rotation[None], dtype=torch.float32), step)
+                                torch.as_tensor(rotation[None], dtype=torch.float32), step,
+                                surface_normals=normals)
         self.last_channels = tuple(value[0].numpy().copy() for value in self.map.last_channels)
         self.last_visibility = self.map.last_visibility[0].numpy().copy()
         self.last_blackout = step < int(self.map.blackout_until[0])
@@ -122,4 +128,5 @@ class StudentMapAdapter:
                 "command_feedback": self.extras.command_feedback,
                 "confidence_pose_covariance_included": True,
                 "parameters_calibrated_on_hardware": False,
-                "map_model": "shared training 2.5D FOV/terrain visibility + fixed acquisition packets + per-cell history/age; no beam scan, reflectivity, overhangs or robot self-shadow"}
+                "support_surface_visibility": self.cfg.support_surface_visibility,
+                "map_model": "shared 2.5D FOV/terrain visibility with optional mesh-normal front-face gate; fixed packets/history; no wall-point fitting, beam scan, overhangs or robot self-shadow"}

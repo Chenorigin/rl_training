@@ -157,7 +157,9 @@ class SensorTests(unittest.TestCase):
         self.assertTrue(torch.allclose(variance, pose_height_variance(z+7, valid, grid, torch.full((2,), .03), torch.full((2,), .02), torch.zeros(2)), atol=1e-6, rtol=1e-5))
         score = confidence_from_quality(valid, variance, torch.zeros_like(z), clean_cfg())
         self.assertLess(score[1].min().item(), score[0].min().item())
-        invalid = confidence_from_quality(torch.ones(3), torch.tensor([0., torch.nan, .01]), torch.tensor([1., 0., 0.]), clean_cfg())
+        # Test an expired sample, not the still-valid inclusive TTL boundary.
+        invalid = confidence_from_quality(torch.ones(3), torch.tensor([0., torch.nan, .01]),
+                                          torch.tensor([clean_cfg().max_map_age_s+.02, 0., 0.]), clean_cfg())
         self.assertEqual(invalid[0].item(), 0.)
         self.assertEqual(invalid[1].item(), 0.)
 

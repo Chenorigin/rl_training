@@ -21,6 +21,8 @@ from task_support.cts.all_terrain_curriculum import CURRENT, CHALLENGE
 @pytest.fixture(scope='module')
 def source():
     settings = json.loads((Path(__file__).resolve().parents[1]/'configs/distillation/cts.json').read_text())
+    for key in ('wall_hold_practice','stair_hold_practice','safety_learning','stair_recovery','motion_quality','stair_stop','obstacle_response','stair_walls','hind_ascent','wall_stability','clutter_consistency','front_descent','objective_consistency'):
+        settings['all_terrain'].pop(key,None)
     settings['all_terrain'].pop('compound_commands', None)
     settings['all_terrain'].pop('wall_practice', None)
     settings['all_terrain']['fractions'] = [.28,.28,.14,.10,.03,.03,.02,.02,.05,.05]

@@ -59,17 +59,25 @@ def last_issued_action(env):
 
 
 def capture_hits(env):
-    name = 'height_scanner_capture' if env.cfg.student_perception.map_capture_padding_m else 'height_scanner'
+    name = 'height_scanner_capture' if (env.cfg.student_perception.map_capture_padding_m
+        or env.cfg.student_perception.support_surface_visibility) else 'height_scanner'
     return env.scene.sensors[name].data.ray_hits_w
+
+
+def capture_normals(env):
+    return (env.scene.sensors['height_scanner_capture'].data.ray_normals_w
+            if env.cfg.student_perception.support_surface_visibility else None)
 
 
 def student_observation(env):
     robot = env.scene["robot"]
     rotation = quaternion_rotation(robot.data.root_quat_w)
     yaw = torch.atan2(rotation[:, 1, 0], rotation[:, 0, 0])
+    normals = capture_normals(env)
     return sensor_state(env).observe(clean_teacher_proprio(env),
                                      capture_hits(env),
-                                     robot.data.root_pos_w, yaw, rotation, int(env.common_step_counter))
+                                     robot.data.root_pos_w, yaw, rotation, int(env.common_step_counter),
+                                     surface_normals=normals)
 
 
 def reset_student(env, env_ids):

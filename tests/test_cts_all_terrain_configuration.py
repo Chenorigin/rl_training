@@ -148,7 +148,7 @@ def test_preflight_counts_collision_stack_outside_baseline_and_reports_exact_byt
     namespace = dict(all_terrain=all_terrain, n=0, rollout=0, model_reserve=0,
                      mesh_bytes=0, auxiliary_budget={'auxiliary_reserve_bytes': 0},
                      capture_budget={'extra_capture_reserve_bytes': 0},
-                     straight_target_bytes=0, course_tag_bytes=0, recovery_bytes=0)
+                     straight_target_bytes=0, course_tag_bytes=0, recovery_bytes=0, surface_bytes=0)
     exec(compile(ast.fix_missing_locations(module), str(path), 'exec'), namespace)
     expected = 0 if stack_mib is None else stack_mib * 1024**2
     assert namespace['report'] == dict(planned_increment_bytes=8 * 1024**3 + expected,

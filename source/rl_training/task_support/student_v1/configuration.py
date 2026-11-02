@@ -24,6 +24,8 @@ class StudentV1PerceptionCfg:
     vertical_fov_min_deg: float = -90.0
     vertical_fov_max_deg: float = 90.0
     terrain_visibility: bool = True
+    # Versioned simulator sensing; archived checkpoints keep their old behavior.
+    support_surface_visibility: bool = False
     visibility_samples: int = 16
     visibility_tolerance_m: float = 0.015
     # Zero preserves archived acquisition geometry and seeded sensor behavior.
@@ -77,6 +79,8 @@ class StudentV1PerceptionCfg:
             raise ValueError("zero_delay_probability must be numeric")
         if not isinstance(self.front_only, bool):
             raise ValueError("front_only must be a boolean")
+        if type(self.support_surface_visibility) is not bool:
+            raise ValueError('support_surface_visibility must be a boolean')
         if type(self.continuous_delay) is not bool:
             raise ValueError('continuous_delay must be a boolean')
         for name in ('min_delay_s', 'max_delay_s'):
